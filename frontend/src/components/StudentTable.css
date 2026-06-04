@@ -1,6 +1,11 @@
+.student-table-wrapper {
+    overflow-x: auto;
+}
+
 .student-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.9rem;
 }
 
 .student-table th {
@@ -9,12 +14,126 @@
     text-align: left;
     background-color: #2a2a2a;
     color: #e0e0e0;
+    white-space: nowrap;
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable-header:hover {
+    background-color: #3a3a3a;
 }
 
 .student-table tbody tr {
     border-bottom: 1px solid #444;
 }
 
+.student-table tbody tr:hover {
+    background-color: #333;
+}
+
 .student-table td {
     padding: 8px 12px;
+    white-space: nowrap;
+}
+
+.empty-row {
+    text-align: center;
+    color: #999;
+    padding: 24px 12px;
+}
+
+.action-cell {
+    display: flex;
+    gap: 6px;
+}
+
+.edit-input {
+    width: 100%;
+    min-width: 60px;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    border: 1px solid #666;
+    border-radius: 3px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-save,
+.btn-cancel {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.btn-edit {
+    background-color: #4a90d9;
+}
+
+.btn-edit:hover {
+    background-color: #357abd;
+}
+
+.btn-delete {
+    background-color: #d94a4a;
+}
+
+.btn-delete:hover {
+    background-color: #bd3535;
+}
+
+.btn-save {
+    background-color: #4a9d5a;
+}
+
+.btn-save:hover {
+    background-color: #3b8548;
+}
+
+.btn-cancel {
+    background-color: #888;
+}
+
+.btn-cancel:hover {
+    background-color: #666;
+}
+
+/* Toolbar */
+.table-toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-input {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    min-width: 220px;
+}
+
+.btn-add {
+    padding: 6px 16px;
+    background-color: #4a9d5a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-add:hover {
+    background-color: #3b8548;
 }
