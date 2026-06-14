@@ -1,3 +1,8 @@
+.gesamtuebersicht-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 .gesamtuebersicht-page h2 {
     margin-bottom: 16px;
 }

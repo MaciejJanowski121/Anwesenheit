@@ -1,17 +1,26 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './components/MainLayout';
+import HomePage from './pages/HomePage';
 import GesamtuebersichtPage from './pages/GesamtuebersichtPage';
+import KursePage from './pages/KursePage';
+import AnwesenheitPage from './pages/AnwesenheitPage';
+import ImportPage from './pages/ImportPage';
 import './App.css';
 
 function App() {
     return (
-        <div className="app">
-            <header className="app-header">
-                <h1>Anwesenheitsliste</h1>
-            </header>
-            <main>
-                <GesamtuebersichtPage />
-            </main>
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route element={<MainLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/gesamtuebersicht" element={<GesamtuebersichtPage />} />
+                    <Route path="/kurse" element={<KursePage />} />
+                    <Route path="/anwesenheit" element={<AnwesenheitPage />} />
+                    <Route path="/import" element={<ImportPage />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
     );
 }
 

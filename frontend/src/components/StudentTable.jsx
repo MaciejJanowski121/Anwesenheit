@@ -68,7 +68,7 @@ function StudentTable({
     };
 
     return (
-        <div className="student-table-wrapper">
+        <div className="table-container">
             <table className="student-table">
                 <thead>
                     <tr>

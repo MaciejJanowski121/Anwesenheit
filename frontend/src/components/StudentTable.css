@@ -1,9 +1,12 @@
-.student-table-wrapper {
+.table-container {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
 }
 
 .student-table {
-    width: 100%;
+    width: max-content;
+    min-width: 1200px;
     border-collapse: collapse;
     font-size: 0.9rem;
 }
@@ -74,11 +77,11 @@
 }
 
 .btn-edit {
-    background-color: #4a90d9;
+    background-color: #e8792b;
 }
 
 .btn-edit:hover {
-    background-color: #357abd;
+    background-color: #d06820;
 }
 
 .btn-delete {
@@ -90,11 +93,11 @@
 }
 
 .btn-save {
-    background-color: #4a9d5a;
+    background-color: #5a9e3e;
 }
 
 .btn-save:hover {
-    background-color: #3b8548;
+    background-color: #4a8a30;
 }
 
 .btn-cancel {
@@ -126,7 +129,7 @@
 
 .btn-add {
     padding: 6px 16px;
-    background-color: #4a9d5a;
+    background-color: #5a9e3e;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -135,5 +138,5 @@
 }
 
 .btn-add:hover {
-    background-color: #3b8548;
+    background-color: #4a8a30;
 }

@@ -1,0 +1,142 @@
+.home-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.welcome-section {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.welcome-section h2 {
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-size: 1.8rem;
+}
+
+.welcome-date {
+    color: #e8792b;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.welcome-section p {
+    color: #b8b8b8;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 18px;
+    margin-bottom: 34px;
+}
+
+.stat-card {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 22px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.stat-card:hover {
+    border-color: #e8792b;
+    transform: translateY(-2px);
+    transition: 0.2s ease;
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(232, 121, 43, 0.15);
+    color: #e8792b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #b8b8b8;
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.dashboard-panel {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.dashboard-panel h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quick-action-btn {
+    background: #333333;
+    border: 1px solid #555;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 14px;
+    border-radius: 8px;
+    transition: 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    border-color: #6fbf4a;
+    background: rgba(111, 191, 74, 0.12);
+}
+
+.placeholder-text {
+    color: #b8b8b8;
+}
+
+@media (max-width: 900px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+}

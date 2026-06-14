@@ -1,32 +1,33 @@
 package com.example.anwesenheit.model;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Kurs {
-
-    @OneToMany(mappedBy = "kurs")
-    private List<Buchung> buchungen;
+public class Buchung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String buchungsstatus;
 
-    private String wochentag;
+    private String abholzeit;
 
-    private String uhrzeit;
+    private String bemerkung;
 
-    private String beschreibung;
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "kurs_id")
+    private Kurs kurs;
 }
