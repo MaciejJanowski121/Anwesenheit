@@ -67,13 +67,32 @@
 .btn-edit,
 .btn-delete,
 .btn-save,
-.btn-cancel {
+.btn-cancel,
+.btn-details {
+
     padding: 4px 10px;
+
     border: none;
+
     border-radius: 4px;
+
     cursor: pointer;
+
     font-size: 0.8rem;
+
     color: #fff;
+
+}
+
+
+.btn-details {
+    display: inline-block;
+    background-color: #3a3a3a;
+    text-decoration: none;
+}
+
+.btn-details:hover {
+    background-color: #4a4a4a;
 }
 
 .btn-edit {

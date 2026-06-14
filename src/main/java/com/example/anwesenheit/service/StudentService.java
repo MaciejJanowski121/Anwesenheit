@@ -34,8 +34,6 @@ public class StudentService {
 
         student.setKlasse(updatedStudent.getKlasse());
 
-        student.setKlassenkuerzel(updatedStudent.getKlassenkuerzel());
-
         student.setEmail1(updatedStudent.getEmail1());
 
         student.setEmail2(updatedStudent.getEmail2());

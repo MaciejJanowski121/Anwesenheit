@@ -1,11 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './StudentTable.css';
 
 const columns = [
     { key: 'name', label: 'Name' },
     { key: 'jahrgang', label: 'Jahrgang' },
     { key: 'klasse', label: 'Klasse' },
-    { key: 'klassenkuerzel', label: 'Klassenkürzel' },
     { key: 'mittagessen', label: 'Mittagessen' },
     { key: 'gehtUm1530', label: 'Geht um 15:30 Uhr' },
     { key: 'rueckmeldung', label: 'Rückmeldung' },
@@ -15,18 +15,19 @@ const columns = [
 ];
 
 function StudentTable({
-    students,
-    sortKey,
-    sortDirection,
-    onSort,
-    editingId,
-    editData,
-    onEditStart,
-    onEditChange,
-    onEditSave,
-    onEditCancel,
-    onDelete,
-}) {
+                          students,
+                          sortKey,
+                          sortDirection,
+                          onSort,
+                          editingId,
+                          editData,
+                          onEditStart,
+                          onEditChange,
+                          onEditSave,
+                          onEditCancel,
+                          onDelete,
+                      }) {
+
     const renderSortIndicator = (key) => {
         if (sortKey !== key) return null;
         return sortDirection === 'asc' ? ' ▲' : ' ▼';
@@ -41,10 +42,13 @@ function StudentTable({
                     <input
                         type="checkbox"
                         checked={!!editData[col.key]}
-                        onChange={(e) => onEditChange(col.key, e.target.checked)}
+                        onChange={(e) =>
+                            onEditChange(col.key, e.target.checked)
+                        }
                     />
                 );
             }
+
             return student[col.key] ? 'Ja' : 'Nein';
         }
 
@@ -57,7 +61,9 @@ function StudentTable({
                     onChange={(e) =>
                         onEditChange(
                             col.key,
-                            col.key === 'jahrgang' ? Number(e.target.value) : e.target.value
+                            col.key === 'jahrgang'
+                                ? Number(e.target.value)
+                                : e.target.value
                         )
                     }
                 />
@@ -70,63 +76,99 @@ function StudentTable({
     return (
         <div className="table-container">
             <table className="student-table">
+
                 <thead>
-                    <tr>
-                        {columns.map((col) => (
-                            <th
-                                key={col.key}
-                                className="sortable-header"
-                                onClick={() => onSort(col.key)}
-                            >
-                                {col.label}{renderSortIndicator(col.key)}
-                            </th>
-                        ))}
-                        <th>Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.length === 0 && (
-                        <tr>
-                            <td colSpan={columns.length + 1} className="empty-row">
-                                Keine Einträge gefunden.
-                            </td>
-                        </tr>
-                    )}
-                    {students.map((student, index) => (
-                        <tr key={student.id ?? index}>
-                            {columns.map((col) => (
-                                <td key={col.key}>{renderCell(student, col)}</td>
-                            ))}
-                            <td className="action-cell">
-                                {editingId === student.id ? (
-                                    <>
-                                        <button className="btn-save" onClick={onEditSave}>
-                                            Speichern
-                                        </button>
-                                        <button className="btn-cancel" onClick={onEditCancel}>
-                                            Abbrechen
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => onEditStart(student)}
-                                        >
-                                            Bearbeiten
-                                        </button>
-                                        <button
-                                            className="btn-delete"
-                                            onClick={() => onDelete(student.id)}
-                                        >
-                                            Löschen
-                                        </button>
-                                    </>
-                                )}
-                            </td>
-                        </tr>
+                <tr>
+                    {columns.map((col) => (
+                        <th
+                            key={col.key}
+                            className="sortable-header"
+                            onClick={() => onSort(col.key)}
+                        >
+                            {col.label}
+                            {renderSortIndicator(col.key)}
+                        </th>
                     ))}
+
+                    <th>Aktionen</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                {students.length === 0 && (
+                    <tr>
+                        <td
+                            colSpan={columns.length + 1}
+                            className="empty-row"
+                        >
+                            Keine Einträge gefunden.
+                        </td>
+                    </tr>
+                )}
+
+                {students.map((student, index) => (
+                    <tr key={student.id ?? index}>
+
+                        {columns.map((col) => (
+                            <td key={col.key}>
+                                {renderCell(student, col)}
+                            </td>
+                        ))}
+
+                        <td className="action-cell">
+
+                            {editingId === student.id ? (
+                                <>
+                                    <button
+                                        className="btn-save"
+                                        onClick={onEditSave}
+                                    >
+                                        Speichern
+                                    </button>
+
+                                    <button
+                                        className="btn-cancel"
+                                        onClick={onEditCancel}
+                                    >
+                                        Abbrechen
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        to={`/students/${student.id}`}
+                                        className="btn-details"
+                                    >
+                                        Details
+                                    </Link>
+
+                                    <button
+                                        className="btn-edit"
+                                        onClick={() =>
+                                            onEditStart(student)
+                                        }
+                                    >
+                                        Bearbeiten
+                                    </button>
+
+                                    <button
+                                        className="btn-delete"
+                                        onClick={() =>
+                                            onDelete(student.id)
+                                        }
+                                    >
+                                        Löschen
+                                    </button>
+                                </>
+                            )}
+
+                        </td>
+                    </tr>
+                ))}
+
                 </tbody>
+
             </table>
         </div>
     );

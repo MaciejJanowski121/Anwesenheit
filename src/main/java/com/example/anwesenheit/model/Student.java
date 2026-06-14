@@ -29,8 +29,6 @@ public class Student {
 
     private String klasse;
 
-    private String klassenkuerzel;
-
     private String email1;
 
     private String email2;

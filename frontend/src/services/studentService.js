@@ -20,3 +20,8 @@ export const updateStudent = async (id, student) => {
 export const deleteStudent = async (id) => {
     await axios.delete(`${API_BASE_URL}/students/${id}`);
 };
+
+export const getStudentById = async (id) => {
+    const response = await axios.get(`${API_BASE_URL}/students/${id}`);
+    return response.data;
+};

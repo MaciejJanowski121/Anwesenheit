@@ -46,7 +46,7 @@ public class ExcelImportService {
                 student.setGehtUm1530(getBooleanValue(row.getCell(4), evaluator, formatter));
                 student.setRueckmeldung(getStringValue(row.getCell(5), evaluator, formatter));
 
-                student.setKlassenkuerzel(null);
+
 
                 student.setAnaBuchung(getStringValue(row.getCell(17), evaluator, formatter));
                 student.setMittagessen(getBooleanValue(row.getCell(18), evaluator, formatter));

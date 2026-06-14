@@ -1,0 +1,14 @@
+.student-details-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.details-message {
+    color: #ffffff;
+    padding: 32px;
+}
+
+.details-message.error {
+    color: #ff6b6b;
+}

@@ -1,82 +1,112 @@
 .student-detail-view {
-    max-width: 800px;
+    max-width: 1100px;
 }
 
 .back-button {
-    padding: 6px 16px;
-    background-color: #555;
-    color: #e0e0e0;
+    padding: 10px 18px;
+    background-color: #444;
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    transition: 0.2s ease;
 }
 
 .back-button:hover {
-    background-color: #666;
+    background-color: #555;
 }
 
-.student-detail-view h3 {
-    margin-bottom: 20px;
-    font-size: 1.4rem;
+.detail-header {
+    margin-bottom: 30px;
+}
+
+.detail-header h2 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 2rem;
+}
+
+.detail-header p {
+    margin-top: 8px;
+    color: #999;
 }
 
 .detail-section {
-    margin-bottom: 24px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
 }
 
-.detail-section h4 {
-    margin-bottom: 10px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #555;
-    color: #ccc;
-    font-size: 1rem;
+.detail-section h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    color: #ffffff;
+    font-size: 1.1rem;
 }
 
 .detail-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px 24px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
 }
 
 .detail-item {
-    display: flex;
-    flex-direction: column;
-    padding: 4px 0;
+    background: #333333;
+    border-radius: 8px;
+    padding: 12px;
 }
 
 .detail-label {
+    display: block;
     font-size: 0.8rem;
     color: #999;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
 
 .detail-value {
+    color: #ffffff;
+    font-weight: 500;
     font-size: 0.95rem;
 }
 
 .detail-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
+    margin-top: 10px;
 }
 
 .detail-table th {
     text-align: left;
-    padding: 6px 12px;
+    padding: 12px;
+    background-color: #333333;
+    color: #ffffff;
     border-bottom: 2px solid #555;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
 }
 
 .detail-table td {
-    padding: 6px 12px;
+    padding: 12px;
     border-bottom: 1px solid #444;
 }
 
-.detail-remarks {
-    font-size: 0.95rem;
-    color: #ccc;
-    margin: 0;
+.detail-table tr:hover {
+    background-color: rgba(232, 121, 43, 0.08);
+}
+
+.empty-text {
+    color: #999;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-table {
+        display: block;
+        overflow-x: auto;
+    }
 }
