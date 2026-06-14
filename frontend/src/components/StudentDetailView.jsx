@@ -1,7 +1,7 @@
 import React from 'react';
 import './StudentDetailView.css';
 
-function StudentDetailView({ student, onClose }) {
+function StudentDetailView({ student, buchungen, onClose }) {
     return (
         <div className="student-detail-view">
             <button className="back-button" onClick={onClose}>
@@ -27,7 +27,6 @@ function StudentDetailView({ student, onClose }) {
                         <span className="detail-value">{student.klasse || '–'}</span>
                     </div>
 
-
                     <div className="detail-item">
                         <span className="detail-label">Rückmeldung</span>
                         <span className="detail-value">{student.rueckmeldung || '–'}</span>
@@ -40,7 +39,9 @@ function StudentDetailView({ student, onClose }) {
 
                     <div className="detail-item">
                         <span className="detail-label">Geht um 15:30 Uhr</span>
-                        <span className="detail-value">{student.gehtUm1530 ? 'Ja' : 'Nein'}</span>
+                        <span className="detail-value">
+                            {student.gehtUm1530 ? 'Ja' : 'Nein'}
+                        </span>
                     </div>
                 </div>
             </section>
@@ -51,7 +52,9 @@ function StudentDetailView({ student, onClose }) {
                 <div className="detail-grid">
                     <div className="detail-item">
                         <span className="detail-label">Mittagessen</span>
-                        <span className="detail-value">{student.mittagessen ? 'Ja' : 'Nein'}</span>
+                        <span className="detail-value">
+                            {student.mittagessen ? 'Ja' : 'Nein'}
+                        </span>
                     </div>
                 </div>
             </section>
@@ -62,12 +65,16 @@ function StudentDetailView({ student, onClose }) {
                 <div className="detail-grid">
                     <div className="detail-item">
                         <span className="detail-label">Email 1</span>
-                        <span className="detail-value">{student.email1 || '–'}</span>
+                        <span className="detail-value">
+                            {student.email1 || '–'}
+                        </span>
                     </div>
 
                     <div className="detail-item">
                         <span className="detail-label">Email 2</span>
-                        <span className="detail-value">{student.email2 || '–'}</span>
+                        <span className="detail-value">
+                            {student.email2 || '–'}
+                        </span>
                     </div>
                 </div>
             </section>
@@ -75,24 +82,24 @@ function StudentDetailView({ student, onClose }) {
             <section className="detail-section">
                 <h3>Kursbuchungen</h3>
 
-                {student.buchungen && student.buchungen.length > 0 ? (
+                {buchungen && buchungen.length > 0 ? (
                     <table className="detail-table">
                         <thead>
                         <tr>
                             <th>Kurs</th>
                             <th>Wochentag</th>
                             <th>Uhrzeit</th>
-                            <th>Status</th>
+                            <th>Beschreibung</th>
                         </tr>
                         </thead>
 
                         <tbody>
-                        {student.buchungen.map((buchung) => (
+                        {buchungen.map((buchung) => (
                             <tr key={buchung.id}>
                                 <td>{buchung.kurs?.name || '–'}</td>
                                 <td>{buchung.kurs?.wochentag || '–'}</td>
                                 <td>{buchung.kurs?.uhrzeit || '–'}</td>
-                                <td>{buchung.buchungsstatus || '–'}</td>
+                                <td>{buchung.kurs?.beschreibung || '–'}</td>
                             </tr>
                         ))}
                         </tbody>

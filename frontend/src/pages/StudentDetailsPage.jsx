@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import StudentDetailView from '../components/StudentDetailView';
 import { getStudentById } from '../services/studentService';
+import { getBuchungenByStudent } from '../services/buchungService';
 import './StudentDetailsPage.css';
 
 function StudentDetailsPage() {
@@ -9,13 +10,20 @@ function StudentDetailsPage() {
     const navigate = useNavigate();
 
     const [student, setStudent] = useState(null);
+    const [buchungen, setBuchungen] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        getStudentById(id)
-            .then((data) => {
-                setStudent(data);
+        setLoading(true);
+
+        Promise.all([
+            getStudentById(id),
+            getBuchungenByStudent(id)
+        ])
+            .then(([studentData, buchungenData]) => {
+                setStudent(studentData);
+                setBuchungen(buchungenData);
                 setError('');
             })
             .catch((error) => {
@@ -37,6 +45,7 @@ function StudentDetailsPage() {
         <div className="student-details-page">
             <StudentDetailView
                 student={student}
+                buchungen={buchungen}
                 onClose={() => navigate('/gesamtuebersicht')}
             />
         </div>

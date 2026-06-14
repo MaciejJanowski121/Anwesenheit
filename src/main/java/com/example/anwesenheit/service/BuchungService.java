@@ -37,7 +37,7 @@ public class BuchungService {
         Buchung buchung = new Buchung();
         buchung.setStudent(student);
         buchung.setKurs(kurs);
-        buchung.setBuchungsstatus("Aktiv");
+
 
         return buchungRepository.save(buchung);
     }
