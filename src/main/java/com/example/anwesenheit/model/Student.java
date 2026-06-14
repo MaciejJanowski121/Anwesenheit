@@ -1,4 +1,5 @@
 package com.example.anwesenheit.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 public class Student {
 
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     private List<Buchung> buchungen;
 
