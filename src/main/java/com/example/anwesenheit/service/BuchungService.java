@@ -46,6 +46,10 @@ public class BuchungService {
         return buchungRepository.findByStudentId(studentId);
     }
 
+    public List<Buchung> getBuchungenByKursId(Long kursId) {
+        return buchungRepository.findByKursId(kursId);
+    }
+
     public void deleteBuchung(Long id) {
         buchungRepository.deleteById(id);
     }

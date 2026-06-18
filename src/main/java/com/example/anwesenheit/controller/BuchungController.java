@@ -31,6 +31,13 @@ public class BuchungController {
         return buchungService.getBuchungenByStudentId(studentId);
     }
 
+    @GetMapping("/kurs/{kursId}")
+    public List<Buchung> getBuchungenByKursId(
+            @PathVariable Long kursId
+    ) {
+        return buchungService.getBuchungenByKursId(kursId);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteBuchung(
             @PathVariable Long id

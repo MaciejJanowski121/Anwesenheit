@@ -1,165 +1,163 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStudents } from '../services/studentService';
+import { getKurse } from '../services/kursService';
+import { getAllAnwesenheiten } from '../services/anwesenheitService';
 import './HomePage.css';
 
 function HomePage() {
-
     const [stats, setStats] = useState({
-        total: 0,
-        klassen: 0,
-        mittagessen: 0,
-        gehtUm1530: 0
+        studentsTotal: 0,
+        klassenTotal: 0,
+        kurseTotal: 0,
+        anwesenheitenToday: 0,
+        fehltToday: 0
     });
 
     const [loading, setLoading] = useState(true);
 
+    const todayIso = new Date().toISOString().split('T')[0];
+
     useEffect(() => {
-
-        getStudents()
-            .then((data) => {
-
+        Promise.all([
+            getStudents(),
+            getKurse(),
+            getAllAnwesenheiten()
+        ])
+            .then(([students, kurse, anwesenheiten]) => {
                 const klassen = new Set(
-                    data.map(student => student.klasse).filter(Boolean)
+                    students.map((student) => student.klasse).filter(Boolean)
+                );
+
+                const todayAnwesenheiten = anwesenheiten.filter(
+                    (a) => a.datum === todayIso
                 );
 
                 setStats({
-                    total: data.length,
-                    klassen: klassen.size,
-                    mittagessen: data.filter(student => student.mittagessen).length,
-                    gehtUm1530: data.filter(student => student.gehtUm1530).length
+                    studentsTotal: students.length,
+                    klassenTotal: klassen.size,
+                    kurseTotal: kurse.length,
+                    anwesenheitenToday: todayAnwesenheiten.length,
+                    fehltToday: todayAnwesenheiten.filter((a) => a.status === 'FEHLT').length
                 });
-
             })
             .catch((error) => {
-                console.error("Fehler beim Laden der Statistik:", error);
+                console.error('Fehler beim Laden der Dashboard-Daten:', error);
             })
             .finally(() => {
                 setLoading(false);
             });
+    }, [todayIso]);
 
-    }, []);
-
-    const today = new Date().toLocaleDateString("de-DE", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
+    const today = new Date().toLocaleDateString('de-DE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
 
     return (
         <div className="home-page">
-
-            <div className="welcome-section">
+            <section className="welcome-section">
                 <h2>Willkommen zur Anwesenheitsverwaltung</h2>
                 <p className="welcome-date">{today}</p>
                 <p>
-                    Verwaltung von Schülern, Kursen und Anwesenheiten
-                    an einem zentralen Ort.
+                    Übersicht über Schülerdaten, Kursbuchungen und Anwesenheiten
+                    der Montessori Schule Augsburg.
                 </p>
-            </div>
+            </section>
 
-            <div className="dashboard-stats">
-
+            <section className="dashboard-stats">
                 <div className="stat-card">
                     <span className="stat-icon">S</span>
-
                     <div className="stat-info">
                         <span className="stat-value">
-                            {loading ? "..." : stats.total}
+                            {loading ? '...' : stats.studentsTotal}
                         </span>
-
-                        <span className="stat-label">
-                            Schüler gesamt
-                        </span>
+                        <span className="stat-label">Schüler gesamt</span>
                     </div>
                 </div>
 
                 <div className="stat-card">
                     <span className="stat-icon">K</span>
-
                     <div className="stat-info">
                         <span className="stat-value">
-                            {loading ? "..." : stats.klassen}
+                            {loading ? '...' : stats.klassenTotal}
                         </span>
-
-                        <span className="stat-label">
-                            Klassen
-                        </span>
+                        <span className="stat-label">Klassen</span>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <span className="stat-icon">M</span>
-
+                    <span className="stat-icon">C</span>
                     <div className="stat-info">
                         <span className="stat-value">
-                            {loading ? "..." : stats.mittagessen}
+                            {loading ? '...' : stats.kurseTotal}
                         </span>
-
-                        <span className="stat-label">
-                            Mittagessen
-                        </span>
+                        <span className="stat-label">Kurse</span>
                     </div>
                 </div>
 
                 <div className="stat-card">
-                    <span className="stat-icon">15</span>
-
+                    <span className="stat-icon">A</span>
                     <div className="stat-info">
                         <span className="stat-value">
-                            {loading ? "..." : stats.gehtUm1530}
+                            {loading ? '...' : stats.anwesenheitenToday}
                         </span>
-
-                        <span className="stat-label">
-                            Gehen um 15:30
-                        </span>
+                        <span className="stat-label">Anwesenheiten heute</span>
                     </div>
                 </div>
 
-            </div>
+                <div className="stat-card">
+                    <span className="stat-icon">F</span>
+                    <div className="stat-info">
+                        <span className="stat-value">
+                            {loading ? '...' : stats.fehltToday}
+                        </span>
+                        <span className="stat-label">Fehlend heute</span>
+                    </div>
+                </div>
+            </section>
 
-            <div className="dashboard-sections">
-
+            <section className="dashboard-sections">
                 <div className="dashboard-panel">
                     <h3>Schnellzugriffe</h3>
 
                     <div className="quick-actions">
-
-                        <Link
-                            to="/import"
-                            className="quick-action-btn"
-                        >
-                            Excel importieren
-                        </Link>
-
-                        <Link
-                            to="/gesamtuebersicht"
-                            className="quick-action-btn"
-                        >
-                            Neuen Schüler anlegen
-                        </Link>
-
-                        <Link
-                            to="/anwesenheit"
-                            className="quick-action-btn"
-                        >
+                        <Link to="/anwesenheit" className="quick-action-btn">
                             Anwesenheit erfassen
                         </Link>
 
+                        <Link to="/gesamtuebersicht" className="quick-action-btn">
+                            Schüler verwalten
+                        </Link>
+
+                        <Link to="/kurse" className="quick-action-btn">
+                            Kurse verwalten
+                        </Link>
+
+                        <Link to="/import" className="quick-action-btn">
+                            Excel importieren
+                        </Link>
                     </div>
                 </div>
 
                 <div className="dashboard-panel">
-                    <h3>Letzte Aktivitäten</h3>
+                    <h3>Heute</h3>
 
-                    <p className="placeholder-text">
-                        Noch keine Aktivitäten erfasst.
-                    </p>
+                    <div className="dashboard-summary">
+                        <p>
+                            <strong>{loading ? '...' : stats.anwesenheitenToday}</strong>
+                            {' '}Anwesenheitseinträge wurden heute gespeichert.
+                        </p>
+
+                        <p>
+                            <strong>{loading ? '...' : stats.fehltToday}</strong>
+                            {' '}Schüler wurden heute als fehlend markiert.
+                        </p>
+                    </div>
                 </div>
-
-            </div>
-
+            </section>
         </div>
     );
 }

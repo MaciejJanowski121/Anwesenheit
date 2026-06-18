@@ -25,4 +25,8 @@ public class Anwesenheit {
     @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "kurs_id")
+    private Kurs kurs;
 }

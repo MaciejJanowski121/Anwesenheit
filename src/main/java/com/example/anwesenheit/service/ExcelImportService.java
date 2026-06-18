@@ -1,31 +1,54 @@
 package com.example.anwesenheit.service;
 
+import com.example.anwesenheit.model.Buchung;
+import com.example.anwesenheit.model.Kurs;
 import com.example.anwesenheit.model.Student;
+import com.example.anwesenheit.repository.BuchungRepository;
+import com.example.anwesenheit.repository.KursRepository;
 import com.example.anwesenheit.repository.StudentRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class ExcelImportService {
 
-    private final StudentRepository studentRepository;
+    private static final int FIRST_DATA_ROW_INDEX = 6;
+    private static final int FIRST_KURS_COLUMN = 19;
+    private static final int LAST_KURS_COLUMN = 95;
+    private static final int KURS_HEADER_ROW = 5;
 
-    public ExcelImportService(StudentRepository studentRepository) {
+    private final StudentRepository studentRepository;
+    private final KursRepository kursRepository;
+    private final BuchungRepository buchungRepository;
+
+    public ExcelImportService(
+            StudentRepository studentRepository,
+            KursRepository kursRepository,
+            BuchungRepository buchungRepository
+    ) {
         this.studentRepository = studentRepository;
+        this.kursRepository = kursRepository;
+        this.buchungRepository = buchungRepository;
     }
 
     public void importStudents(MultipartFile file) {
+        buchungRepository.deleteAll();
+        kursRepository.deleteAll();
         studentRepository.deleteAll();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
             Sheet sheet = workbook.getSheetAt(0);
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             DataFormatter formatter = new DataFormatter();
 
-            for (int i = 6; i <= sheet.getLastRowNum(); i++) {
+            Map<Integer, Kurs> kursByColumn = importKurse(sheet, evaluator, formatter);
+
+            for (int i = FIRST_DATA_ROW_INDEX; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
 
                 if (row == null) {
@@ -45,18 +68,124 @@ public class ExcelImportService {
                 student.setKlasse(getStringValue(row.getCell(3), evaluator, formatter));
                 student.setGehtUm1530(getBooleanValue(row.getCell(4), evaluator, formatter));
                 student.setRueckmeldung(getStringValue(row.getCell(5), evaluator, formatter));
-
-
-
                 student.setAnaBuchung(getStringValue(row.getCell(17), evaluator, formatter));
                 student.setMittagessen(getBooleanValue(row.getCell(18), evaluator, formatter));
 
-                studentRepository.save(student);
+                student.setEmail1(null);
+                student.setEmail2(null);
+
+                Student savedStudent = studentRepository.save(student);
+
+                importBuchungen(row, savedStudent, kursByColumn, evaluator, formatter);
             }
 
         } catch (Exception e) {
             throw new RuntimeException("Fehler beim Excel-Import", e);
         }
+    }
+
+    private Map<Integer, Kurs> importKurse(
+            Sheet sheet,
+            FormulaEvaluator evaluator,
+            DataFormatter formatter
+    ) {
+        Map<Integer, Kurs> kursByColumn = new HashMap<>();
+
+        Row headerRow = sheet.getRow(KURS_HEADER_ROW);
+
+        for (int column = FIRST_KURS_COLUMN; column <= LAST_KURS_COLUMN; column++) {
+            String header = getStringValue(headerRow.getCell(column), evaluator, formatter);
+
+            if (header == null || header.isBlank()) {
+                continue;
+            }
+
+            if (isFreiColumn(header)) {
+                continue;
+            }
+
+            Kurs kurs = new Kurs();
+            kurs.setName(extractKursName(header));
+            kurs.setWochentag(extractWochentag(header));
+            kurs.setUhrzeit(null);
+            kurs.setBeschreibung(header);
+
+            Kurs savedKurs = kursRepository.save(kurs);
+            kursByColumn.put(column, savedKurs);
+        }
+
+        return kursByColumn;
+    }
+
+    private void importBuchungen(
+            Row row,
+            Student student,
+            Map<Integer, Kurs> kursByColumn,
+            FormulaEvaluator evaluator,
+            DataFormatter formatter
+    ) {
+        for (Map.Entry<Integer, Kurs> entry : kursByColumn.entrySet()) {
+            Integer column = entry.getKey();
+            Kurs kurs = entry.getValue();
+
+            String value = getStringValue(row.getCell(column), evaluator, formatter);
+
+            if (isKursGebucht(value)) {
+                Buchung buchung = new Buchung();
+                buchung.setStudent(student);
+                buchung.setKurs(kurs);
+
+                buchungRepository.save(buchung);
+            }
+        }
+    }
+
+    private String extractWochentag(String header) {
+        String lower = header.toLowerCase();
+
+        if (lower.contains("montag")) return "Montag";
+        if (lower.contains("dienstag")) return "Dienstag";
+        if (lower.contains("mittwoch")) return "Mittwoch";
+        if (lower.contains("donnerstag")) return "Donnerstag";
+        if (lower.contains("freitag")) return "Freitag";
+
+        return null;
+    }
+
+    private String extractKursName(String header) {
+        return header
+                .replace("Montag", "")
+                .replace("Dienstag", "")
+                .replace("Mittwoch", "")
+                .replace("Donnerstag", "")
+                .replace("Freitag", "")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
+    private boolean isFreiColumn(String header) {
+        String normalized = header.trim().toLowerCase();
+
+        return normalized.equals("frei")
+                || normalized.endsWith(" frei")
+                || normalized.contains(" montag frei")
+                || normalized.contains(" dienstag frei")
+                || normalized.contains(" mittwoch frei")
+                || normalized.contains(" donnerstag frei")
+                || normalized.contains(" freitag frei");
+    }
+
+    private boolean isKursGebucht(String value) {
+        if (value == null) {
+            return false;
+        }
+
+        String normalized = value.trim().toLowerCase();
+
+        return normalized.equals("1")
+                || normalized.equals("x")
+                || normalized.equals("ja")
+                || normalized.equals("true");
     }
 
     private String getStringValue(Cell cell, FormulaEvaluator evaluator, DataFormatter formatter) {

@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import StudentDetailView from '../components/StudentDetailView';
 import { getStudentById } from '../services/studentService';
-import { getBuchungenByStudent } from '../services/buchungService';
+import { getKurse } from '../services/kursService';
+import {
+    getBuchungenByStudent,
+    createBuchung,
+    deleteBuchung
+} from '../services/buchungService';
+import { getAnwesenheitenByStudent } from '../services/anwesenheitService';
 import './StudentDetailsPage.css';
 
 function StudentDetailsPage() {
@@ -11,6 +17,8 @@ function StudentDetailsPage() {
 
     const [student, setStudent] = useState(null);
     const [buchungen, setBuchungen] = useState([]);
+    const [kurse, setKurse] = useState([]);
+    const [anwesenheiten, setAnwesenheiten] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -19,11 +27,15 @@ function StudentDetailsPage() {
 
         Promise.all([
             getStudentById(id),
-            getBuchungenByStudent(id)
+            getBuchungenByStudent(id),
+            getKurse(),
+            getAnwesenheitenByStudent(id)
         ])
-            .then(([studentData, buchungenData]) => {
+            .then(([studentData, buchungenData, kurseData, anwesenheitenData]) => {
                 setStudent(studentData);
                 setBuchungen(buchungenData);
+                setKurse(kurseData);
+                setAnwesenheiten(anwesenheitenData);
                 setError('');
             })
             .catch((error) => {
@@ -32,6 +44,28 @@ function StudentDetailsPage() {
             })
             .finally(() => setLoading(false));
     }, [id]);
+
+    const handleAssignKurs = async (kursId) => {
+        try {
+            const newBuchung = await createBuchung(id, kursId);
+            setBuchungen((prev) => [...prev, newBuchung]);
+        } catch (error) {
+            console.error(error);
+            setError('Kurs konnte nicht zugewiesen werden.');
+        }
+    };
+
+    const handleDeleteBuchung = async (buchungId) => {
+        try {
+            await deleteBuchung(buchungId);
+            setBuchungen((prev) =>
+                prev.filter((buchung) => buchung.id !== buchungId)
+            );
+        } catch (error) {
+            console.error(error);
+            setError('Kurs konnte nicht entfernt werden.');
+        }
+    };
 
     if (loading) {
         return <p className="details-message">Schüler wird geladen...</p>;
@@ -46,6 +80,10 @@ function StudentDetailsPage() {
             <StudentDetailView
                 student={student}
                 buchungen={buchungen}
+                kurse={kurse}
+                anwesenheiten={anwesenheiten}
+                onAssignKurs={handleAssignKurs}
+                onDeleteBuchung={handleDeleteBuchung}
                 onClose={() => navigate('/gesamtuebersicht')}
             />
         </div>

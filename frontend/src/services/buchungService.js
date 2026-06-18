@@ -11,3 +11,19 @@ export const getBuchungenByStudent = async (studentId) => {
 
     return response.data;
 };
+
+export const createBuchung = async (studentId, kursId) => {
+
+    const response = await axios.post(
+
+        `${API_URL}/student/${studentId}/kurs/${kursId}`
+
+    );
+
+    return response.data;
+
+};
+
+export const deleteBuchung = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+};

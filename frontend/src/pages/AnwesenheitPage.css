@@ -1,0 +1,142 @@
+.anwesenheit-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.anwesenheit-page h2 {
+    color: #ffffff;
+    margin-bottom: 24px;
+}
+
+.anwesenheit-toolbar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.anwesenheit-toolbar input,
+.anwesenheit-toolbar select {
+    padding: 10px 14px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.anwesenheit-list {
+    margin-top: 24px;
+}
+
+.anwesenheit-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.anwesenheit-table th {
+    background-color: #333;
+    color: #ffffff;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #444;
+}
+
+.anwesenheit-table td {
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    color: #dddddd;
+}
+
+.anwesenheit-table tbody tr:hover {
+    background-color: #363636;
+}
+
+.empty-text {
+    color: #999;
+    padding: 20px 0;
+}
+
+.status-select {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px 10px;
+    min-width: 150px;
+}
+
+.save-button {
+    margin-top: 24px;
+    padding: 10px 20px;
+    background-color: #e8792b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.save-button:hover {
+    background-color: #cf6820;
+}
+
+.anwesenheit-message {
+    margin-top: 16px;
+    color: #6fbf4a;
+    font-weight: 600;
+}
+
+.bemerkung-input {
+    width: 100%;
+    min-width: 180px;
+    padding: 6px 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+}
+
+.anwesenheit-list {
+    margin-top: 24px;
+    overflow-x: auto;
+}
+
+.anwesenheit-table {
+    width: 100%;
+    min-width: 900px;
+    table-layout: fixed;
+}
+
+.anwesenheit-table th,
+.anwesenheit-table td {
+    padding: 10px 12px;
+}
+
+.anwesenheit-table th:nth-child(1),
+.anwesenheit-table td:nth-child(1) {
+    width: 35%;
+}
+
+.anwesenheit-table th:nth-child(2),
+.anwesenheit-table td:nth-child(2) {
+    width: 18%;
+}
+
+.anwesenheit-table th:nth-child(3),
+.anwesenheit-table td:nth-child(3) {
+    width: 20%;
+}
+
+.anwesenheit-table th:nth-child(4),
+.anwesenheit-table td:nth-child(4) {
+    width: 27%;
+}
+
+.bemerkung-input {
+    width: 100%;
+    box-sizing: border-box;
+}
