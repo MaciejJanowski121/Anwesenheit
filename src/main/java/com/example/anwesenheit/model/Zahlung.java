@@ -7,25 +7,28 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
-@Getter
-@Setter
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
-public class Buchung {
+public class Zahlung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+    private Buchung buchung;
 
-    @ManyToOne
-    @JoinColumn(name = "kurs_id")
-    private Kurs kurs;
+    private Double betrag;
 
-    private LocalDate buchungsdatum;
+    private LocalDate zahlungsdatum;
+
+    private YearMonth abrechnungsmonat;
+
+    private String bemerkung;
 }

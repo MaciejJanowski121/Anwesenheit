@@ -7,6 +7,7 @@ import com.example.anwesenheit.repository.BuchungRepository;
 import com.example.anwesenheit.repository.KursRepository;
 import com.example.anwesenheit.repository.StudentRepository;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -37,9 +38,11 @@ public class BuchungService {
         Buchung buchung = new Buchung();
         buchung.setStudent(student);
         buchung.setKurs(kurs);
-
+        buchung.setBuchungsdatum(LocalDate.now());
 
         return buchungRepository.save(buchung);
+
+
     }
 
     public List<Buchung> getBuchungenByStudentId(Long studentId) {

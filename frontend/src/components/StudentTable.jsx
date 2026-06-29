@@ -3,15 +3,17 @@ import { Link } from 'react-router-dom';
 import './StudentTable.css';
 
 const columns = [
-    { key: 'name', label: 'Name' },
+    { key: 'nachname', label: 'Nachname' },
+    { key: 'vorname', label: 'Vorname' },
     { key: 'jahrgang', label: 'Jahrgang' },
     { key: 'klasse', label: 'Klasse' },
-    { key: 'mittagessen', label: 'Mittagessen' },
-    { key: 'gehtUm1530', label: 'Geht um 15:30 Uhr' },
-    { key: 'rueckmeldung', label: 'Rückmeldung' },
-    { key: 'anaBuchung', label: 'ANA-Buchung' },
+    { key: 'fotoFreigabe', label: 'Fotofreigabe' },
     { key: 'email1', label: 'Email 1' },
+    { key: 'telefon1', label: 'Telefon 1' },
+    { key: 'mobil1', label: 'Mobil 1' },
     { key: 'email2', label: 'Email 2' },
+    { key: 'telefon2', label: 'Telefon 2' },
+    { key: 'mobil2', label: 'Mobil 2' },
 ];
 
 function StudentTable({
@@ -27,7 +29,6 @@ function StudentTable({
                           onEditCancel,
                           onDelete,
                       }) {
-
     const renderSortIndicator = (key) => {
         if (sortKey !== key) return null;
         return sortDirection === 'asc' ? ' ▲' : ' ▼';
@@ -36,7 +37,7 @@ function StudentTable({
     const renderCell = (student, col) => {
         const isEditing = editingId === student.id;
 
-        if (col.key === 'mittagessen' || col.key === 'gehtUm1530') {
+        if (col.key === 'fotoFreigabe') {
             if (isEditing) {
                 return (
                     <input
@@ -70,13 +71,12 @@ function StudentTable({
             );
         }
 
-        return student[col.key];
+        return student[col.key] || '–';
     };
 
     return (
         <div className="table-container">
             <table className="student-table">
-
                 <thead>
                 <tr>
                     {columns.map((col) => (
@@ -95,7 +95,6 @@ function StudentTable({
                 </thead>
 
                 <tbody>
-
                 {students.length === 0 && (
                     <tr>
                         <td
@@ -109,7 +108,6 @@ function StudentTable({
 
                 {students.map((student, index) => (
                     <tr key={student.id ?? index}>
-
                         {columns.map((col) => (
                             <td key={col.key}>
                                 {renderCell(student, col)}
@@ -117,7 +115,6 @@ function StudentTable({
                         ))}
 
                         <td className="action-cell">
-
                             {editingId === student.id ? (
                                 <>
                                     <button
@@ -162,13 +159,10 @@ function StudentTable({
                                     </button>
                                 </>
                             )}
-
                         </td>
                     </tr>
                 ))}
-
                 </tbody>
-
             </table>
         </div>
     );

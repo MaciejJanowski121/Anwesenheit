@@ -25,23 +25,25 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String vorname;
+
+    private String nachname;
 
     private Integer jahrgang;
 
     private String klasse;
 
+    private Boolean fotoFreigabe;
+
     private String email1;
+
+    private String telefon1;
+
+    private String mobil1;
 
     private String email2;
 
-    private Boolean mittagessen;
+    private String telefon2;
 
-    private Boolean gehtUm1530;
-
-    private String rueckmeldung;
-
-    private String anaBuchung;
-
-
+    private String mobil2;
 }

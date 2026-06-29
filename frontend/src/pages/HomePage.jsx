@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStudents } from '../services/studentService';
 import { getKurse } from '../services/kursService';
-import { getAllAnwesenheiten } from '../services/anwesenheitService';
 import './HomePage.css';
 
 function HomePage() {
@@ -10,35 +9,26 @@ function HomePage() {
         studentsTotal: 0,
         klassenTotal: 0,
         kurseTotal: 0,
-        anwesenheitenToday: 0,
-        fehltToday: 0
+        gehtUm1530: 0
     });
 
     const [loading, setLoading] = useState(true);
 
-    const todayIso = new Date().toISOString().split('T')[0];
-
     useEffect(() => {
         Promise.all([
             getStudents(),
-            getKurse(),
-            getAllAnwesenheiten()
+            getKurse()
         ])
-            .then(([students, kurse, anwesenheiten]) => {
+            .then(([students, kurse]) => {
                 const klassen = new Set(
                     students.map((student) => student.klasse).filter(Boolean)
-                );
-
-                const todayAnwesenheiten = anwesenheiten.filter(
-                    (a) => a.datum === todayIso
                 );
 
                 setStats({
                     studentsTotal: students.length,
                     klassenTotal: klassen.size,
                     kurseTotal: kurse.length,
-                    anwesenheitenToday: todayAnwesenheiten.length,
-                    fehltToday: todayAnwesenheiten.filter((a) => a.status === 'FEHLT').length
+                    gehtUm1530: students.filter((student) => student.gehtUm1530).length
                 });
             })
             .catch((error) => {
@@ -47,7 +37,7 @@ function HomePage() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [todayIso]);
+    }, []);
 
     const today = new Date().toLocaleDateString('de-DE', {
         weekday: 'long',
@@ -62,7 +52,7 @@ function HomePage() {
                 <h2>Willkommen zur Anwesenheitsverwaltung</h2>
                 <p className="welcome-date">{today}</p>
                 <p>
-                    Übersicht über Schülerdaten, Kursbuchungen und Anwesenheiten
+                    Übersicht über Schülerdaten, Kurse und Anwesenheiten
                     der Montessori Schule Augsburg.
                 </p>
             </section>
@@ -99,22 +89,12 @@ function HomePage() {
                 </div>
 
                 <div className="stat-card">
-                    <span className="stat-icon">A</span>
+                    <span className="stat-icon">15</span>
                     <div className="stat-info">
                         <span className="stat-value">
-                            {loading ? '...' : stats.anwesenheitenToday}
+                            {loading ? '...' : stats.gehtUm1530}
                         </span>
-                        <span className="stat-label">Anwesenheiten heute</span>
-                    </div>
-                </div>
-
-                <div className="stat-card">
-                    <span className="stat-icon">F</span>
-                    <div className="stat-info">
-                        <span className="stat-value">
-                            {loading ? '...' : stats.fehltToday}
-                        </span>
-                        <span className="stat-label">Fehlend heute</span>
+                        <span className="stat-label">Gehen um 15:30</span>
                     </div>
                 </div>
             </section>
@@ -143,17 +123,17 @@ function HomePage() {
                 </div>
 
                 <div className="dashboard-panel">
-                    <h3>Heute</h3>
+                    <h3>Aktueller Stand</h3>
 
                     <div className="dashboard-summary">
                         <p>
-                            <strong>{loading ? '...' : stats.anwesenheitenToday}</strong>
-                            {' '}Anwesenheitseinträge wurden heute gespeichert.
+                            Die Schülerdaten, Kurse und Kurszuordnungen werden
+                            aus der Excel-Datei importiert.
                         </p>
 
                         <p>
-                            <strong>{loading ? '...' : stats.fehltToday}</strong>
-                            {' '}Schüler wurden heute als fehlend markiert.
+                            Die Anwesenheit kann kursbezogen erfasst und im Verlauf
+                            später kontrolliert werden.
                         </p>
                     </div>
                 </div>

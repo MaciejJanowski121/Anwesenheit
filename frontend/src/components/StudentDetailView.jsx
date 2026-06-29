@@ -17,7 +17,9 @@ function StudentDetailView({
             </button>
 
             <div className="detail-header">
-                <h2>{student.name}</h2>
+                <h2>
+                    {student.nachname}, {student.vorname}
+                </h2>
                 <p>Schülerdetails</p>
             </div>
 
@@ -25,6 +27,16 @@ function StudentDetailView({
                 <h3>Allgemeine Informationen</h3>
 
                 <div className="detail-grid">
+                    <div className="detail-item">
+                        <span className="detail-label">Vorname</span>
+                        <span className="detail-value">{student.vorname || '–'}</span>
+                    </div>
+
+                    <div className="detail-item">
+                        <span className="detail-label">Nachname</span>
+                        <span className="detail-value">{student.nachname || '–'}</span>
+                    </div>
+
                     <div className="detail-item">
                         <span className="detail-label">Jahrgang</span>
                         <span className="detail-value">{student.jahrgang || '–'}</span>
@@ -36,39 +48,16 @@ function StudentDetailView({
                     </div>
 
                     <div className="detail-item">
-                        <span className="detail-label">Rückmeldung</span>
-                        <span className="detail-value">{student.rueckmeldung || '–'}</span>
-                    </div>
-
-                    <div className="detail-item">
-                        <span className="detail-label">ANA-Buchung</span>
-                        <span className="detail-value">{student.anaBuchung || '–'}</span>
-                    </div>
-
-                    <div className="detail-item">
-                        <span className="detail-label">Geht um 15:30 Uhr</span>
+                        <span className="detail-label">Foto- und Bildfreigabe</span>
                         <span className="detail-value">
-                            {student.gehtUm1530 ? 'Ja' : 'Nein'}
+                            {student.fotoFreigabe ? 'Ja' : 'Nein'}
                         </span>
                     </div>
                 </div>
             </section>
 
             <section className="detail-section">
-                <h3>Betreuung und Essen</h3>
-
-                <div className="detail-grid">
-                    <div className="detail-item">
-                        <span className="detail-label">Mittagessen</span>
-                        <span className="detail-value">
-                            {student.mittagessen ? 'Ja' : 'Nein'}
-                        </span>
-                    </div>
-                </div>
-            </section>
-
-            <section className="detail-section">
-                <h3>Kontakt</h3>
+                <h3>Kontakt 1</h3>
 
                 <div className="detail-grid">
                     <div className="detail-item">
@@ -77,8 +66,34 @@ function StudentDetailView({
                     </div>
 
                     <div className="detail-item">
+                        <span className="detail-label">Telefon 1</span>
+                        <span className="detail-value">{student.telefon1 || '–'}</span>
+                    </div>
+
+                    <div className="detail-item">
+                        <span className="detail-label">Mobil 1</span>
+                        <span className="detail-value">{student.mobil1 || '–'}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section className="detail-section">
+                <h3>Kontakt 2</h3>
+
+                <div className="detail-grid">
+                    <div className="detail-item">
                         <span className="detail-label">Email 2</span>
                         <span className="detail-value">{student.email2 || '–'}</span>
+                    </div>
+
+                    <div className="detail-item">
+                        <span className="detail-label">Telefon 2</span>
+                        <span className="detail-value">{student.telefon2 || '–'}</span>
+                    </div>
+
+                    <div className="detail-item">
+                        <span className="detail-label">Mobil 2</span>
+                        <span className="detail-value">{student.mobil2 || '–'}</span>
                     </div>
                 </div>
             </section>
@@ -92,7 +107,7 @@ function StudentDetailView({
                         onChange={(e) => {
                             if (e.target.value) {
                                 onAssignKurs(e.target.value);
-                                e.target.value = "";
+                                e.target.value = '';
                             }
                         }}
                     >
@@ -111,9 +126,11 @@ function StudentDetailView({
                         <thead>
                         <tr>
                             <th>Kurs</th>
+                            <th>Kursleitung</th>
                             <th>Wochentag</th>
                             <th>Uhrzeit</th>
-                            <th>Beschreibung</th>
+                            <th>Buchungsart</th>
+                            <th>Gebühr</th>
                             <th>Aktionen</th>
                         </tr>
                         </thead>
@@ -122,9 +139,15 @@ function StudentDetailView({
                         {buchungen.map((buchung) => (
                             <tr key={buchung.id}>
                                 <td>{buchung.kurs?.name || '–'}</td>
+                                <td>{buchung.kurs?.kursleitung || '–'}</td>
                                 <td>{buchung.kurs?.wochentag || '–'}</td>
                                 <td>{buchung.kurs?.uhrzeit || '–'}</td>
-                                <td>{buchung.kurs?.beschreibung || '–'}</td>
+                                <td>{buchung.kurs?.buchungsart || '–'}</td>
+                                <td>
+                                    {buchung.kurs?.kursgebuehr != null
+                                        ? `${buchung.kurs.kursgebuehr} €`
+                                        : '–'}
+                                </td>
                                 <td>
                                     <button
                                         className="btn-remove-kurs"
@@ -159,14 +182,16 @@ function StudentDetailView({
                         </thead>
 
                         <tbody>
-                        {anwesenheiten.map((anwesenheit) => (
-                            <tr key={anwesenheit.id}>
-                                <td>{anwesenheit.datum || '–'}</td>
-                                <td>{anwesenheit.kurs?.name || '–'}</td>
-                                <td>{anwesenheit.status || '–'}</td>
-                                <td>{anwesenheit.bemerkung || '–'}</td>
-                            </tr>
-                        ))}
+                        {[...anwesenheiten]
+                            .sort((a, b) => b.datum.localeCompare(a.datum))
+                            .map((anwesenheit) => (
+                                <tr key={anwesenheit.id}>
+                                    <td>{anwesenheit.datum || '–'}</td>
+                                    <td>{anwesenheit.kurs?.name || '–'}</td>
+                                    <td>{anwesenheit.status || '–'}</td>
+                                    <td>{anwesenheit.bemerkung || '–'}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 ) : (

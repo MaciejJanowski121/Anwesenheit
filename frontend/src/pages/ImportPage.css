@@ -1,7 +1,19 @@
 .import-page {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 32px 24px;
+}
+
+.import-page h2 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.import-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 24px;
 }
 
 .import-card {
@@ -11,38 +23,49 @@
     padding: 28px;
 }
 
-.import-card h2 {
-    color: #fff;
+.import-card h3 {
     margin-top: 0;
+    margin-bottom: 16px;
+    color: #ffffff;
 }
 
 .import-card p {
     color: #b8b8b8;
     line-height: 1.6;
+    margin-bottom: 20px;
 }
 
 .file-input {
-    margin-top: 20px;
+    width: 100%;
     margin-bottom: 20px;
-    color: #fff;
+    color: #ffffff;
 }
 
 .import-button {
-    background: #e8792b;
-    color: #fff;
+    width: 100%;
+    padding: 12px;
     border: none;
     border-radius: 8px;
-    padding: 12px 18px;
+    background-color: #e8792b;
+    color: white;
     cursor: pointer;
     font-weight: 600;
+    font-size: 0.95rem;
+    transition: 0.2s;
 }
 
 .import-button:hover {
-    background: #d6681f;
+    background-color: #cf6820;
 }
 
 .import-message {
-    margin-top: 18px;
+    margin-top: 16px;
     color: #6fbf4a;
     font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .import-grid {
+        grid-template-columns: 1fr;
+    }
 }

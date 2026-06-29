@@ -1,14 +1,12 @@
 package com.example.anwesenheit.controller;
 
 import com.example.anwesenheit.service.ExcelImportService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/import")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ExcelImportController {
 
     private final ExcelImportService excelImportService;
@@ -18,11 +16,16 @@ public class ExcelImportController {
     }
 
     @PostMapping("/students")
-    public String importStudents(
-            @RequestParam("file") MultipartFile file) {
-
+    public void importStudents(
+            @RequestParam("file") MultipartFile file
+    ) {
         excelImportService.importStudents(file);
+    }
 
-        return "Import erfolgreich";
+    @PostMapping("/kurse")
+    public void importKurse(
+            @RequestParam("file") MultipartFile file
+    ) {
+        excelImportService.importKurse(file);
     }
 }

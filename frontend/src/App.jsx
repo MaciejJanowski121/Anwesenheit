@@ -7,6 +7,7 @@ import KursePage from './pages/KursePage';
 import AnwesenheitPage from './pages/AnwesenheitPage';
 import ImportPage from './pages/ImportPage';
 import StudentDetailsPage from './pages/StudentDetailsPage';
+import GebuehrenPage from './pages/GebuehrenPage';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/gesamtuebersicht" element={<GesamtuebersichtPage />} />
                     <Route path="/kurse" element={<KursePage />} />
+                    <Route path="/gebuehren" element={<GebuehrenPage />} />
                     <Route path="/anwesenheit" element={<AnwesenheitPage />} />
                     <Route path="/import" element={<ImportPage />} />
                     <Route path="/students/:id" element={<StudentDetailsPage />} />

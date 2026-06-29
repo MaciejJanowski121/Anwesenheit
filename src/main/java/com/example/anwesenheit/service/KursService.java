@@ -24,13 +24,16 @@ public class KursService {
     }
 
     public Kurs updateKurs(Long id, Kurs updatedKurs) {
+
         Kurs kurs = kursRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kurs nicht gefunden"));
 
         kurs.setName(updatedKurs.getName());
         kurs.setWochentag(updatedKurs.getWochentag());
         kurs.setUhrzeit(updatedKurs.getUhrzeit());
-        kurs.setBeschreibung(updatedKurs.getBeschreibung());
+        kurs.setKursleitung(updatedKurs.getKursleitung());
+        kurs.setBuchungsart(updatedKurs.getBuchungsart());
+        kurs.setKursgebuehr(updatedKurs.getKursgebuehr());
 
         return kursRepository.save(kurs);
     }

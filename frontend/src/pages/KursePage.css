@@ -1,16 +1,42 @@
 .kurse-page {
-    max-width: 1000px;
+    max-width: 1450px;
     margin: 0 auto;
     padding: 32px 24px;
+    overflow-x: auto;
 }
 
 .kurse-page h2 {
     color: #ffffff;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.kurse-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.kurse-filter-input {
+    min-width: 280px;
+    padding: 10px 14px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.kurse-filter-input:focus {
+    outline: none;
+    border-color: #e8792b;
 }
 
 .kurse-table {
     width: 100%;
+    min-width: 1250px;
     border-collapse: collapse;
     background: #2a2a2a;
     border-radius: 10px;
@@ -22,17 +48,252 @@
     padding: 12px 14px;
     border-bottom: 1px solid #444;
     text-align: left;
+    color: #dddddd;
+    white-space: nowrap;
 }
 
 .kurse-table th {
     background: #333333;
     color: #ffffff;
+    font-weight: 600;
 }
 
-.kurse-table td {
-    color: #dddddd;
-}
-
-.kurse-table tr:hover {
+.kurse-table tbody tr:hover {
     background: rgba(232, 121, 43, 0.08);
+}
+
+.kurs-edit-input {
+    width: 100%;
+    min-width: 120px;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+}
+
+.kurs-edit-input:focus {
+    outline: none;
+    border-color: #e8792b;
+}
+
+.action-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.empty-row {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+.btn-add,
+.btn-edit,
+.btn-delete,
+.btn-save,
+.btn-cancel {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.btn-add,
+.btn-edit {
+    background-color: #e8792b;
+}
+
+.btn-add:hover,
+.btn-edit:hover {
+    background-color: #cf6820;
+}
+
+.btn-delete {
+    background-color: #d94a4a;
+}
+
+.btn-delete:hover {
+    background-color: #bd3535;
+}
+
+.btn-save {
+    background-color: #4caf50;
+}
+
+.btn-save:hover {
+    background-color: #3f9443;
+}
+
+.btn-cancel {
+    background-color: #666;
+}
+
+.btn-cancel:hover {
+    background-color: #555;
+}
+
+@media (max-width: 900px) {
+    .kurse-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .kurse-filter-input {
+        width: 100%;
+    }
+}.kurse-page {
+     max-width: 1450px;
+     margin: 0 auto;
+     padding: 32px 24px;
+     overflow-x: auto;
+ }
+
+.kurse-page h2 {
+    color: #ffffff;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.kurse-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.kurse-filter-input {
+    min-width: 280px;
+    padding: 10px 14px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.kurse-filter-input:focus {
+    outline: none;
+    border-color: #e8792b;
+}
+
+.kurse-table {
+    width: 100%;
+    min-width: 1250px;
+    border-collapse: collapse;
+    background: #2a2a2a;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.kurse-table th,
+.kurse-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+    color: #dddddd;
+    white-space: nowrap;
+}
+
+.kurse-table th {
+    background: #333333;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.kurse-table tbody tr:hover {
+    background: rgba(232, 121, 43, 0.08);
+}
+
+.kurs-edit-input {
+    width: 100%;
+    min-width: 120px;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+}
+
+.kurs-edit-input:focus {
+    outline: none;
+    border-color: #e8792b;
+}
+
+.action-cell {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.empty-row {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+.btn-add,
+.btn-edit,
+.btn-delete,
+.btn-save,
+.btn-cancel {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.btn-add,
+.btn-edit {
+    background-color: #e8792b;
+}
+
+.btn-add:hover,
+.btn-edit:hover {
+    background-color: #cf6820;
+}
+
+.btn-delete {
+    background-color: #d94a4a;
+}
+
+.btn-delete:hover {
+    background-color: #bd3535;
+}
+
+.btn-save {
+    background-color: #4caf50;
+}
+
+.btn-save:hover {
+    background-color: #3f9443;
+}
+
+.btn-cancel {
+    background-color: #666;
+}
+
+.btn-cancel:hover {
+    background-color: #555;
+}
+
+@media (max-width: 900px) {
+    .kurse-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .kurse-filter-input {
+        width: 100%;
+    }
 }

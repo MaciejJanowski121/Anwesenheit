@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-
+import React, { useEffect, useState } from 'react';
 import StudentTable from '../components/StudentTable';
 
 import {
@@ -12,151 +11,103 @@ import {
 import './GesamtuebersichtPage.css';
 
 const emptyStudent = {
-
-    name: "",
-
-    jahrgang: "",
-
-    klasse: "",
-
-    klassenkuerzel: "",
-
-    mittagessen: false,
-
-    gehtUm1530: false,
-
-    rueckmeldung: "",
-
-    anaBuchung: "",
-
-    email1: "",
-
-    email2: "",
-
+    vorname: '',
+    nachname: '',
+    jahrgang: '',
+    klasse: '',
+    fotoFreigabe: false,
+    email1: '',
+    telefon1: '',
+    mobil1: '',
+    email2: '',
+    telefon2: '',
+    mobil2: ''
 };
 
 function GesamtuebersichtPage() {
-
     const [students, setStudents] = useState([]);
-
     const [filter, setFilter] = useState('');
-
     const [sortKey, setSortKey] = useState(null);
-
     const [sortDirection, setSortDirection] = useState('asc');
-
     const [editingId, setEditingId] = useState(null);
-
     const [editData, setEditData] = useState({});
 
     useEffect(() => {
-
         getStudents()
-
             .then((data) => setStudents(data))
-
             .catch((error) =>
-
-                console.error("Fehler beim Laden der Schüler:", error));
-
+                console.error('Fehler beim Laden der Schüler:', error)
+            );
     }, []);
 
     const filtered = students.filter((s) => {
-
         if (!filter) return true;
 
         const term = filter.toLowerCase();
 
         return (
-
-            (s.name || "").toLowerCase().includes(term) ||
-
-            (s.klasse || "").toLowerCase().includes(term) ||
-
-            (s.klassenkuerzel || "").toLowerCase().includes(term) ||
-
-            (s.email1 || "").toLowerCase().includes(term) ||
-
-            (s.email2 || "").toLowerCase().includes(term) ||
-
-            (s.rueckmeldung || "").toLowerCase().includes(term) ||
-
-            (s.anaBuchung || "").toLowerCase().includes(term) ||
-
-            String(s.jahrgang || "").includes(term)
-
+            (s.vorname || '').toLowerCase().includes(term) ||
+            (s.nachname || '').toLowerCase().includes(term) ||
+            (s.klasse || '').toLowerCase().includes(term) ||
+            (s.email1 || '').toLowerCase().includes(term) ||
+            (s.telefon1 || '').toLowerCase().includes(term) ||
+            (s.mobil1 || '').toLowerCase().includes(term) ||
+            (s.email2 || '').toLowerCase().includes(term) ||
+            (s.telefon2 || '').toLowerCase().includes(term) ||
+            (s.mobil2 || '').toLowerCase().includes(term) ||
+            String(s.jahrgang || '').includes(term)
         );
-
     });
 
     const sorted = [...filtered].sort((a, b) => {
-
         if (!sortKey) return 0;
 
         let valA = a[sortKey];
-
         let valB = b[sortKey];
 
         if (typeof valA === 'boolean') {
-
             valA = valA ? 1 : 0;
-
             valB = valB ? 1 : 0;
-
         }
 
         if (typeof valA === 'number') {
-
             return sortDirection === 'asc' ? valA - valB : valB - valA;
-
         }
 
-        const strA = String(valA || "").toLowerCase();
-
-        const strB = String(valB || "").toLowerCase();
+        const strA = String(valA || '').toLowerCase();
+        const strB = String(valB || '').toLowerCase();
 
         if (strA < strB) return sortDirection === 'asc' ? -1 : 1;
-
         if (strA > strB) return sortDirection === 'asc' ? 1 : -1;
 
         return 0;
-
     });
 
     const handleSort = (key) => {
-
         if (sortKey === key) {
-
             setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
-
         } else {
-
             setSortKey(key);
-
             setSortDirection('asc');
-
         }
-
     };
 
     const handleEditStart = (student) => {
-
         setEditingId(student.id);
-
-        setEditData({...student});
-
+        setEditData({ ...student });
     };
 
     const handleEditChange = (key, value) => {
-
-        setEditData((prev) => ({...prev, [key]: value}));
-
+        setEditData((prev) => ({
+            ...prev,
+            [key]: value
+        }));
     };
 
     const handleEditSave = async () => {
         let savedStudent;
 
-        if (typeof editingId === "number") {
+        if (typeof editingId === 'number') {
             savedStudent = await updateStudent(editingId, editData);
         } else {
             savedStudent = await createStudent(editData);
@@ -170,26 +121,22 @@ function GesamtuebersichtPage() {
         setEditData({});
     };
 
-
-
     const handleEditCancel = () => {
-
         setEditingId(null);
-
         setEditData({});
-
     };
+
     const handleAdd = () => {
         const tempId = `new-${Date.now()}`;
         const newStudent = { ...emptyStudent, id: tempId };
 
-        setStudents((prev) => [...prev, newStudent]);
+        setStudents((prev) => [newStudent, ...prev]);
         setEditingId(tempId);
-        setEditData(emptyStudent);
+        setEditData(newStudent);
     };
 
     const handleDelete = async (id) => {
-        if (typeof id === "number") {
+        if (typeof id === 'number') {
             await deleteStudent(id);
         }
 
@@ -202,65 +149,38 @@ function GesamtuebersichtPage() {
     };
 
     return (
-
         <div className="gesamtuebersicht-page">
-
             <h2>Gesamtübersicht</h2>
 
             <div className="table-toolbar">
-
                 <input
-
                     className="filter-input"
-
                     type="text"
-
-                    placeholder="Suche (Name, Klasse, Email …)"
-
+                    placeholder="Vorname, Nachname, Klasse, Telefon..."
                     value={filter}
-
                     onChange={(e) => setFilter(e.target.value)}
-
                 />
 
                 <button className="btn-add" onClick={handleAdd}>
-
                     + Neuer Eintrag
-
                 </button>
-
             </div>
 
             <StudentTable
-
                 students={sorted}
-
                 sortKey={sortKey}
-
                 sortDirection={sortDirection}
-
                 onSort={handleSort}
-
                 editingId={editingId}
-
                 editData={editData}
-
                 onEditStart={handleEditStart}
-
                 onEditChange={handleEditChange}
-
                 onEditSave={handleEditSave}
-
                 onEditCancel={handleEditCancel}
-
                 onDelete={handleDelete}
-
             />
-
         </div>
-
     );
-
 }
 
 export default GesamtuebersichtPage;

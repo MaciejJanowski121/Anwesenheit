@@ -1,12 +1,43 @@
 .anwesenheit-page {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 .anwesenheit-page h2 {
     color: #ffffff;
-    margin-bottom: 24px;
+    text-align: center;
+    margin-bottom: 30px;
 }
+
+/* Tabs */
+
+.anwesenheit-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.tab-button {
+    padding: 12px 24px;
+    border: 1px solid #555;
+    border-radius: 10px;
+    background-color: #2a2a2a;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.tab-button:hover {
+    background-color: #333;
+}
+
+.tab-button.active {
+    background-color: #e8792b;
+    border-color: #e8792b;
+}
+
+/* Toolbar */
 
 .anwesenheit-toolbar {
     display: flex;
@@ -25,12 +56,21 @@
     font-size: 0.95rem;
 }
 
+/* Tabellen */
+
 .anwesenheit-list {
     margin-top: 24px;
+    overflow-x: auto;
+}
+
+.saved-anwesenheiten {
+    margin-top: 30px;
+    overflow-x: auto;
 }
 
 .anwesenheit-table {
     width: 100%;
+    min-width: 1100px;
     border-collapse: collapse;
     background-color: #2a2a2a;
     border-radius: 8px;
@@ -40,9 +80,10 @@
 .anwesenheit-table th {
     background-color: #333;
     color: #ffffff;
-    padding: 12px;
+    padding: 14px;
     text-align: left;
     border-bottom: 2px solid #444;
+    font-size: 1rem;
 }
 
 .anwesenheit-table td {
@@ -55,10 +96,34 @@
     background-color: #363636;
 }
 
-.empty-text {
-    color: #999;
-    padding: 20px 0;
+/* Kolumnen */
+
+.anwesenheit-table th:nth-child(1),
+.anwesenheit-table td:nth-child(1) {
+    width: 25%;
 }
+
+.anwesenheit-table th:nth-child(2),
+.anwesenheit-table td:nth-child(2) {
+    width: 15%;
+}
+
+.anwesenheit-table th:nth-child(3),
+.anwesenheit-table td:nth-child(3) {
+    width: 20%;
+}
+
+.anwesenheit-table th:nth-child(4),
+.anwesenheit-table td:nth-child(4) {
+    width: 25%;
+}
+
+.anwesenheit-table th:nth-child(5),
+.anwesenheit-table td:nth-child(5) {
+    width: 15%;
+}
+
+/* Status */
 
 .status-select {
     background-color: #333;
@@ -69,9 +134,24 @@
     min-width: 150px;
 }
 
+/* Bemerkung */
+
+.bemerkung-input {
+    width: 100%;
+    min-width: 180px;
+    padding: 8px 10px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #333;
+    color: white;
+    box-sizing: border-box;
+}
+
+/* Save Button */
+
 .save-button {
     margin-top: 24px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #e8792b;
     color: white;
     border: none;
@@ -84,59 +164,88 @@
     background-color: #cf6820;
 }
 
+/* Nachrichten */
+
 .anwesenheit-message {
     margin-top: 16px;
     color: #6fbf4a;
     font-weight: 600;
 }
 
-.bemerkung-input {
-    width: 100%;
-    min-width: 180px;
-    padding: 6px 10px;
-    border: 1px solid #555;
-    border-radius: 6px;
-    background-color: #333;
+.empty-text {
+    color: #999;
+    padding: 20px 0;
+}
+
+/* Verlauf */
+
+.saved-anwesenheiten h3 {
+    text-align: center;
+    margin-bottom: 24px;
     color: white;
+    font-size: 2rem;
 }
 
-.anwesenheit-list {
-    margin-top: 24px;
-    overflow-x: auto;
+/* Edit Buttons */
+
+.btn-edit {
+    background-color: #e8792b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
 }
 
-.anwesenheit-table {
-    width: 100%;
-    min-width: 900px;
-    table-layout: fixed;
+.btn-edit:hover {
+    background-color: #cf6820;
 }
 
-.anwesenheit-table th,
-.anwesenheit-table td {
-    padding: 10px 12px;
+.btn-save {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-right: 8px;
 }
 
-.anwesenheit-table th:nth-child(1),
-.anwesenheit-table td:nth-child(1) {
-    width: 35%;
+.btn-save:hover {
+    background-color: #3f9443;
 }
 
-.anwesenheit-table th:nth-child(2),
-.anwesenheit-table td:nth-child(2) {
-    width: 18%;
+.btn-cancel {
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
 }
 
-.anwesenheit-table th:nth-child(3),
-.anwesenheit-table td:nth-child(3) {
-    width: 20%;
+.btn-cancel:hover {
+    background-color: #555;
 }
 
-.anwesenheit-table th:nth-child(4),
-.anwesenheit-table td:nth-child(4) {
-    width: 27%;
+/* Aktionsspalte */
+
+.anwesenheit-table td:last-child {
+    min-width: 180px;
 }
 
-.bemerkung-input {
-    width: 100%;
-    box-sizing: border-box;
+.btn-delete {
+    background-color: #d94a4a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.btn-delete:hover {
+    background-color: #bd3535;
 }

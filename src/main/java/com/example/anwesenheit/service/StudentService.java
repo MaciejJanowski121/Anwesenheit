@@ -9,7 +9,6 @@ import java.util.List;
 @Service
 public class StudentService {
 
-
     private final StudentRepository studentRepository;
 
     public StudentService(StudentRepository studentRepository) {
@@ -20,44 +19,38 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+    }
+
     public Student createStudent(Student student) {
         return studentRepository.save(student);
     }
 
     public Student updateStudent(Long id, Student updatedStudent) {
         Student student = studentRepository.findById(id)
-
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-        student.setName(updatedStudent.getName());
 
+        student.setVorname(updatedStudent.getVorname());
+        student.setNachname(updatedStudent.getNachname());
         student.setJahrgang(updatedStudent.getJahrgang());
-
         student.setKlasse(updatedStudent.getKlasse());
 
+        student.setFotoFreigabe(updatedStudent.getFotoFreigabe());
+
         student.setEmail1(updatedStudent.getEmail1());
+        student.setTelefon1(updatedStudent.getTelefon1());
+        student.setMobil1(updatedStudent.getMobil1());
 
         student.setEmail2(updatedStudent.getEmail2());
-
-        student.setMittagessen(updatedStudent.getMittagessen());
-
-        student.setGehtUm1530(updatedStudent.getGehtUm1530());
-
-        student.setRueckmeldung(updatedStudent.getRueckmeldung());
-
-        student.setAnaBuchung(updatedStudent.getAnaBuchung());
+        student.setTelefon2(updatedStudent.getTelefon2());
+        student.setMobil2(updatedStudent.getMobil2());
 
         return studentRepository.save(student);
     }
 
     public void deleteStudent(Long id) {
-
         studentRepository.deleteById(id);
-
     }
-
-    public Student getStudentById(Long id) {
-        return studentRepository.findById(id).orElseThrow(() -> new RuntimeException("Student not found"));
-    }
-
-
 }

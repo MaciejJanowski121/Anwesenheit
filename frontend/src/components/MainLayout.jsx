@@ -8,17 +8,43 @@ function MainLayout() {
         <div className="app-layout">
             <header className="app-header">
                 <div className="header-brand">
-                    <img src={logo} alt="Montessori Logo" className="header-logo" />
-                    <h1 className="header-title">Anwesenheitsliste</h1>
+                    <img
+                        src={logo}
+                        alt="Montessori Logo"
+                        className="header-logo"
+                    />
+                    <h1 className="header-title">
+                        Anwesenheitsliste
+                    </h1>
                 </div>
             </header>
+
             <nav className="main-nav">
-                <NavLink to="/" end>Startseite</NavLink>
-                <NavLink to="/gesamtuebersicht">Gesamtübersicht</NavLink>
-                <NavLink to="/kurse">Kurse</NavLink>
-                <NavLink to="/anwesenheit">Anwesenheit</NavLink>
-                <NavLink to="/import">Import</NavLink>
+                <NavLink to="/" end>
+                    Startseite
+                </NavLink>
+
+                <NavLink to="/gesamtuebersicht">
+                    Gesamtübersicht
+                </NavLink>
+
+                <NavLink to="/kurse">
+                    Kurse
+                </NavLink>
+
+                <NavLink to="/anwesenheit">
+                    Anwesenheit
+                </NavLink>
+
+                <NavLink to="/gebuehren">
+                    Gebühren
+                </NavLink>
+
+                <NavLink to="/import">
+                    Import
+                </NavLink>
             </nav>
+
             <main className="app-main">
                 <Outlet />
             </main>

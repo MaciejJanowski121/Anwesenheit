@@ -30,5 +30,7 @@ public class Kurs {
 
     private String uhrzeit;
 
-    private String beschreibung;
+    private String kursleitung;
+    private String buchungsart;
+    private Double kursgebuehr;
 }
