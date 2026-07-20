@@ -45,6 +45,8 @@ public class BuchungService {
 
     }
 
+
+
     public List<Buchung> getBuchungenByStudentId(Long studentId) {
         return buchungRepository.findByStudentId(studentId);
     }

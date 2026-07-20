@@ -5,7 +5,6 @@ import com.example.anwesenheit.model.Student;
 import com.example.anwesenheit.repository.BuchungRepository;
 import com.example.anwesenheit.repository.KursRepository;
 import com.example.anwesenheit.repository.StudentRepository;
-import com.example.anwesenheit.repository.ZahlungRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -17,22 +16,22 @@ public class ExcelImportService {
     private final StudentRepository studentRepository;
     private final KursRepository kursRepository;
     private final BuchungRepository buchungRepository;
-    private final ZahlungRepository zahlungRepository;
+
 
     public ExcelImportService(
             StudentRepository studentRepository,
             KursRepository kursRepository,
-            BuchungRepository buchungRepository,
-            ZahlungRepository zahlungRepository
+            BuchungRepository buchungRepository
+
     ) {
         this.studentRepository = studentRepository;
         this.kursRepository = kursRepository;
         this.buchungRepository = buchungRepository;
-        this.zahlungRepository = zahlungRepository;
+
     }
 
     public void importStudents(MultipartFile file) {
-        zahlungRepository.deleteAll();
+
         buchungRepository.deleteAll();
         studentRepository.deleteAll();
 
@@ -90,7 +89,6 @@ public class ExcelImportService {
     }
 
     public void importKurse(MultipartFile file) {
-        zahlungRepository.deleteAll();
         buchungRepository.deleteAll();
         kursRepository.deleteAll();
 

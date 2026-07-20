@@ -38,6 +38,8 @@ public class BuchungController {
         return buchungService.getBuchungenByKursId(kursId);
     }
 
+
+
     @DeleteMapping("/{id}")
     public void deleteBuchung(
             @PathVariable Long id

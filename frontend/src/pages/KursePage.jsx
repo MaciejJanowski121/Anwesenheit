@@ -23,10 +23,17 @@ function KursePage() {
     const [editData, setEditData] = useState({});
 
     useEffect(() => {
-        getKurse()
-            .then((data) => setKurse(data))
-            .catch((error) => console.error(error));
+        loadKurse();
     }, []);
+
+    const loadKurse = async () => {
+        try {
+            const data = await getKurse();
+            setKurse(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const filteredKurse = kurse.filter((kurs) => {
         const term = filter.toLowerCase();
@@ -62,50 +69,79 @@ function KursePage() {
         }));
     };
 
-    const handleEditSave = async () => {
-        let savedKurs;
-
-        const dataToSave = {
-            ...editData,
+    const createPayload = () => {
+        return {
+            name: editData.name || '',
+            kursleitung: editData.kursleitung || '',
+            wochentag: editData.wochentag || '',
+            uhrzeit: editData.uhrzeit || '',
+            buchungsart: editData.buchungsart || '',
             kursgebuehr:
-                editData.kursgebuehr === '' || editData.kursgebuehr === null
+                editData.kursgebuehr === '' ||
+                editData.kursgebuehr === null ||
+                editData.kursgebuehr === undefined
                     ? null
                     : Number(editData.kursgebuehr)
         };
+    };
 
-        if (typeof editingId === 'number') {
-            savedKurs = await updateKurs(editingId, dataToSave);
-        } else {
-            savedKurs = await createKurs(dataToSave);
+    const handleEditSave = async () => {
+        try {
+            let savedKurs;
+            const dataToSave = createPayload();
+
+            if (typeof editingId === 'number') {
+                savedKurs = await updateKurs(editingId, dataToSave);
+
+                setKurse((prev) =>
+                    prev.map((kurs) =>
+                        kurs.id === editingId ? savedKurs : kurs
+                    )
+                );
+            } else {
+                savedKurs = await createKurs(dataToSave);
+
+                setKurse((prev) =>
+                    prev.map((kurs) =>
+                        kurs.id === editingId ? savedKurs : kurs
+                    )
+                );
+            }
+
+            setEditingId(null);
+            setEditData({});
+        } catch (error) {
+            console.error('Fehler beim Speichern des Kurses:', error);
         }
-
-        setKurse((prev) =>
-            prev.map((kurs) =>
-                kurs.id === editingId ? savedKurs : kurs
-            )
-        );
-
-        setEditingId(null);
-        setEditData({});
     };
 
     const handleEditCancel = () => {
+        if (typeof editingId !== 'number') {
+            setKurse((prev) =>
+                prev.filter((kurs) => kurs.id !== editingId)
+            );
+        }
+
         setEditingId(null);
         setEditData({});
     };
 
     const handleDelete = async (id) => {
-        if (typeof id === 'number') {
-            await deleteKurs(id);
-        }
+        try {
+            if (typeof id === 'number') {
+                await deleteKurs(id);
+            }
 
-        setKurse((prev) =>
-            prev.filter((kurs) => kurs.id !== id)
-        );
+            setKurse((prev) =>
+                prev.filter((kurs) => kurs.id !== id)
+            );
 
-        if (editingId === id) {
-            setEditingId(null);
-            setEditData({});
+            if (editingId === id) {
+                setEditingId(null);
+                setEditData({});
+            }
+        } catch (error) {
+            console.error('Fehler beim Löschen des Kurses:', error);
         }
     };
 

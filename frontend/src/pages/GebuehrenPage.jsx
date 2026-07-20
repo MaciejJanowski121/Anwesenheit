@@ -2,53 +2,71 @@ import React, { useEffect, useState } from 'react';
 import {
     getStudents,
     getBuchungenByStudent,
-    getZahlungenByStudent,
-    deleteZahlung,
-    bezahleKurs
+    getGebuehrenStatus,
+    toggleGebuehrenErfasst
 } from '../services/gebuehrenService';
 import './GebuehrenPage.css';
 
-function GebuehrenPage() {
-    const currentMonth = new Date().toISOString().slice(0, 7);
+const schuljahre = [
+    '2025/2026',
+    '2026/2027',
+    '2027/2028',
+    '2028/2029'
+];
 
+function GebuehrenPage() {
     const [students, setStudents] = useState([]);
     const [selectedStudentId, setSelectedStudentId] = useState('');
     const [buchungen, setBuchungen] = useState([]);
-    const [zahlungen, setZahlungen] = useState([]);
     const [message, setMessage] = useState('');
-    const [abrechnungsmonat, setAbrechnungsmonat] = useState(currentMonth);
+
+    const [schuljahr, setSchuljahr] = useState('2026/2027');
+    const [halbjahr, setHalbjahr] = useState(1);
+    const [erfassung, setErfassung] = useState(null);
 
     useEffect(() => {
         getStudents()
-            .then((data) => setStudents(data))
+            .then(setStudents)
             .catch((error) => {
                 console.error(error);
                 setMessage('Schüler konnten nicht geladen werden.');
             });
     }, []);
 
-    const loadGebuehrenData = async (studentId) => {
-        const [buchungenData, zahlungenData] = await Promise.all([
-            getBuchungenByStudent(studentId),
-            getZahlungenByStudent(studentId)
-        ]);
+    useEffect(() => {
+        if (selectedStudentId) {
+            loadErfassung(selectedStudentId, schuljahr, halbjahr);
+        }
+    }, [selectedStudentId, schuljahr, halbjahr]);
 
-        setBuchungen(buchungenData);
-        setZahlungen(zahlungenData);
+    const loadBuchungen = async (studentId) => {
+        const data = await getBuchungenByStudent(studentId);
+        setBuchungen(data);
+    };
+
+    const loadErfassung = async (studentId, selectedSchuljahr, selectedHalbjahr) => {
+        const data = await getGebuehrenStatus(
+            studentId,
+            selectedSchuljahr,
+            selectedHalbjahr
+        );
+
+        setErfassung(data);
     };
 
     const handleStudentChange = async (studentId) => {
         setSelectedStudentId(studentId);
         setMessage('');
+        setErfassung(null);
 
         if (!studentId) {
             setBuchungen([]);
-            setZahlungen([]);
             return;
         }
 
         try {
-            await loadGebuehrenData(studentId);
+            await loadBuchungen(studentId);
+            await loadErfassung(studentId, schuljahr, halbjahr);
         } catch (error) {
             console.error(error);
             setMessage('Gebührendaten konnten nicht geladen werden.');
@@ -59,30 +77,6 @@ function GebuehrenPage() {
         (student) => String(student.id) === String(selectedStudentId)
     );
 
-    const filteredZahlungen = zahlungen.filter((zahlung) => {
-        if (!abrechnungsmonat) {
-            return true;
-        }
-
-        return String(zahlung.abrechnungsmonat) === abrechnungsmonat;
-    });
-
-    const getBezahltForBuchung = (buchungId) => {
-        return filteredZahlungen
-            .filter((zahlung) => zahlung.buchung?.id === buchungId)
-            .reduce((sum, zahlung) => sum + (zahlung.betrag || 0), 0);
-    };
-
-    const total = buchungen.reduce((sum, buchung) => {
-        return sum + (buchung.kurs?.kursgebuehr || 0);
-    }, 0);
-
-    const bezahlt = filteredZahlungen.reduce((sum, zahlung) => {
-        return sum + (zahlung.betrag || 0);
-    }, 0);
-
-    const offen = total - bezahlt;
-
     const formatCurrency = (value) => {
         return value.toLocaleString('de-DE', {
             style: 'currency',
@@ -90,29 +84,77 @@ function GebuehrenPage() {
         });
     };
 
-    const handleBezahleKurs = async (buchungId) => {
-        try {
-            await bezahleKurs(buchungId, abrechnungsmonat);
-            setMessage('Zahlung wurde gespeichert.');
-            await loadGebuehrenData(selectedStudentId);
-        } catch (error) {
-            console.error(error);
-            setMessage(
-                error.response?.data?.message ||
-                error.response?.data ||
-                'Kurs wurde für diesen Monat bereits bezahlt.'
-            );
-        }
+    const getKursFaktor = (buchungsart) => {
+        if (!buchungsart) return 0;
+
+        const art = buchungsart.toUpperCase();
+
+        if (art === 'OGS') return 1;
+        if (art === 'OGSH') return 0.5;
+
+        return 0;
     };
 
-    const handleDeleteZahlung = async (id) => {
+    const getKursGebuehr = (kurs) => {
+        const art = kurs?.buchungsart?.toUpperCase();
+
+        if (art === 'M') {
+            return kurs.kursgebuehr || 0;
+        }
+
+        return 0;
+    };
+
+    const getBerechnung = (kurs) => {
+        const art = kurs?.buchungsart?.toUpperCase();
+
+        if (art === 'M') return 'Individuelle Kursgebühr';
+        if (art === 'OGS') return '1 Kurs';
+        if (art === 'OGSH') return '0,5 Kurs';
+        if (art === 'KURZ') return 'kostenlos';
+        if (art === 'OGSF') return 'kostenlos';
+        if (art === 'P') return 'kostenlos';
+
+        return '–';
+    };
+
+    const getOgsGebuehr = (faktor) => {
+        return faktor * 150;
+    };
+
+    const countByBuchungsart = (art) => {
+        return buchungen.filter(
+            (buchung) =>
+                buchung.kurs?.buchungsart?.toUpperCase() === art
+        ).length;
+    };
+
+    const ogsFaktor = buchungen.reduce((sum, buchung) => {
+        return sum + getKursFaktor(buchung.kurs?.buchungsart);
+    }, 0);
+
+    const musikGebuehren = buchungen.reduce((sum, buchung) => {
+        return sum + getKursGebuehr(buchung.kurs);
+    }, 0);
+
+    const ogsGebuehr = getOgsGebuehr(ogsFaktor);
+    const gesamt = ogsGebuehr + musikGebuehren;
+
+    const handleToggleErfasst = async () => {
+        if (!selectedStudentId) return;
+
         try {
-            await deleteZahlung(id);
-            setMessage('Zahlung wurde gelöscht.');
-            await loadGebuehrenData(selectedStudentId);
+            const data = await toggleGebuehrenErfasst(
+                selectedStudentId,
+                schuljahr,
+                halbjahr
+            );
+
+            setErfassung(data);
+            setMessage('Erfassungsstatus wurde aktualisiert.');
         } catch (error) {
             console.error(error);
-            setMessage('Zahlung konnte nicht gelöscht werden.');
+            setMessage('Erfassungsstatus konnte nicht aktualisiert werden.');
         }
     };
 
@@ -139,155 +181,140 @@ function GebuehrenPage() {
             </section>
 
             {selectedStudent && (
-                <>
-                    <section className="gebuehren-card">
-                        <h3>
-                            Gebührenübersicht für {selectedStudent.nachname}, {selectedStudent.vorname}
-                        </h3>
+                <section className="gebuehren-card">
+                    <h3>
+                        Gebührenübersicht für {selectedStudent.nachname}, {selectedStudent.vorname}
+                    </h3>
 
-                        <div className="month-selector">
-                            <label>Abrechnungsmonat</label>
-
-                            <input
-                                type="month"
-                                value={abrechnungsmonat}
-                                onChange={(e) => setAbrechnungsmonat(e.target.value)}
-                            />
+                    <div className="gebuehren-filter-row">
+                        <div className="filter-field">
+                            <label>Schuljahr</label>
+                            <select
+                                value={schuljahr}
+                                onChange={(e) => setSchuljahr(e.target.value)}
+                            >
+                                {schuljahre.map((jahr) => (
+                                    <option key={jahr} value={jahr}>
+                                        {jahr}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
-                        {buchungen.length === 0 ? (
-                            <p className="empty-text">
-                                Für diesen Schüler sind noch keine Kurse gebucht.
-                            </p>
-                        ) : (
-                            <>
-                                <table className="gebuehren-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Kurs</th>
-                                        <th>Wochentag</th>
-                                        <th>Uhrzeit</th>
-                                        <th>Gebucht seit</th>
-                                        <th>Gebühr</th>
-                                        <th>Bezahlt</th>
-                                        <th>Offen</th>
-                                        <th>Status</th>
-                                        <th>Aktion</th>
-                                    </tr>
-                                    </thead>
+                        <div className="filter-field">
+                            <label>Halbjahr</label>
+                            <select
+                                value={halbjahr}
+                                onChange={(e) => setHalbjahr(Number(e.target.value))}
+                            >
+                                <option value={1}>1. Halbjahr</option>
+                                <option value={2}>2. Halbjahr</option>
+                            </select>
+                        </div>
 
-                                    <tbody>
-                                    {buchungen.map((buchung) => {
-                                        const kursGebuehr = buchung.kurs?.kursgebuehr || 0;
-                                        const bezahltForBuchung = getBezahltForBuchung(buchung.id);
-                                        const offenForBuchung = kursGebuehr - bezahltForBuchung;
-                                        const isBezahlt = offenForBuchung <= 0 && kursGebuehr > 0;
+                        <div className="erfassung-status-box">
+                            <span>Status</span>
 
-                                        return (
-                                            <tr key={buchung.id}>
-                                                <td>{buchung.kurs?.name || '–'}</td>
-                                                <td>{buchung.kurs?.wochentag || '–'}</td>
-                                                <td>{buchung.kurs?.uhrzeit || '–'}</td>
-                                                <td>{buchung.buchungsdatum || '–'}</td>
-                                                <td>{formatCurrency(kursGebuehr)}</td>
-                                                <td>{formatCurrency(bezahltForBuchung)}</td>
-                                                <td>{formatCurrency(offenForBuchung)}</td>
-                                                <td>
-                                                    {isBezahlt ? (
-                                                        <span className="bezahlt-label">
-                                                            Bezahlt
-                                                        </span>
-                                                    ) : (
-                                                        <span className="offen-label">
-                                                            Offen
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    {isBezahlt ? (
-                                                        <span className="already-paid-text">
-                                                            ✔ Bezahlt
-                                                        </span>
-                                                    ) : (
-                                                        <button
-                                                            className="payment-button"
-                                                            onClick={() => handleBezahleKurs(buchung.id)}
-                                                            disabled={kursGebuehr <= 0}
-                                                        >
-                                                            Bezahlen
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                    </tbody>
-                                </table>
+                            {erfassung?.erfasst ? (
+                                <strong className="status-erfasst">
+                                    Erfasst
+                                </strong>
+                            ) : (
+                                <strong className="status-nicht-erfasst">
+                                    Nicht erfasst
+                                </strong>
+                            )}
 
-                                <div className="gebuehren-summary">
-                                    <div>
-                                        <span>Anzahl Kurse</span>
-                                        <strong>{buchungen.length}</strong>
-                                    </div>
+                            <button
+                                className="payment-button"
+                                onClick={handleToggleErfasst}
+                            >
+                                {erfassung?.erfasst
+                                    ? 'Rückgängig'
+                                    : 'Als erfasst markieren'}
+                            </button>
+                        </div>
+                    </div>
 
-                                    <div>
-                                        <span>Gesamtbetrag</span>
-                                        <strong>{formatCurrency(total)}</strong>
-                                    </div>
-
-                                    <div>
-                                        <span>Bezahlt</span>
-                                        <strong>{formatCurrency(bezahlt)}</strong>
-                                    </div>
-
-                                    <div>
-                                        <span>Offen</span>
-                                        <strong>{formatCurrency(offen)}</strong>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </section>
-
-                    {filteredZahlungen.length > 0 && (
-                        <section className="gebuehren-card">
-                            <h3>Zahlungshistorie für {abrechnungsmonat}</h3>
-
+                    {buchungen.length === 0 ? (
+                        <p className="empty-text">
+                            Für diesen Schüler sind noch keine Kurse gebucht.
+                        </p>
+                    ) : (
+                        <>
                             <table className="gebuehren-table">
                                 <thead>
                                 <tr>
-                                    <th>Abrechnungsmonat</th>
-                                    <th>Zahlungsdatum</th>
                                     <th>Kurs</th>
-                                    <th>Betrag</th>
-                                    <th>Bemerkung</th>
-                                    <th>Aktionen</th>
+                                    <th>Wochentag</th>
+                                    <th>Uhrzeit</th>
+                                    <th>Buchungsart</th>
+                                    <th>Berechnung</th>
+                                    <th>Faktor</th>
+                                    <th>Kursgebühr</th>
                                 </tr>
                                 </thead>
 
                                 <tbody>
-                                {filteredZahlungen.map((zahlung) => (
-                                    <tr key={zahlung.id}>
-                                        <td>{String(zahlung.abrechnungsmonat) || '–'}</td>
-                                        <td>{zahlung.zahlungsdatum || '–'}</td>
-                                        <td>{zahlung.buchung?.kurs?.name || '–'}</td>
-                                        <td>{formatCurrency(zahlung.betrag || 0)}</td>
-                                        <td>{zahlung.bemerkung || '–'}</td>
-                                        <td>
-                                            <button
-                                                className="delete-payment-button"
-                                                onClick={() => handleDeleteZahlung(zahlung.id)}
-                                            >
-                                                Löschen
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {buchungen.map((buchung) => {
+                                    const kurs = buchung.kurs;
+                                    const faktor = getKursFaktor(kurs?.buchungsart);
+                                    const kursGebuehr = getKursGebuehr(kurs);
+
+                                    return (
+                                        <tr key={buchung.id}>
+                                            <td>{kurs?.name || '–'}</td>
+                                            <td>{kurs?.wochentag || '–'}</td>
+                                            <td>{kurs?.uhrzeit || '–'}</td>
+                                            <td>{kurs?.buchungsart || '–'}</td>
+                                            <td>{getBerechnung(kurs)}</td>
+                                            <td>{faktor}</td>
+                                            <td>{formatCurrency(kursGebuehr)}</td>
+                                        </tr>
+                                    );
+                                })}
                                 </tbody>
                             </table>
-                        </section>
+
+                            <div className="gebuehren-summary">
+                                <div>
+                                    <span>OGS-Kurse</span>
+                                    <strong>{countByBuchungsart('OGS')}</strong>
+                                </div>
+
+                                <div>
+                                    <span>OGSH-Kurse</span>
+                                    <strong>{countByBuchungsart('OGSH')}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Musikkurse</span>
+                                    <strong>{countByBuchungsart('M')}</strong>
+                                </div>
+
+                                <div>
+                                    <span>OGS-Faktor</span>
+                                    <strong>{ogsFaktor}</strong>
+                                </div>
+
+                                <div>
+                                    <span>OGS-Gebühr / Halbjahr</span>
+                                    <strong>{formatCurrency(ogsGebuehr)}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Musikgebühren</span>
+                                    <strong>{formatCurrency(musikGebuehren)}</strong>
+                                </div>
+
+                                <div className="summary-total">
+                                    <span>Gesamtbetrag / Halbjahr</span>
+                                    <strong>{formatCurrency(gesamt)}</strong>
+                                </div>
+                            </div>
+                        </>
                     )}
-                </>
+                </section>
             )}
 
             {message && (

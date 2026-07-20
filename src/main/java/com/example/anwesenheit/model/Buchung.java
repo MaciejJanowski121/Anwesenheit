@@ -28,4 +28,5 @@ public class Buchung {
     private Kurs kurs;
 
     private LocalDate buchungsdatum;
+
 }

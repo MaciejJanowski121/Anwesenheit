@@ -6,29 +6,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-
-
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
 @Entity
-public class Zahlung {
+public class GebuehrenErfassung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Buchung buchung;
+    private Student student;
 
-    private Double betrag;
+    private String schuljahr;
 
-    private LocalDate zahlungsdatum;
+    private Integer halbjahr;
 
-    private YearMonth abrechnungsmonat;
-
-    private String bemerkung;
+    private Boolean erfasst;
 }
