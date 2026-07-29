@@ -105,7 +105,7 @@ function AnwesenheitPage() {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/buchungen/kurs/${kursId}`
+                `/api/buchungen/kurs/${kursId}`
             );
 
             const buchungen = await response.json();

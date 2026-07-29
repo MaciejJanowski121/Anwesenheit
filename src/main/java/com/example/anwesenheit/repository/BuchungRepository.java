@@ -10,4 +10,5 @@ public interface BuchungRepository extends JpaRepository<Buchung, Long> {
     List<Buchung> findByStudentId(Long studentId);
 
     List<Buchung> findByKursId(Long kursId);
+
 }

@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/buchungen';
+const API_URL = '/api/buchungen';
 
 export const getBuchungenByStudent = async (studentId) => {
     const response = await axios.get(

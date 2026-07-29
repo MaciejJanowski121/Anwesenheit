@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/anwesenheiten';
+const API_URL = '/api/anwesenheiten';
 
 export const getAllAnwesenheiten = async () => {
     const response = await axios.get(API_URL);

@@ -41,16 +41,17 @@ function StudentTable({
             if (isEditing) {
                 return (
                     <input
-                        type="checkbox"
-                        checked={!!editData[col.key]}
+                        className="edit-input"
+                        type="text"
+                        value={editData[col.key] ?? ''}
                         onChange={(e) =>
-                            onEditChange(col.key, e.target.checked)
+                            onEditChange(col.key, e.target.value)
                         }
                     />
                 );
             }
 
-            return student[col.key] ? 'Ja' : 'Nein';
+            return student[col.key] || '–';
         }
 
         if (isEditing) {

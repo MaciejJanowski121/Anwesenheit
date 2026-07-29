@@ -15,7 +15,7 @@ const emptyStudent = {
     nachname: '',
     jahrgang: '',
     klasse: '',
-    fotoFreigabe: false,
+    fotoFreigabe: '',
     email1: '',
     telefon1: '',
     mobil1: '',
@@ -49,6 +49,7 @@ function GesamtuebersichtPage() {
             (s.vorname || '').toLowerCase().includes(term) ||
             (s.nachname || '').toLowerCase().includes(term) ||
             (s.klasse || '').toLowerCase().includes(term) ||
+            (s.fotoFreigabe || '').toLowerCase().includes(term) ||
             (s.email1 || '').toLowerCase().includes(term) ||
             (s.telefon1 || '').toLowerCase().includes(term) ||
             (s.mobil1 || '').toLowerCase().includes(term) ||
@@ -58,7 +59,6 @@ function GesamtuebersichtPage() {
             String(s.jahrgang || '').includes(term)
         );
     });
-
     const sorted = [...filtered].sort((a, b) => {
         if (!sortKey) return 0;
 

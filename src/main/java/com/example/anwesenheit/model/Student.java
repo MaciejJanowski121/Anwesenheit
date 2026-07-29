@@ -33,7 +33,7 @@ public class Student {
 
     private String klasse;
 
-    private Boolean fotoFreigabe;
+    private String fotoFreigabe;
 
     private String email1;
 

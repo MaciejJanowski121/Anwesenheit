@@ -8,6 +8,7 @@ import AnwesenheitPage from './pages/AnwesenheitPage';
 import ImportPage from './pages/ImportPage';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 import GebuehrenPage from './pages/GebuehrenPage';
+import ZuschuessePage from "./pages/ZuschuessePage";
 import './App.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                     <Route path="/anwesenheit" element={<AnwesenheitPage />} />
                     <Route path="/import" element={<ImportPage />} />
                     <Route path="/students/:id" element={<StudentDetailsPage />} />
+                    <Route path="/zuschuesse" element={<ZuschuessePage />} />
                 </Route>
             </Routes>
         </BrowserRouter>

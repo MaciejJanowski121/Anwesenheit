@@ -36,6 +36,10 @@ function MainLayout() {
                     Anwesenheit
                 </NavLink>
 
+                <NavLink to="/zuschuesse">
+                    Zuschüsse
+                </NavLink>
+
                 <NavLink to="/gebuehren">
                     Gebühren
                 </NavLink>
