@@ -1,24 +1,92 @@
-.table-container {
+/* =====================================================
+   SCROLL CONTAINER
+   ===================================================== */
+
+.student-table-scroll {
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 8px;
+
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #666666 #2a2a2a;
 }
 
-.student-table {
+.student-table-scroll::-webkit-scrollbar {
+    height: 10px;
+}
+
+.student-table-scroll::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: #2a2a2a;
+}
+
+.student-table-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: #666666;
+}
+
+.student-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7a7a7a;
+}
+
+.student-table-container {
+    min-width: 100%;
     width: max-content;
-    min-width: 1700px;
+}
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.student-table {
+    width: 100%;
+    min-width: 1750px;
     border-collapse: collapse;
+    border: 1px solid #444444;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #252525;
     font-size: 0.9rem;
 }
 
 .student-table th {
-    border-bottom: 2px solid #555;
-    padding: 8px 12px;
+    padding: 11px 14px;
+    border-bottom: 2px solid #555555;
+    background: #2f2f2f;
+    color: #e5e5e5;
+    font-size: 0.82rem;
+    font-weight: 600;
     text-align: left;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
     white-space: nowrap;
 }
+
+.student-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #3e3e3e;
+    color: #dddddd;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.student-table tbody tr {
+    background: #252525;
+    transition: background-color 0.15s ease;
+}
+
+.student-table tbody tr:hover {
+    background: #303030;
+}
+
+.student-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =====================================================
+   SORT
+   ===================================================== */
 
 .sortable-header {
     cursor: pointer;
@@ -26,42 +94,61 @@
 }
 
 .sortable-header:hover {
-    background-color: #3a3a3a;
+    background: #3a3a3a;
 }
 
-.student-table tbody tr {
-    border-bottom: 1px solid #444;
+.header-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.student-table tbody tr:hover {
-    background-color: #333;
-}
-
-.student-table td {
-    padding: 8px 12px;
-    white-space: nowrap;
-}
+/* =====================================================
+   EMPTY
+   ===================================================== */
 
 .empty-row {
-    text-align: center;
-    color: #999;
-    padding: 24px 12px;
+    padding: 30px 14px !important;
+    color: #999999 !important;
+    text-align: center !important;
+}
+
+/* =====================================================
+   EDITING
+   ===================================================== */
+
+.edit-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 110px;
+    padding: 7px 9px;
+    border: 1px solid #666666;
+    border-radius: 6px;
+    outline: none;
+    background: #202020;
+    color: #ffffff;
+    font-size: 0.85rem;
+}
+
+.edit-input:focus {
+    border-color: #e8792b;
+    box-shadow: 0 0 0 2px rgba(232, 121, 43, 0.15);
+}
+
+/* =====================================================
+   ACTIONS
+   ===================================================== */
+
+.actions-header {
+    text-align: right !important;
 }
 
 .action-cell {
     display: flex;
-    gap: 6px;
-}
-
-.edit-input {
-    width: 100%;
-    min-width: 60px;
-    padding: 3px 6px;
-    font-size: 0.85rem;
-    border: 1px solid #666;
-    border-radius: 3px;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    min-width: 255px;
 }
 
 .btn-edit,
@@ -69,93 +156,89 @@
 .btn-save,
 .btn-cancel,
 .btn-details {
-
-    padding: 4px 10px;
-
     border: none;
-
-    border-radius: 4px;
-
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
     cursor: pointer;
-
-    font-size: 0.8rem;
-
-    color: #fff;
-
+    white-space: nowrap;
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
 }
-
 
 .btn-details {
     display: inline-block;
-    background-color: #3a3a3a;
+    background: #444444;
     text-decoration: none;
 }
 
 .btn-details:hover {
-    background-color: #4a4a4a;
+    background: #555555;
 }
 
 .btn-edit {
-    background-color: #e8792b;
+    background: #e8792b;
 }
 
 .btn-edit:hover {
-    background-color: #d06820;
+    background: #d06820;
 }
 
 .btn-delete {
-    background-color: #d94a4a;
+    background: #d94a4a;
 }
 
 .btn-delete:hover {
-    background-color: #bd3535;
+    background: #bd3535;
 }
 
 .btn-save {
-    background-color: #5a9e3e;
+    background: #5a9e3e;
 }
 
 .btn-save:hover {
-    background-color: #4a8a30;
+    background: #4a8a30;
 }
 
 .btn-cancel {
-    background-color: #888;
+    background: #777777;
 }
 
 .btn-cancel:hover {
-    background-color: #666;
+    background: #666666;
 }
 
-/* Toolbar */
-.table-toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    align-items: center;
-    flex-wrap: wrap;
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+    .student-table {
+        min-width: 1650px;
+    }
+
+    .student-table th,
+    .student-table td {
+        padding: 9px 11px;
+    }
 }
 
-.filter-input {
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background-color: #2a2a2a;
-    color: #e0e0e0;
-    min-width: 220px;
-}
-
-.btn-add {
-    padding: 6px 16px;
-    background-color: #5a9e3e;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
+.student-row {
     cursor: pointer;
-    font-size: 0.9rem;
 }
 
-.btn-add:hover {
-    background-color: #4a8a30;
+.student-row:hover {
+    background: #303030;
+}
+
+.student-row-editing {
+    cursor: default;
+    background: rgba(232, 121, 43, 0.08);
+}
+
+.student-row-editing:hover {
+    background: rgba(232, 121, 43, 0.08);
 }

@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
+
 import {
     getKurse,
     createKurs,
     updateKurs,
     deleteKurs
 } from '../services/kursService';
+
 import './KursePage.css';
 
 const emptyKurs = {
@@ -37,10 +39,13 @@ const BUCHUNGSARTEN = [
 function KursePage() {
     const [kurse, setKurse] = useState([]);
     const [filter, setFilter] = useState('');
+
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({});
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -53,17 +58,30 @@ function KursePage() {
             setError('');
 
             const data = await getKurse();
-            setKurse(Array.isArray(data) ? data : []);
+
+            setKurse(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
         } catch (error) {
-            console.error(error);
-            setError('Die Kurse konnten nicht geladen werden.');
+            console.error(
+                'Fehler beim Laden der Kurse:',
+                error
+            );
+
+            setError(
+                'Die Kurse konnten nicht geladen werden.'
+            );
         } finally {
             setLoading(false);
         }
     };
 
     const filteredKurse = useMemo(() => {
-        const term = filter.trim().toLowerCase();
+        const term = filter
+            .trim()
+            .toLowerCase();
 
         if (!term) {
             return kurse;
@@ -94,12 +112,13 @@ function KursePage() {
     }, [kurse]);
 
     const kostenpflichtigeKurse = useMemo(() => {
-        return kurse.filter(
-            (kurs) =>
+        return kurse.filter((kurs) => {
+            return (
                 kurs.kursgebuehr !== null &&
                 kurs.kursgebuehr !== undefined &&
                 kurs.kursgebuehr !== ''
-        ).length;
+            );
+        }).length;
     }, [kurse]);
 
     const handleAdd = () => {
@@ -108,12 +127,17 @@ function KursePage() {
         }
 
         const tempId = `new-${Date.now()}`;
+
         const newKurs = {
             ...emptyKurs,
             id: tempId
         };
 
-        setKurse((prev) => [newKurs, ...prev]);
+        setKurse((previous) => [
+            newKurs,
+            ...previous
+        ]);
+
         setEditingId(tempId);
         setEditData(newKurs);
         setError('');
@@ -125,27 +149,39 @@ function KursePage() {
         }
 
         setEditingId(kurs.id);
+
         setEditData({
             ...kurs,
             kursgebuehr: kurs.kursgebuehr ?? ''
         });
+
         setError('');
     };
 
     const handleEditChange = (field, value) => {
-        setEditData((prev) => ({
-            ...prev,
+        setEditData((previous) => ({
+            ...previous,
             [field]: value
         }));
     };
 
     const createPayload = () => {
         return {
-            name: editData.name?.trim() || '',
-            kursleitung: editData.kursleitung?.trim() || '',
-            wochentag: editData.wochentag || '',
-            uhrzeit: editData.uhrzeit || '',
-            buchungsart: editData.buchungsart || '',
+            name:
+                editData.name?.trim() || '',
+
+            kursleitung:
+                editData.kursleitung?.trim() || '',
+
+            wochentag:
+                editData.wochentag || '',
+
+            uhrzeit:
+                editData.uhrzeit || '',
+
+            buchungsart:
+                editData.buchungsart || '',
+
             kursgebuehr:
                 editData.kursgebuehr === '' ||
                 editData.kursgebuehr === null ||
@@ -157,22 +193,34 @@ function KursePage() {
 
     const validateKurs = () => {
         if (!editData.name?.trim()) {
-            setError('Bitte geben Sie einen Kursnamen ein.');
+            setError(
+                'Bitte geben Sie einen Kursnamen ein.'
+            );
+
             return false;
         }
 
         if (!editData.kursleitung?.trim()) {
-            setError('Bitte geben Sie eine Kursleitung ein.');
+            setError(
+                'Bitte geben Sie eine Kursleitung ein.'
+            );
+
             return false;
         }
 
         if (!editData.wochentag) {
-            setError('Bitte wählen Sie einen Wochentag aus.');
+            setError(
+                'Bitte wählen Sie einen Wochentag aus.'
+            );
+
             return false;
         }
 
         if (!editData.buchungsart) {
-            setError('Bitte wählen Sie eine Buchungsart aus.');
+            setError(
+                'Bitte wählen Sie eine Buchungsart aus.'
+            );
+
             return false;
         }
 
@@ -180,7 +228,10 @@ function KursePage() {
             editData.kursgebuehr !== '' &&
             Number(editData.kursgebuehr) < 0
         ) {
-            setError('Die Kursgebühr darf nicht negativ sein.');
+            setError(
+                'Die Kursgebühr darf nicht negativ sein.'
+            );
+
             return false;
         }
 
@@ -196,20 +247,23 @@ function KursePage() {
             setSaving(true);
             setError('');
 
-            const dataToSave = createPayload();
+            const payload = createPayload();
+
             let savedKurs;
 
             if (typeof editingId === 'number') {
                 savedKurs = await updateKurs(
                     editingId,
-                    dataToSave
+                    payload
                 );
             } else {
-                savedKurs = await createKurs(dataToSave);
+                savedKurs = await createKurs(
+                    payload
+                );
             }
 
-            setKurse((prev) =>
-                prev.map((kurs) =>
+            setKurse((previous) =>
+                previous.map((kurs) =>
                     kurs.id === editingId
                         ? savedKurs
                         : kurs
@@ -235,9 +289,10 @@ function KursePage() {
 
     const handleEditCancel = () => {
         if (typeof editingId !== 'number') {
-            setKurse((prev) =>
-                prev.filter(
-                    (kurs) => kurs.id !== editingId
+            setKurse((previous) =>
+                previous.filter(
+                    (kurs) =>
+                        kurs.id !== editingId
                 )
             );
         }
@@ -263,9 +318,10 @@ function KursePage() {
                 await deleteKurs(kurs.id);
             }
 
-            setKurse((prev) =>
-                prev.filter(
-                    (item) => item.id !== kurs.id
+            setKurse((previous) =>
+                previous.filter(
+                    (item) =>
+                        item.id !== kurs.id
                 )
             );
 
@@ -312,7 +368,8 @@ function KursePage() {
     };
 
     const renderCell = (kurs, field) => {
-        const isEditing = editingId === kurs.id;
+        const isEditing =
+            editingId === kurs.id;
 
         if (!isEditing) {
             if (field === 'kursgebuehr') {
@@ -346,13 +403,14 @@ function KursePage() {
                             K
                         </span>
 
-                        <div>
+                        <div className="kurs-name-content">
                             <strong>
                                 {kurs.name || '–'}
                             </strong>
 
                             <small>
                                 {kurs.wochentag || 'Kein Tag'}
+
                                 {kurs.uhrzeit
                                     ? ` · ${kurs.uhrzeit}`
                                     : ''}
@@ -454,45 +512,54 @@ function KursePage() {
 
     return (
         <div className="kurse-page">
-            <section className="kurse-header">
-                <div>
-                    <span className="kurse-eyebrow">
-                        Kursverwaltung
-                    </span>
 
+            <header className="page-header">
+                <div className="page-header-content">
                     <h1>Kurse</h1>
 
                     <p>
-                        Verwalten Sie Kurse,
-                        Kursleitungen und
-                        Buchungsarten.
+                        Kurse, Kursleitungen,
+                        Buchungsarten und Gebühren verwalten
                     </p>
                 </div>
 
                 <button
                     type="button"
-                    className="btn-add"
+                    className="kurse-add-button"
                     onClick={handleAdd}
                     disabled={editingId !== null}
                 >
                     <span>+</span>
                     Neuer Kurs
                 </button>
-            </section>
+            </header>
 
             <section className="kurse-stats">
                 <div className="kurse-stat-card">
-                    <span>Alle Kurse</span>
-                    <strong>{kurse.length}</strong>
+                    <span>
+                        Alle Kurse
+                    </span>
+
+                    <strong>
+                        {kurse.length}
+                    </strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>Buchungsarten</span>
-                    <strong>{kursartenCount}</strong>
+                    <span>
+                        Buchungsarten
+                    </span>
+
+                    <strong>
+                        {kursartenCount}
+                    </strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>Mit Kursgebühr</span>
+                    <span>
+                        Mit Kursgebühr
+                    </span>
+
                     <strong>
                         {kostenpflichtigeKurse}
                     </strong>
@@ -506,6 +573,7 @@ function KursePage() {
             )}
 
             <section className="kurse-content">
+
                 <div className="kurse-toolbar">
                     <div className="kurse-search">
                         <span className="kurse-search-icon">
@@ -527,13 +595,14 @@ function KursePage() {
 
                     <span className="kurse-result-count">
                         {filteredKurse.length}{' '}
+
                         {filteredKurse.length === 1
                             ? 'Kurs'
                             : 'Kurse'}
                     </span>
                 </div>
 
-                <div className="kurse-table-wrapper">
+                <div className="kurse-table-scroll">
                     <table className="kurse-table">
                         <thead>
                         <tr>
@@ -543,6 +612,7 @@ function KursePage() {
                             <th>Uhrzeit</th>
                             <th>Buchungsart</th>
                             <th>Kursgebühr</th>
+
                             <th className="aktionen-header">
                                 Aktionen
                             </th>
@@ -554,7 +624,7 @@ function KursePage() {
                             <tr>
                                 <td
                                     colSpan="7"
-                                    className="empty-row"
+                                    className="kurse-empty-row"
                                 >
                                     Kurse werden geladen...
                                 </td>
@@ -563,7 +633,7 @@ function KursePage() {
                             <tr>
                                 <td
                                     colSpan="7"
-                                    className="empty-row"
+                                    className="kurse-empty-row"
                                 >
                                     Keine Kurse gefunden.
                                 </td>
@@ -620,18 +690,14 @@ function KursePage() {
                                         )}
                                     </td>
 
-                                    <td className="action-cell">
+                                    <td className="kurse-action-cell">
                                         {editingId === kurs.id ? (
                                             <>
                                                 <button
                                                     type="button"
-                                                    className="btn-save"
-                                                    onClick={
-                                                        handleEditSave
-                                                    }
-                                                    disabled={
-                                                        saving
-                                                    }
+                                                    className="kurse-save-button"
+                                                    onClick={handleEditSave}
+                                                    disabled={saving}
                                                 >
                                                     {saving
                                                         ? 'Speichern...'
@@ -640,13 +706,9 @@ function KursePage() {
 
                                                 <button
                                                     type="button"
-                                                    className="btn-cancel"
-                                                    onClick={
-                                                        handleEditCancel
-                                                    }
-                                                    disabled={
-                                                        saving
-                                                    }
+                                                    className="kurse-cancel-button"
+                                                    onClick={handleEditCancel}
+                                                    disabled={saving}
                                                 >
                                                     Abbrechen
                                                 </button>
@@ -655,15 +717,14 @@ function KursePage() {
                                             <>
                                                 <button
                                                     type="button"
-                                                    className="btn-edit"
+                                                    className="kurse-edit-button"
                                                     onClick={() =>
                                                         handleEditStart(
                                                             kurs
                                                         )
                                                     }
                                                     disabled={
-                                                        editingId !==
-                                                        null
+                                                        editingId !== null
                                                     }
                                                 >
                                                     Bearbeiten
@@ -671,15 +732,14 @@ function KursePage() {
 
                                                 <button
                                                     type="button"
-                                                    className="btn-delete"
+                                                    className="kurse-delete-button"
                                                     onClick={() =>
                                                         handleDelete(
                                                             kurs
                                                         )
                                                     }
                                                     disabled={
-                                                        editingId !==
-                                                        null
+                                                        editingId !== null
                                                     }
                                                     aria-label={`${kurs.name} löschen`}
                                                 >

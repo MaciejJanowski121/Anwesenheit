@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+
 import {
     getStudents,
     getBuchungenByStudent,
     getGebuehrenStatus,
     toggleGebuehrenErfasst
 } from '../services/gebuehrenService';
+
 import './GebuehrenPage.css';
 
 const schuljahre = [
@@ -26,35 +28,78 @@ function GebuehrenPage() {
 
     useEffect(() => {
         getStudents()
-            .then(setStudents)
+            .then((data) => {
+                setStudents(
+                    Array.isArray(data)
+                        ? data
+                        : []
+                );
+            })
             .catch((error) => {
                 console.error(error);
-                setMessage('Schüler konnten nicht geladen werden.');
+
+                setMessage(
+                    'Schüler konnten nicht geladen werden.'
+                );
             });
     }, []);
 
     useEffect(() => {
         if (selectedStudentId) {
-            loadErfassung(selectedStudentId, schuljahr, halbjahr);
+            loadErfassung(
+                selectedStudentId,
+                schuljahr,
+                halbjahr
+            );
         }
-    }, [selectedStudentId, schuljahr, halbjahr]);
+    }, [
+        selectedStudentId,
+        schuljahr,
+        halbjahr
+    ]);
 
-    const loadBuchungen = async (studentId) => {
-        const data = await getBuchungenByStudent(studentId);
-        setBuchungen(data);
-    };
+    const loadBuchungen = async (
+        studentId
+    ) => {
+        const data =
+            await getBuchungenByStudent(
+                studentId
+            );
 
-    const loadErfassung = async (studentId, selectedSchuljahr, selectedHalbjahr) => {
-        const data = await getGebuehrenStatus(
-            studentId,
-            selectedSchuljahr,
-            selectedHalbjahr
+        setBuchungen(
+            Array.isArray(data)
+                ? data
+                : []
         );
-
-        setErfassung(data);
     };
 
-    const handleStudentChange = async (studentId) => {
+    const loadErfassung = async (
+        studentId,
+        selectedSchuljahr,
+        selectedHalbjahr
+    ) => {
+        try {
+            const data =
+                await getGebuehrenStatus(
+                    studentId,
+                    selectedSchuljahr,
+                    selectedHalbjahr
+                );
+
+            setErfassung(data);
+        } catch (error) {
+            console.error(
+                'Gebührenstatus konnte nicht geladen werden:',
+                error
+            );
+
+            setErfassung(null);
+        }
+    };
+
+    const handleStudentChange = async (
+        studentId
+    ) => {
         setSelectedStudentId(studentId);
         setMessage('');
         setErfassung(null);
@@ -66,168 +111,345 @@ function GebuehrenPage() {
 
         try {
             await loadBuchungen(studentId);
-            await loadErfassung(studentId, schuljahr, halbjahr);
+
+            await loadErfassung(
+                studentId,
+                schuljahr,
+                halbjahr
+            );
         } catch (error) {
             console.error(error);
-            setMessage('Gebührendaten konnten nicht geladen werden.');
+
+            setMessage(
+                'Gebührendaten konnten nicht geladen werden.'
+            );
         }
     };
 
-    const selectedStudent = students.find(
-        (student) => String(student.id) === String(selectedStudentId)
-    );
+    const selectedStudent =
+        students.find(
+            (student) =>
+                String(student.id) ===
+                String(selectedStudentId)
+        );
 
     const formatCurrency = (value) => {
-        return value.toLocaleString('de-DE', {
-            style: 'currency',
-            currency: 'EUR'
-        });
+        return new Intl.NumberFormat(
+            'de-DE',
+            {
+                style: 'currency',
+                currency: 'EUR'
+            }
+        ).format(
+            Number(value) || 0
+        );
     };
 
-    const getKursFaktor = (buchungsart) => {
-        if (!buchungsart) return 0;
+    const getKursFaktor = (
+        buchungsart
+    ) => {
+        if (!buchungsart) {
+            return 0;
+        }
 
-        const art = buchungsart.toUpperCase();
+        const art =
+            buchungsart.toUpperCase();
 
-        if (art === 'OGS') return 1;
-        if (art === 'OGSH') return 0.5;
+        if (art === 'OGS') {
+            return 1;
+        }
+
+        if (art === 'OGSH') {
+            return 0.5;
+        }
 
         return 0;
     };
 
     const getKursGebuehr = (kurs) => {
-        const art = kurs?.buchungsart?.toUpperCase();
+        const art =
+            kurs?.buchungsart?.toUpperCase();
 
         if (art === 'M') {
-            return kurs.kursgebuehr || 0;
+            return Number(
+                kurs.kursgebuehr
+            ) || 0;
         }
 
         return 0;
     };
 
     const getBerechnung = (kurs) => {
-        const art = kurs?.buchungsart?.toUpperCase();
+        const art =
+            kurs?.buchungsart?.toUpperCase();
 
-        if (art === 'M') return 'Individuelle Kursgebühr';
-        if (art === 'OGS') return '1 Kurs';
-        if (art === 'OGSH') return '0,5 Kurs';
-        if (art === 'KURZ') return 'kostenlos';
-        if (art === 'OGSF') return 'kostenlos';
-        if (art === 'P') return 'kostenlos';
+        if (art === 'M') {
+            return 'Individuelle Kursgebühr';
+        }
+
+        if (art === 'OGS') {
+            return '1 Kurs';
+        }
+
+        if (art === 'OGSH') {
+            return '0,5 Kurs';
+        }
+
+        if (art === 'KURZ') {
+            return 'Kostenlos';
+        }
+
+        if (art === 'OGSF') {
+            return 'Kostenlos';
+        }
+
+        if (art === 'P') {
+            return 'Kostenlos';
+        }
 
         return '–';
     };
 
-    const getOgsGebuehr = (faktor) => {
+    const getOgsGebuehr = (
+        faktor
+    ) => {
         return faktor * 150;
     };
 
-    const countByBuchungsart = (art) => {
+    const countByBuchungsart = (
+        art
+    ) => {
         return buchungen.filter(
             (buchung) =>
-                buchung.kurs?.buchungsart?.toUpperCase() === art
+                buchung.kurs
+                    ?.buchungsart
+                    ?.toUpperCase() === art
         ).length;
     };
 
-    const ogsFaktor = buchungen.reduce((sum, buchung) => {
-        return sum + getKursFaktor(buchung.kurs?.buchungsart);
-    }, 0);
+    const ogsFaktor =
+        buchungen.reduce(
+            (sum, buchung) => {
+                return (
+                    sum +
+                    getKursFaktor(
+                        buchung.kurs
+                            ?.buchungsart
+                    )
+                );
+            },
+            0
+        );
 
-    const musikGebuehren = buchungen.reduce((sum, buchung) => {
-        return sum + getKursGebuehr(buchung.kurs);
-    }, 0);
+    const musikGebuehren =
+        buchungen.reduce(
+            (sum, buchung) => {
+                return (
+                    sum +
+                    getKursGebuehr(
+                        buchung.kurs
+                    )
+                );
+            },
+            0
+        );
 
-    const ogsGebuehr = getOgsGebuehr(ogsFaktor);
-    const gesamt = ogsGebuehr + musikGebuehren;
+    const ogsGebuehr =
+        getOgsGebuehr(ogsFaktor);
 
-    const handleToggleErfasst = async () => {
-        if (!selectedStudentId) return;
+    const gesamt =
+        ogsGebuehr +
+        musikGebuehren;
 
-        try {
-            const data = await toggleGebuehrenErfasst(
-                selectedStudentId,
-                schuljahr,
-                halbjahr
-            );
+    const handleToggleErfasst =
+        async () => {
+            if (!selectedStudentId) {
+                return;
+            }
 
-            setErfassung(data);
-            setMessage('Erfassungsstatus wurde aktualisiert.');
-        } catch (error) {
-            console.error(error);
-            setMessage('Erfassungsstatus konnte nicht aktualisiert werden.');
-        }
-    };
+            try {
+                const data =
+                    await toggleGebuehrenErfasst(
+                        selectedStudentId,
+                        schuljahr,
+                        halbjahr
+                    );
+
+                setErfassung(data);
+
+                setMessage(
+                    'Erfassungsstatus wurde aktualisiert.'
+                );
+            } catch (error) {
+                console.error(error);
+
+                setMessage(
+                    'Erfassungsstatus konnte nicht aktualisiert werden.'
+                );
+            }
+        };
 
     return (
         <div className="gebuehren-page">
-            <h2>Gebühren</h2>
 
-            <section className="gebuehren-card">
-                <h3>Schüler auswählen</h3>
+            <header className="page-header">
+                <div className="page-header-content">
+                    <h1>Gebühren</h1>
 
-                <select
-                    className="student-select"
-                    value={selectedStudentId}
-                    onChange={(e) => handleStudentChange(e.target.value)}
-                >
-                    <option value="">Bitte Schüler auswählen...</option>
+                    <p>
+                        Kursgebühren berechnen
+                        und die Übertragung in das
+                        Schulverwaltungsprogramm dokumentieren
+                    </p>
+                </div>
+            </header>
 
-                    {students.map((student) => (
-                        <option key={student.id} value={student.id}>
-                            {student.nachname}, {student.vorname}
+            {message && (
+                <div className="gebuehren-message">
+                    {message}
+                </div>
+            )}
+
+            <section className="gebuehren-section">
+                <div className="gebuehren-section-header">
+                    <div>
+                        <h2>
+                            Schüler auswählen
+                        </h2>
+
+                        <p>
+                            Wählen Sie einen Schüler aus,
+                            um die Gebührenübersicht zu öffnen.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="gebuehren-student-selection">
+                    <select
+                        className="student-select"
+                        value={selectedStudentId}
+                        onChange={(event) =>
+                            handleStudentChange(
+                                event.target.value
+                            )
+                        }
+                    >
+                        <option value="">
+                            Bitte Schüler auswählen...
                         </option>
-                    ))}
-                </select>
+
+                        {students.map((student) => (
+                            <option
+                                key={student.id}
+                                value={student.id}
+                            >
+                                {student.nachname},{' '}
+                                {student.vorname}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </section>
 
             {selectedStudent && (
-                <section className="gebuehren-card">
-                    <h3>
-                        Gebührenübersicht für {selectedStudent.nachname}, {selectedStudent.vorname}
-                    </h3>
+                <section className="gebuehren-section">
+                    <div className="gebuehren-section-header">
+                        <div>
+                            <h2>
+                                Gebührenübersicht
+                            </h2>
+
+                            <p>
+                                {selectedStudent.nachname},{' '}
+                                {selectedStudent.vorname}
+                            </p>
+                        </div>
+
+                        <span className="gebuehren-booking-count">
+                            {buchungen.length}{' '}
+                            {buchungen.length === 1
+                                ? 'Buchung'
+                                : 'Buchungen'}
+                        </span>
+                    </div>
 
                     <div className="gebuehren-filter-row">
-                        <div className="filter-field">
-                            <label>Schuljahr</label>
+                        <div className="gebuehren-filter-field">
+                            <label htmlFor="gebuehren-schuljahr">
+                                Schuljahr
+                            </label>
+
                             <select
+                                id="gebuehren-schuljahr"
                                 value={schuljahr}
-                                onChange={(e) => setSchuljahr(e.target.value)}
+                                onChange={(event) =>
+                                    setSchuljahr(
+                                        event.target.value
+                                    )
+                                }
                             >
-                                {schuljahre.map((jahr) => (
-                                    <option key={jahr} value={jahr}>
-                                        {jahr}
-                                    </option>
-                                ))}
+                                {schuljahre.map(
+                                    (jahr) => (
+                                        <option
+                                            key={jahr}
+                                            value={jahr}
+                                        >
+                                            {jahr}
+                                        </option>
+                                    )
+                                )}
                             </select>
                         </div>
 
-                        <div className="filter-field">
-                            <label>Halbjahr</label>
+                        <div className="gebuehren-filter-field">
+                            <label htmlFor="gebuehren-halbjahr">
+                                Halbjahr
+                            </label>
+
                             <select
+                                id="gebuehren-halbjahr"
                                 value={halbjahr}
-                                onChange={(e) => setHalbjahr(Number(e.target.value))}
+                                onChange={(event) =>
+                                    setHalbjahr(
+                                        Number(
+                                            event.target.value
+                                        )
+                                    )
+                                }
                             >
-                                <option value={1}>1. Halbjahr</option>
-                                <option value={2}>2. Halbjahr</option>
+                                <option value={1}>
+                                    1. Halbjahr
+                                </option>
+
+                                <option value={2}>
+                                    2. Halbjahr
+                                </option>
                             </select>
                         </div>
 
                         <div className="erfassung-status-box">
-                            <span>Status</span>
+                            <div className="erfassung-status-content">
+                                <span>
+                                    Status
+                                </span>
 
-                            {erfassung?.erfasst ? (
-                                <strong className="status-erfasst">
-                                    Erfasst
-                                </strong>
-                            ) : (
-                                <strong className="status-nicht-erfasst">
-                                    Nicht erfasst
-                                </strong>
-                            )}
+                                {erfassung?.erfasst ? (
+                                    <strong className="status-erfasst">
+                                        Erfasst
+                                    </strong>
+                                ) : (
+                                    <strong className="status-nicht-erfasst">
+                                        Nicht erfasst
+                                    </strong>
+                                )}
+                            </div>
 
                             <button
-                                className="payment-button"
-                                onClick={handleToggleErfasst}
+                                type="button"
+                                className="gebuehren-erfasst-button"
+                                onClick={
+                                    handleToggleErfasst
+                                }
                             >
                                 {erfassung?.erfasst
                                     ? 'Rückgängig'
@@ -237,90 +459,179 @@ function GebuehrenPage() {
                     </div>
 
                     {buchungen.length === 0 ? (
-                        <p className="empty-text">
-                            Für diesen Schüler sind noch keine Kurse gebucht.
-                        </p>
+                        <div className="gebuehren-empty">
+                            Für diesen Schüler sind
+                            noch keine Kurse gebucht.
+                        </div>
                     ) : (
                         <>
-                            <table className="gebuehren-table">
-                                <thead>
-                                <tr>
-                                    <th>Kurs</th>
-                                    <th>Wochentag</th>
-                                    <th>Uhrzeit</th>
-                                    <th>Buchungsart</th>
-                                    <th>Berechnung</th>
-                                    <th>Faktor</th>
-                                    <th>Kursgebühr</th>
-                                </tr>
-                                </thead>
+                            <div className="gebuehren-table-scroll">
+                                <table className="gebuehren-table">
+                                    <thead>
+                                    <tr>
+                                        <th>Kurs</th>
+                                        <th>Wochentag</th>
+                                        <th>Uhrzeit</th>
+                                        <th>Buchungsart</th>
+                                        <th>Berechnung</th>
+                                        <th>Faktor</th>
+                                        <th>Kursgebühr</th>
+                                    </tr>
+                                    </thead>
 
-                                <tbody>
-                                {buchungen.map((buchung) => {
-                                    const kurs = buchung.kurs;
-                                    const faktor = getKursFaktor(kurs?.buchungsart);
-                                    const kursGebuehr = getKursGebuehr(kurs);
+                                    <tbody>
+                                    {buchungen.map(
+                                        (buchung) => {
+                                            const kurs =
+                                                buchung.kurs;
 
-                                    return (
-                                        <tr key={buchung.id}>
-                                            <td>{kurs?.name || '–'}</td>
-                                            <td>{kurs?.wochentag || '–'}</td>
-                                            <td>{kurs?.uhrzeit || '–'}</td>
-                                            <td>{kurs?.buchungsart || '–'}</td>
-                                            <td>{getBerechnung(kurs)}</td>
-                                            <td>{faktor}</td>
-                                            <td>{formatCurrency(kursGebuehr)}</td>
-                                        </tr>
-                                    );
-                                })}
-                                </tbody>
-                            </table>
+                                            const faktor =
+                                                getKursFaktor(
+                                                    kurs?.buchungsart
+                                                );
+
+                                            const kursGebuehr =
+                                                getKursGebuehr(
+                                                    kurs
+                                                );
+
+                                            return (
+                                                <tr
+                                                    key={
+                                                        buchung.id
+                                                    }
+                                                >
+                                                    <td>
+                                                        {kurs?.name ||
+                                                            '–'}
+                                                    </td>
+
+                                                    <td>
+                                                        {kurs?.wochentag ||
+                                                            '–'}
+                                                    </td>
+
+                                                    <td>
+                                                        {kurs?.uhrzeit ||
+                                                            '–'}
+                                                    </td>
+
+                                                    <td>
+                                                        {kurs?.buchungsart ||
+                                                            '–'}
+                                                    </td>
+
+                                                    <td>
+                                                        {getBerechnung(
+                                                            kurs
+                                                        )}
+                                                    </td>
+
+                                                    <td>
+                                                        {faktor}
+                                                    </td>
+
+                                                    <td>
+                                                        {formatCurrency(
+                                                            kursGebuehr
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        }
+                                    )}
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <div className="gebuehren-summary">
-                                <div>
-                                    <span>OGS-Kurse</span>
-                                    <strong>{countByBuchungsart('OGS')}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        OGS-Kurse
+                                    </span>
+
+                                    <strong>
+                                        {countByBuchungsart(
+                                            'OGS'
+                                        )}
+                                    </strong>
                                 </div>
 
-                                <div>
-                                    <span>OGSH-Kurse</span>
-                                    <strong>{countByBuchungsart('OGSH')}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        OGSH-Kurse
+                                    </span>
+
+                                    <strong>
+                                        {countByBuchungsart(
+                                            'OGSH'
+                                        )}
+                                    </strong>
                                 </div>
 
-                                <div>
-                                    <span>Musikkurse</span>
-                                    <strong>{countByBuchungsart('M')}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        Musikkurse
+                                    </span>
+
+                                    <strong>
+                                        {countByBuchungsart(
+                                            'M'
+                                        )}
+                                    </strong>
                                 </div>
 
-                                <div>
-                                    <span>OGS-Faktor</span>
-                                    <strong>{ogsFaktor}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        OGS-Faktor
+                                    </span>
+
+                                    <strong>
+                                        {ogsFaktor}
+                                    </strong>
                                 </div>
 
-                                <div>
-                                    <span>OGS-Gebühr / Halbjahr</span>
-                                    <strong>{formatCurrency(ogsGebuehr)}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        OGS-Gebühr /
+                                        Halbjahr
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(
+                                            ogsGebuehr
+                                        )}
+                                    </strong>
                                 </div>
 
-                                <div>
-                                    <span>Musikgebühren</span>
-                                    <strong>{formatCurrency(musikGebuehren)}</strong>
+                                <div className="gebuehren-summary-card">
+                                    <span>
+                                        Musikgebühren
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(
+                                            musikGebuehren
+                                        )}
+                                    </strong>
                                 </div>
 
-                                <div className="summary-total">
-                                    <span>Gesamtbetrag / Halbjahr</span>
-                                    <strong>{formatCurrency(gesamt)}</strong>
+                                <div className="gebuehren-summary-card gebuehren-summary-total">
+                                    <span>
+                                        Gesamtbetrag /
+                                        Halbjahr
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(
+                                            gesamt
+                                        )}
+                                    </strong>
                                 </div>
                             </div>
                         </>
                     )}
                 </section>
-            )}
-
-            {message && (
-                <p className="gebuehren-message">
-                    {message}
-                </p>
             )}
         </div>
     );

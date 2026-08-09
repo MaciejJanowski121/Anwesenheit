@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import StudentTable from '../components/StudentTable';
 
 import {
@@ -26,66 +26,241 @@ const emptyStudent = {
 
 function GesamtuebersichtPage() {
     const [students, setStudents] = useState([]);
+
+    // Allgemeine Suche
     const [filter, setFilter] = useState('');
+
+    // Zusätzliche Filter
+    const [nachnameFilter, setNachnameFilter] = useState('');
+    const [vornameFilter, setVornameFilter] = useState('');
+    const [jahrgangFilter, setJahrgangFilter] = useState('');
+    const [fotoFilter, setFotoFilter] = useState('');
+
     const [sortKey, setSortKey] = useState(null);
     const [sortDirection, setSortDirection] = useState('asc');
+
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({});
 
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
     useEffect(() => {
-        getStudents()
-            .then((data) => setStudents(data))
-            .catch((error) =>
-                console.error('Fehler beim Laden der Schüler:', error)
-            );
+        loadStudents();
     }, []);
 
-    const filtered = students.filter((s) => {
-        if (!filter) return true;
+    const loadStudents = async () => {
+        try {
+            setLoading(true);
+            setError('');
 
-        const term = filter.toLowerCase();
+            const data = await getStudents();
 
-        return (
-            (s.vorname || '').toLowerCase().includes(term) ||
-            (s.nachname || '').toLowerCase().includes(term) ||
-            (s.klasse || '').toLowerCase().includes(term) ||
-            (s.fotoFreigabe || '').toLowerCase().includes(term) ||
-            (s.email1 || '').toLowerCase().includes(term) ||
-            (s.telefon1 || '').toLowerCase().includes(term) ||
-            (s.mobil1 || '').toLowerCase().includes(term) ||
-            (s.email2 || '').toLowerCase().includes(term) ||
-            (s.telefon2 || '').toLowerCase().includes(term) ||
-            (s.mobil2 || '').toLowerCase().includes(term) ||
-            String(s.jahrgang || '').includes(term)
+            setStudents(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
+        } catch (error) {
+            console.error(
+                'Fehler beim Laden der Schüler:',
+                error
+            );
+
+            setError(
+                'Die Schülerdaten konnten nicht geladen werden.'
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /*
+     * Verfügbare Jahrgänge automatisch aus den Schülerdaten erzeugen.
+     */
+    const jahrgaenge = useMemo(() => {
+        return [
+            ...new Set(
+                students
+                    .map((student) => student.jahrgang)
+                    .filter(
+                        (jahrgang) =>
+                            jahrgang !== null &&
+                            jahrgang !== undefined &&
+                            jahrgang !== ''
+                    )
+            )
+        ].sort((a, b) => Number(a) - Number(b));
+    }, [students]);
+
+    /*
+     * Verfügbare Werte für die Fotofreigabe automatisch
+     * aus den vorhandenen Schülerdaten erzeugen.
+     */
+    const fotoFreigaben = useMemo(() => {
+        return [
+            ...new Set(
+                students
+                    .map((student) => student.fotoFreigabe)
+                    .filter(
+                        (value) =>
+                            value !== null &&
+                            value !== undefined &&
+                            String(value).trim() !== ''
+                    )
+            )
+        ].sort((a, b) =>
+            String(a).localeCompare(
+                String(b),
+                'de'
+            )
         );
-    });
-    const sorted = [...filtered].sort((a, b) => {
-        if (!sortKey) return 0;
+    }, [students]);
 
-        let valA = a[sortKey];
-        let valB = b[sortKey];
+    const filtered = useMemo(() => {
+        return students.filter((student) => {
+            const generalTerm =
+                filter.trim().toLowerCase();
 
-        if (typeof valA === 'boolean') {
-            valA = valA ? 1 : 0;
-            valB = valB ? 1 : 0;
-        }
+            const nachnameTerm =
+                nachnameFilter.trim().toLowerCase();
 
-        if (typeof valA === 'number') {
-            return sortDirection === 'asc' ? valA - valB : valB - valA;
-        }
+            const vornameTerm =
+                vornameFilter.trim().toLowerCase();
 
-        const strA = String(valA || '').toLowerCase();
-        const strB = String(valB || '').toLowerCase();
+            const matchesGeneral =
+                !generalTerm ||
+                [
+                    student.vorname,
+                    student.nachname,
+                    student.klasse,
+                    student.fotoFreigabe,
+                    student.email1,
+                    student.telefon1,
+                    student.mobil1,
+                    student.email2,
+                    student.telefon2,
+                    student.mobil2,
+                    student.jahrgang
+                ].some((value) =>
+                    String(value ?? '')
+                        .toLowerCase()
+                        .includes(generalTerm)
+                );
 
-        if (strA < strB) return sortDirection === 'asc' ? -1 : 1;
-        if (strA > strB) return sortDirection === 'asc' ? 1 : -1;
+            const matchesNachname =
+                !nachnameTerm ||
+                String(
+                    student.nachname ?? ''
+                )
+                    .toLowerCase()
+                    .includes(nachnameTerm);
 
-        return 0;
-    });
+            const matchesVorname =
+                !vornameTerm ||
+                String(
+                    student.vorname ?? ''
+                )
+                    .toLowerCase()
+                    .includes(vornameTerm);
+
+            const matchesJahrgang =
+                !jahrgangFilter ||
+                String(student.jahrgang ?? '') ===
+                String(jahrgangFilter);
+
+            const matchesFoto =
+                !fotoFilter ||
+                String(
+                    student.fotoFreigabe ?? ''
+                ) === String(fotoFilter);
+
+            return (
+                matchesGeneral &&
+                matchesNachname &&
+                matchesVorname &&
+                matchesJahrgang &&
+                matchesFoto
+            );
+        });
+    }, [
+        students,
+        filter,
+        nachnameFilter,
+        vornameFilter,
+        jahrgangFilter,
+        fotoFilter
+    ]);
+
+    const sorted = useMemo(() => {
+        return [...filtered].sort((a, b) => {
+            if (!sortKey) {
+                return 0;
+            }
+
+            const valA = a[sortKey];
+            const valB = b[sortKey];
+
+            /*
+             * Zahlen sortieren:
+             * Jahrgang sowie spätere Anwesenheitszähler.
+             */
+            if (
+                typeof valA === 'number' &&
+                typeof valB === 'number'
+            ) {
+                return sortDirection === 'asc'
+                    ? valA - valB
+                    : valB - valA;
+            }
+
+            /*
+             * null / undefined bei den Anwesenheitszahlen
+             * als 0 behandeln.
+             */
+            if (
+                [
+                    'anzahlAnwesend',
+                    'anzahlEntschuldigt',
+                    'anzahlFehlend'
+                ].includes(sortKey)
+            ) {
+                const numberA =
+                    Number(valA) || 0;
+
+                const numberB =
+                    Number(valB) || 0;
+
+                return sortDirection === 'asc'
+                    ? numberA - numberB
+                    : numberB - numberA;
+            }
+
+            const strA =
+                String(valA ?? '')
+                    .toLowerCase();
+
+            const strB =
+                String(valB ?? '')
+                    .toLowerCase();
+
+            return sortDirection === 'asc'
+                ? strA.localeCompare(strB, 'de')
+                : strB.localeCompare(strA, 'de');
+        });
+    }, [
+        filtered,
+        sortKey,
+        sortDirection
+    ]);
 
     const handleSort = (key) => {
         if (sortKey === key) {
-            setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+            setSortDirection((direction) =>
+                direction === 'asc'
+                    ? 'desc'
+                    : 'asc'
+            );
         } else {
             setSortKey(key);
             setSortDirection('asc');
@@ -98,87 +273,357 @@ function GesamtuebersichtPage() {
     };
 
     const handleEditChange = (key, value) => {
-        setEditData((prev) => ({
-            ...prev,
+        setEditData((previous) => ({
+            ...previous,
             [key]: value
         }));
     };
 
     const handleEditSave = async () => {
-        let savedStudent;
+        try {
+            let savedStudent;
 
-        if (typeof editingId === 'number') {
-            savedStudent = await updateStudent(editingId, editData);
-        } else {
-            savedStudent = await createStudent(editData);
+            if (typeof editingId === 'number') {
+                savedStudent =
+                    await updateStudent(
+                        editingId,
+                        editData
+                    );
+            } else {
+                savedStudent =
+                    await createStudent(
+                        editData
+                    );
+            }
+
+            setStudents((previous) =>
+                previous.map((student) =>
+                    student.id === editingId
+                        ? savedStudent
+                        : student
+                )
+            );
+
+            setEditingId(null);
+            setEditData({});
+            setError('');
+        } catch (error) {
+            console.error(
+                'Fehler beim Speichern:',
+                error
+            );
+
+            setError(
+                'Der Schüler konnte nicht gespeichert werden.'
+            );
         }
-
-        setStudents((prev) =>
-            prev.map((s) => (s.id === editingId ? savedStudent : s))
-        );
-
-        setEditingId(null);
-        setEditData({});
     };
 
     const handleEditCancel = () => {
+        if (typeof editingId !== 'number') {
+            setStudents((previous) =>
+                previous.filter(
+                    (student) =>
+                        student.id !== editingId
+                )
+            );
+        }
+
         setEditingId(null);
         setEditData({});
     };
 
     const handleAdd = () => {
-        const tempId = `new-${Date.now()}`;
-        const newStudent = { ...emptyStudent, id: tempId };
+        if (editingId !== null) {
+            return;
+        }
 
-        setStudents((prev) => [newStudent, ...prev]);
+        const tempId =
+            `new-${Date.now()}`;
+
+        const newStudent = {
+            ...emptyStudent,
+            id: tempId,
+
+            // Statistiken für neuen Datensatz
+            anzahlAnwesend: 0,
+            anzahlEntschuldigt: 0,
+            anzahlFehlend: 0
+        };
+
+        setStudents((previous) => [
+            newStudent,
+            ...previous
+        ]);
+
         setEditingId(tempId);
         setEditData(newStudent);
     };
 
     const handleDelete = async (id) => {
-        if (typeof id === 'number') {
-            await deleteStudent(id);
+        const confirmed =
+            window.confirm(
+                'Möchten Sie diesen Schüler wirklich löschen?'
+            );
+
+        if (!confirmed) {
+            return;
         }
 
-        setStudents((prev) => prev.filter((s) => s.id !== id));
+        try {
+            if (typeof id === 'number') {
+                await deleteStudent(id);
+            }
 
-        if (editingId === id) {
-            setEditingId(null);
-            setEditData({});
+            setStudents((previous) =>
+                previous.filter(
+                    (student) =>
+                        student.id !== id
+                )
+            );
+
+            if (editingId === id) {
+                setEditingId(null);
+                setEditData({});
+            }
+
+            setError('');
+        } catch (error) {
+            console.error(
+                'Fehler beim Löschen:',
+                error
+            );
+
+            setError(
+                'Der Schüler konnte nicht gelöscht werden.'
+            );
         }
     };
 
+    const resetFilters = () => {
+        setFilter('');
+        setNachnameFilter('');
+        setVornameFilter('');
+        setJahrgangFilter('');
+        setFotoFilter('');
+    };
+
+    const hasActiveFilters =
+        filter ||
+        nachnameFilter ||
+        vornameFilter ||
+        jahrgangFilter ||
+        fotoFilter;
+
     return (
         <div className="gesamtuebersicht-page">
-            <h2>Gesamtübersicht</h2>
 
-            <div className="table-toolbar">
-                <input
-                    className="filter-input"
-                    type="text"
-                    placeholder="Vorname, Nachname, Klasse, Telefon..."
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                />
+            <header className="page-header">
+                <div className="page-header-content">
+                    <h1>
+                        Gesamtübersicht
+                    </h1>
 
-                <button className="btn-add" onClick={handleAdd}>
+                    <p>
+                        Schülerdaten, Kontaktdaten und
+                        Anwesenheitsstatistiken verwalten
+                    </p>
+                </div>
+
+                <div className="gesamtuebersicht-count">
+                    {students.length} Schüler
+                </div>
+            </header>
+
+            {error && (
+                <div className="gesamtuebersicht-error">
+                    {error}
+                </div>
+            )}
+
+            <section className="gesamtuebersicht-filter-section">
+
+                <div className="gesamtuebersicht-filter-header">
+                    <div>
+                        <h2>
+                            Filter
+                        </h2>
+
+                        <p>
+                            Schüler nach Name,
+                            Vorname, Jahrgang oder
+                            Fotofreigabe filtern
+                        </p>
+                    </div>
+
+                    {hasActiveFilters && (
+                        <button
+                            type="button"
+                            className="gesamtuebersicht-reset-button"
+                            onClick={resetFilters}
+                        >
+                            Filter zurücksetzen
+                        </button>
+                    )}
+                </div>
+
+                <div className="gesamtuebersicht-filter-grid">
+
+                    <div className="gesamtuebersicht-filter-field gesamtuebersicht-filter-field-wide">
+                        <label htmlFor="allgemeine-suche">
+                            Allgemeine Suche
+                        </label>
+
+                        <input
+                            id="allgemeine-suche"
+                            type="text"
+                            placeholder="Klasse, E-Mail, Telefon..."
+                            value={filter}
+                            onChange={(event) =>
+                                setFilter(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div className="gesamtuebersicht-filter-field">
+                        <label htmlFor="nachname-filter">
+                            Nachname
+                        </label>
+
+                        <input
+                            id="nachname-filter"
+                            type="text"
+                            placeholder="Nachname..."
+                            value={nachnameFilter}
+                            onChange={(event) =>
+                                setNachnameFilter(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div className="gesamtuebersicht-filter-field">
+                        <label htmlFor="vorname-filter">
+                            Vorname
+                        </label>
+
+                        <input
+                            id="vorname-filter"
+                            type="text"
+                            placeholder="Vorname..."
+                            value={vornameFilter}
+                            onChange={(event) =>
+                                setVornameFilter(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div className="gesamtuebersicht-filter-field">
+                        <label htmlFor="jahrgang-filter">
+                            Jahrgang
+                        </label>
+
+                        <select
+                            id="jahrgang-filter"
+                            value={jahrgangFilter}
+                            onChange={(event) =>
+                                setJahrgangFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Jahrgänge
+                            </option>
+
+                            {jahrgaenge.map(
+                                (jahrgang) => (
+                                    <option
+                                        key={jahrgang}
+                                        value={jahrgang}
+                                    >
+                                        {jahrgang}
+                                    </option>
+                                )
+                            )}
+                        </select>
+                    </div>
+
+                    <div className="gesamtuebersicht-filter-field">
+                        <label htmlFor="foto-filter">
+                            Fotofreigabe
+                        </label>
+
+                        <select
+                            id="foto-filter"
+                            value={fotoFilter}
+                            onChange={(event) =>
+                                setFotoFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Freigaben
+                            </option>
+
+                            {fotoFreigaben.map(
+                                (freigabe) => (
+                                    <option
+                                        key={freigabe}
+                                        value={freigabe}
+                                    >
+                                        {freigabe}
+                                    </option>
+                                )
+                            )}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div className="gesamtuebersicht-toolbar">
+                <div className="gesamtuebersicht-result-count">
+                    {sorted.length}{' '}
+                    {sorted.length === 1
+                        ? 'Schüler gefunden'
+                        : 'Schüler gefunden'}
+                </div>
+
+                <button
+                    type="button"
+                    className="gesamtuebersicht-add-button"
+                    onClick={handleAdd}
+                    disabled={editingId !== null}
+                >
                     + Neuer Eintrag
                 </button>
             </div>
 
-            <StudentTable
-                students={sorted}
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                editingId={editingId}
-                editData={editData}
-                onEditStart={handleEditStart}
-                onEditChange={handleEditChange}
-                onEditSave={handleEditSave}
-                onEditCancel={handleEditCancel}
-                onDelete={handleDelete}
-            />
+            {loading ? (
+                <div className="gesamtuebersicht-loading">
+                    Schülerdaten werden geladen...
+                </div>
+            ) : (
+                <StudentTable
+                    students={sorted}
+                    sortKey={sortKey}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                    editingId={editingId}
+                    editData={editData}
+                    onEditStart={handleEditStart}
+                    onEditChange={handleEditChange}
+                    onEditSave={handleEditSave}
+                    onEditCancel={handleEditCancel}
+                    onDelete={handleDelete}
+                />
+            )}
         </div>
     );
 }

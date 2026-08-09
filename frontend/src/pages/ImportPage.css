@@ -1,71 +1,248 @@
 .import-page {
-    max-width: 1200px;
+    width: 100%;
+    min-width: 0;
     margin: 0 auto;
-    padding: 32px 24px;
+    color: #f5f5f5;
 }
 
-.import-page h2 {
-    color: #ffffff;
-    text-align: center;
-    margin-bottom: 32px;
-}
+/* =====================================================
+   GRID
+   ===================================================== */
 
 .import-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 24px;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 18px;
 }
+
+/* =====================================================
+   CARD
+   ===================================================== */
 
 .import-card {
-    background: #2a2a2a;
-    border: 1px solid #444;
+    overflow: hidden;
+
+    border: 1px solid #414141;
     border-radius: 12px;
-    padding: 28px;
+
+    background: #252525;
 }
 
-.import-card h3 {
-    margin-top: 0;
-    margin-bottom: 16px;
+.import-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 19px 22px;
+
+    border-bottom: 1px solid #414141;
+
+    background: #292929;
+}
+
+.import-card-header h2 {
+    margin: 0 0 5px;
+
     color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 650;
 }
 
-.import-card p {
-    color: #b8b8b8;
-    line-height: 1.6;
-    margin-bottom: 20px;
+.import-card-header p {
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 14px;
+    line-height: 1.5;
 }
+
+.import-card-badge {
+    flex-shrink: 0;
+
+    padding: 7px 11px;
+
+    border:
+            1px solid
+            rgba(232, 121, 43, 0.25);
+
+    border-radius: 999px;
+
+    background:
+            rgba(232, 121, 43, 0.1);
+
+    color: #f29a5b;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.import-card-content {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+    padding: 22px;
+}
+
+.import-file-label {
+    color: #c7c7c7;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =====================================================
+   FILE INPUT
+   ===================================================== */
 
 .file-input {
+    box-sizing: border-box;
+
     width: 100%;
-    margin-bottom: 20px;
+
+    padding: 10px;
+
+    border: 1px solid #505050;
+    border-radius: 8px;
+
+    background: #202020;
+
+    color: #ffffff;
+
+    font-size: 0.88rem;
+}
+
+.file-input::file-selector-button {
+    margin-right: 12px;
+
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #3a3a3a;
+
+    color: #ffffff;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.file-input::file-selector-button:hover {
+    background: #474747;
+}
+
+.import-file-info {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #414141;
+    border-radius: 8px;
+
+    background: #292929;
+
+    color: #999999;
+
+    font-size: 13px;
+}
+
+.import-file-info strong {
     color: #ffffff;
 }
+
+/* =====================================================
+   BUTTON
+   ===================================================== */
 
 .import-button {
     width: 100%;
-    padding: 12px;
+
+    padding: 10px 16px;
+
     border: none;
     border-radius: 8px;
-    background-color: #e8792b;
-    color: white;
-    cursor: pointer;
+
+    background: #e8792b;
+
+    color: #ffffff;
+
+    font-size: 0.88rem;
     font-weight: 600;
-    font-size: 0.95rem;
-    transition: 0.2s;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
 }
 
-.import-button:hover {
-    background-color: #cf6820;
+.import-button:hover:not(:disabled) {
+    background: #d06820;
 }
+
+.import-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
 
 .import-message {
-    margin-top: 16px;
-    color: #6fbf4a;
-    font-weight: 600;
+    padding: 11px 13px;
+
+    border:
+            1px solid
+            rgba(90, 158, 62, 0.3);
+
+    border-radius: 8px;
+
+    background:
+            rgba(90, 158, 62, 0.1);
+
+    color: #99d47e;
+
+    font-size: 13px;
+    font-weight: 500;
 }
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
 
 @media (max-width: 900px) {
     .import-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .import-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .import-card-badge {
+        align-self: flex-start;
     }
 }

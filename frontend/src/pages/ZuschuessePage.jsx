@@ -1,4 +1,6 @@
+// ZuschuessePage.jsx
 import { useEffect, useState } from "react";
+
 import {
     getZuschussBerechnung
 } from "../services/zuschussService";
@@ -22,7 +24,6 @@ const LEERE_EINSTELLUNG = {
 
 function ZuschuessePage() {
     const [schuljahr, setSchuljahr] = useState("2026/2027");
-
     const [berechnung, setBerechnung] = useState(null);
 
     const [einstellung, setEinstellung] = useState({
@@ -47,35 +48,48 @@ function ZuschuessePage() {
             return;
         }
 
-        setLoading(true);
-        setError("");
-        setSuccess("");
+        try {
+            setLoading(true);
+            setError("");
+            setSuccess("");
 
-        await ladeEinstellungen();
-        await ladeBerechnung();
-
-        setLoading(false);
+            await ladeEinstellungen();
+            await ladeBerechnung();
+        } finally {
+            setLoading(false);
+        }
     };
 
     const ladeEinstellungen = async () => {
         try {
-            const daten = await getBySchuljahr(schuljahr.trim());
+            const daten = await getBySchuljahr(
+                schuljahr.trim()
+            );
 
             setEinstellung({
                 id: daten.id ?? null,
-                schuljahr: daten.schuljahr ?? schuljahr.trim(),
-                kurzgruppeBetrag: daten.kurzgruppeBetrag ?? "",
-                langgruppe12Betrag: daten.langgruppe12Betrag ?? "",
-                langgruppe14Betrag: daten.langgruppe14Betrag ?? "",
-                langgruppe510Betrag: daten.langgruppe510Betrag ?? ""
+                schuljahr:
+                    daten.schuljahr ??
+                    schuljahr.trim(),
+
+                kurzgruppeBetrag:
+                    daten.kurzgruppeBetrag ?? "",
+
+                langgruppe12Betrag:
+                    daten.langgruppe12Betrag ?? "",
+
+                langgruppe14Betrag:
+                    daten.langgruppe14Betrag ?? "",
+
+                langgruppe510Betrag:
+                    daten.langgruppe510Betrag ?? ""
             });
         } catch (err) {
-            console.error("Zuschusseinstellungen konnten nicht geladen werden:", err);
+            console.error(
+                "Zuschusseinstellungen konnten nicht geladen werden:",
+                err
+            );
 
-            /*
-             * Wenn für das Schuljahr noch keine Einstellungen vorhanden sind,
-             * wird ein leerer Datensatz angezeigt.
-             */
             setEinstellung({
                 ...LEERE_EINSTELLUNG,
                 schuljahr: schuljahr.trim()
@@ -85,10 +99,17 @@ function ZuschuessePage() {
 
     const ladeBerechnung = async () => {
         try {
-            const daten = await getZuschussBerechnung(schuljahr.trim());
+            const daten =
+                await getZuschussBerechnung(
+                    schuljahr.trim()
+                );
+
             setBerechnung(daten);
         } catch (err) {
-            console.error("Zuschussberechnung konnte nicht geladen werden:", err);
+            console.error(
+                "Zuschussberechnung konnte nicht geladen werden:",
+                err
+            );
 
             setBerechnung(null);
 
@@ -102,7 +123,8 @@ function ZuschuessePage() {
     };
 
     const handleSchuljahrChange = (event) => {
-        const neuesSchuljahr = event.target.value;
+        const neuesSchuljahr =
+            event.target.value;
 
         setSchuljahr(neuesSchuljahr);
         setSuccess("");
@@ -110,7 +132,8 @@ function ZuschuessePage() {
     };
 
     const handleEinstellungChange = (event) => {
-        const { name, value } = event.target;
+        const { name, value } =
+            event.target;
 
         setEinstellung((vorher) => ({
             ...vorher,
@@ -120,11 +143,16 @@ function ZuschuessePage() {
         setSuccess("");
     };
 
-    const speichereEinstellungen = async (event) => {
+    const speichereEinstellungen = async (
+        event
+    ) => {
         event.preventDefault();
 
         if (!schuljahr.trim()) {
-            setError("Bitte geben Sie ein Schuljahr ein.");
+            setError(
+                "Bitte geben Sie ein Schuljahr ein."
+            );
+
             return;
         }
 
@@ -132,50 +160,76 @@ function ZuschuessePage() {
             setError(
                 "Bitte geben Sie für alle Zuschussbeträge gültige Werte ein."
             );
+
             return;
         }
 
-        setSaving(true);
-        setError("");
-        setSuccess("");
-
-        const daten = {
-            schuljahr: schuljahr.trim(),
-            kurzgruppeBetrag: Number(einstellung.kurzgruppeBetrag),
-            langgruppe12Betrag: Number(
-                einstellung.langgruppe12Betrag
-            ),
-            langgruppe14Betrag: Number(
-                einstellung.langgruppe14Betrag
-            ),
-            langgruppe510Betrag: Number(
-                einstellung.langgruppe510Betrag
-            )
-        };
-
         try {
+            setSaving(true);
+            setError("");
+            setSuccess("");
+
+            const daten = {
+                schuljahr:
+                    schuljahr.trim(),
+
+                kurzgruppeBetrag:
+                    Number(
+                        einstellung.kurzgruppeBetrag
+                    ),
+
+                langgruppe12Betrag:
+                    Number(
+                        einstellung.langgruppe12Betrag
+                    ),
+
+                langgruppe14Betrag:
+                    Number(
+                        einstellung.langgruppe14Betrag
+                    ),
+
+                langgruppe510Betrag:
+                    Number(
+                        einstellung.langgruppe510Betrag
+                    )
+            };
+
             let gespeichert;
 
             if (einstellung.id) {
-                gespeichert = await updateEinstellung(
-                    einstellung.id,
-                    daten
-                );
+                gespeichert =
+                    await updateEinstellung(
+                        einstellung.id,
+                        daten
+                    );
             } else {
-                gespeichert = await createEinstellung(daten);
+                gespeichert =
+                    await createEinstellung(
+                        daten
+                    );
             }
 
             setEinstellung({
                 id: gespeichert.id,
-                schuljahr: gespeichert.schuljahr,
+
+                schuljahr:
+                gespeichert.schuljahr,
+
                 kurzgruppeBetrag:
-                    gespeichert.kurzgruppeBetrag ?? "",
+                    gespeichert.kurzgruppeBetrag ??
+                    "",
+
                 langgruppe12Betrag:
-                    gespeichert.langgruppe12Betrag ?? "",
+                    gespeichert.langgruppe12Betrag ??
+                    "",
+
                 langgruppe14Betrag:
-                    gespeichert.langgruppe14Betrag ?? "",
+                    gespeichert.langgruppe14Betrag ??
+                    "",
+
                 langgruppe510Betrag:
-                    gespeichert.langgruppe510Betrag ?? ""
+                    gespeichert.langgruppe510Betrag ??
+                    ""
             });
 
             setSuccess(
@@ -184,7 +238,10 @@ function ZuschuessePage() {
 
             await ladeBerechnung();
         } catch (err) {
-            console.error("Speichern fehlgeschlagen:", err);
+            console.error(
+                "Speichern fehlgeschlagen:",
+                err
+            );
 
             const message =
                 err.response?.data?.message ||
@@ -206,39 +263,56 @@ function ZuschuessePage() {
         ];
 
         return betraege.every((betrag) => {
-            if (betrag === "" || betrag === null) {
+            if (
+                betrag === "" ||
+                betrag === null
+            ) {
                 return false;
             }
 
             const zahl = Number(betrag);
 
-            return Number.isFinite(zahl) && zahl >= 0;
+            return (
+                Number.isFinite(zahl) &&
+                zahl >= 0
+            );
         });
     };
 
     const formatiereBetrag = (betrag) => {
-        return new Intl.NumberFormat("de-DE", {
-            style: "currency",
-            currency: "EUR"
-        }).format(Number(betrag) || 0);
+        return new Intl.NumberFormat(
+            "de-DE",
+            {
+                style: "currency",
+                currency: "EUR"
+            }
+        ).format(
+            Number(betrag) || 0
+        );
     };
 
     const formatiereZahl = (wert) => {
-        return new Intl.NumberFormat("de-DE", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
-        }).format(Number(wert) || 0);
+        return new Intl.NumberFormat(
+            "de-DE",
+            {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }
+        ).format(
+            Number(wert) || 0
+        );
     };
 
     return (
         <div className="zuschuesse-page">
-            <section className="zuschuesse-header">
-                <div>
+
+            <header className="page-header">
+                <div className="page-header-content">
                     <h1>Zuschüsse</h1>
 
                     <p>
-                        Berechnung der Zählschüler, Gruppen und
-                        Zuschussbeträge
+                        Zählschüler, Gruppen und
+                        Zuschussbeträge berechnen
                     </p>
                 </div>
 
@@ -252,22 +326,28 @@ function ZuschuessePage() {
                             id="schuljahr"
                             type="text"
                             value={schuljahr}
-                            onChange={handleSchuljahrChange}
+                            onChange={
+                                handleSchuljahrChange
+                            }
                             placeholder="2026/2027"
                         />
                     </div>
 
                     <button
                         type="button"
+                        className="zuschuesse-calculate-button"
                         onClick={ladeSeite}
-                        disabled={loading || !schuljahr.trim()}
+                        disabled={
+                            loading ||
+                            !schuljahr.trim()
+                        }
                     >
                         {loading
                             ? "Wird geladen..."
                             : "Berechnen"}
                     </button>
                 </div>
-            </section>
+            </header>
 
             {error && (
                 <div className="zuschuesse-message zuschuesse-error">
@@ -284,10 +364,13 @@ function ZuschuessePage() {
             <section className="zuschuesse-settings-section">
                 <div className="zuschuesse-section-header">
                     <div>
-                        <h2>Zuschusseinstellungen</h2>
+                        <h2>
+                            Zuschusseinstellungen
+                        </h2>
 
                         <p>
-                            Zuschussbeträge für das Schuljahr{" "}
+                            Zuschussbeträge für das
+                            Schuljahr{" "}
                             {schuljahr || "–"}
                         </p>
                     </div>
@@ -301,7 +384,9 @@ function ZuschuessePage() {
 
                 <form
                     className="zuschuesse-settings-form"
-                    onSubmit={speichereEinstellungen}
+                    onSubmit={
+                        speichereEinstellungen
+                    }
                 >
                     <div className="zuschuesse-settings-grid">
                         <div className="zuschuesse-input-group">
@@ -317,7 +402,8 @@ function ZuschuessePage() {
                                     min="0"
                                     step="0.01"
                                     value={
-                                        einstellung.kurzgruppeBetrag
+                                        einstellung
+                                            .kurzgruppeBetrag
                                     }
                                     onChange={
                                         handleEinstellungChange
@@ -342,7 +428,8 @@ function ZuschuessePage() {
                                     min="0"
                                     step="0.01"
                                     value={
-                                        einstellung.langgruppe12Betrag
+                                        einstellung
+                                            .langgruppe12Betrag
                                     }
                                     onChange={
                                         handleEinstellungChange
@@ -367,7 +454,8 @@ function ZuschuessePage() {
                                     min="0"
                                     step="0.01"
                                     value={
-                                        einstellung.langgruppe14Betrag
+                                        einstellung
+                                            .langgruppe14Betrag
                                     }
                                     onChange={
                                         handleEinstellungChange
@@ -392,7 +480,8 @@ function ZuschuessePage() {
                                     min="0"
                                     step="0.01"
                                     value={
-                                        einstellung.langgruppe510Betrag
+                                        einstellung
+                                            .langgruppe510Betrag
                                     }
                                     onChange={
                                         handleEinstellungChange
@@ -408,6 +497,7 @@ function ZuschuessePage() {
                     <div className="zuschuesse-settings-actions">
                         <button
                             type="submit"
+                            className="zuschuesse-save-button"
                             disabled={saving}
                         >
                             {saving
@@ -427,25 +517,31 @@ function ZuschuessePage() {
                             </span>
 
                             <strong>
-                                {berechnung.kurzgruppen ?? 0}
+                                {
+                                    berechnung.kurzgruppen ??
+                                    0
+                                }
                             </strong>
 
                             <small>
                                 {formatiereZahl(
-                                    berechnung.kurzZaehlschueler
+                                    berechnung
+                                        .kurzZaehlschueler
                                 )}{" "}
                                 Zählschüler
                             </small>
 
                             <p>
                                 {formatiereBetrag(
-                                    berechnung.kurzgruppeGesamt
+                                    berechnung
+                                        .kurzgruppeGesamt
                                 )}
                             </p>
 
                             <small>
                                 {formatiereBetrag(
-                                    berechnung.kurzgruppeBetrag
+                                    berechnung
+                                        .kurzgruppeBetrag
                                 )}{" "}
                                 je Gruppe
                             </small>
@@ -457,25 +553,32 @@ function ZuschuessePage() {
                             </span>
 
                             <strong>
-                                {berechnung.langgruppen12 ?? 0}
+                                {
+                                    berechnung
+                                        .langgruppen12 ??
+                                    0
+                                }
                             </strong>
 
                             <small>
                                 {formatiereZahl(
-                                    berechnung.langZaehlschueler12
+                                    berechnung
+                                        .langZaehlschueler12
                                 )}{" "}
                                 Zählschüler
                             </small>
 
                             <p>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe12Gesamt
+                                    berechnung
+                                        .langgruppe12Gesamt
                                 )}
                             </p>
 
                             <small>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe12Betrag
+                                    berechnung
+                                        .langgruppe12Betrag
                                 )}{" "}
                                 je Gruppe
                             </small>
@@ -487,25 +590,32 @@ function ZuschuessePage() {
                             </span>
 
                             <strong>
-                                {berechnung.langgruppen14 ?? 0}
+                                {
+                                    berechnung
+                                        .langgruppen14 ??
+                                    0
+                                }
                             </strong>
 
                             <small>
                                 {formatiereZahl(
-                                    berechnung.langZaehlschueler14
+                                    berechnung
+                                        .langZaehlschueler14
                                 )}{" "}
                                 Zählschüler
                             </small>
 
                             <p>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe14Gesamt
+                                    berechnung
+                                        .langgruppe14Gesamt
                                 )}
                             </p>
 
                             <small>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe14Betrag
+                                    berechnung
+                                        .langgruppe14Betrag
                                 )}{" "}
                                 je Gruppe
                             </small>
@@ -517,25 +627,32 @@ function ZuschuessePage() {
                             </span>
 
                             <strong>
-                                {berechnung.langgruppen510 ?? 0}
+                                {
+                                    berechnung
+                                        .langgruppen510 ??
+                                    0
+                                }
                             </strong>
 
                             <small>
                                 {formatiereZahl(
-                                    berechnung.langZaehlschueler510
+                                    berechnung
+                                        .langZaehlschueler510
                                 )}{" "}
                                 Zählschüler
                             </small>
 
                             <p>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe510Gesamt
+                                    berechnung
+                                        .langgruppe510Gesamt
                                 )}
                             </p>
 
                             <small>
                                 {formatiereBetrag(
-                                    berechnung.langgruppe510Betrag
+                                    berechnung
+                                        .langgruppe510Betrag
                                 )}{" "}
                                 je Gruppe
                             </small>
@@ -548,13 +665,16 @@ function ZuschuessePage() {
 
                             <strong>
                                 {formatiereBetrag(
-                                    berechnung.gesamtZuschuss
+                                    berechnung
+                                        .gesamtZuschuss
                                 )}
                             </strong>
 
                             <small>
                                 Schuljahr{" "}
-                                {berechnung.schuljahr}
+                                {
+                                    berechnung.schuljahr
+                                }
                             </small>
                         </div>
                     </section>
@@ -562,20 +682,27 @@ function ZuschuessePage() {
                     <section className="zuschuesse-table-section">
                         <div className="zuschuesse-table-header">
                             <div>
-                                <h2>Schülerübersicht</h2>
+                                <h2>
+                                    Schülerübersicht
+                                </h2>
 
                                 <p>
-                                    Berechnungswerte pro Schüler
+                                    Berechnungswerte pro
+                                    Schüler
                                 </p>
                             </div>
 
                             <span>
-                                {berechnung.studenten?.length ?? 0}{" "}
+                                {
+                                    berechnung.studenten
+                                        ?.length ??
+                                    0
+                                }{" "}
                                 Schüler
                             </span>
                         </div>
 
-                        <div className="zuschuesse-table-wrapper">
+                        <div className="zuschuesse-table-scroll">
                             <table className="zuschuesse-table">
                                 <thead>
                                 <tr>
@@ -601,76 +728,92 @@ function ZuschuessePage() {
                                     (eintrag) => (
                                         <tr
                                             key={
-                                                eintrag.student.id
+                                                eintrag
+                                                    .student
+                                                    .id
                                             }
                                         >
                                             <td className="zuschuesse-name-cell">
                                                 {
-                                                    eintrag.student
+                                                    eintrag
+                                                        .student
                                                         .vorname
                                                 }{" "}
                                                 {
-                                                    eintrag.student
+                                                    eintrag
+                                                        .student
                                                         .nachname
                                                 }
                                             </td>
 
                                             <td>
-                                                {eintrag.student
-                                                    .klasse || "–"}
+                                                {eintrag
+                                                        .student
+                                                        .klasse ||
+                                                    "–"}
                                             </td>
 
                                             <td>
-                                                {eintrag.student
-                                                    .jahrgang ?? "–"}
+                                                {eintrag
+                                                        .student
+                                                        .jahrgang ??
+                                                    "–"}
                                             </td>
 
                                             <td>
                                                 {
-                                                    eintrag.anzahlKurzBuchungen
+                                                    eintrag
+                                                        .anzahlKurzBuchungen
                                                 }
                                             </td>
 
                                             <td>
                                                 {
-                                                    eintrag.anzahlLangBuchungen
+                                                    eintrag
+                                                        .anzahlLangBuchungen
                                                 }
                                             </td>
 
                                             <td>
                                                 {
-                                                    eintrag.anzahlPBuchungen
+                                                    eintrag
+                                                        .anzahlPBuchungen
                                                 }
                                             </td>
 
                                             <td>
                                                 {formatiereZahl(
-                                                    eintrag.kurzZaehler
+                                                    eintrag
+                                                        .kurzZaehler
                                                 )}
                                             </td>
 
                                             <td>
                                                 {formatiereZahl(
-                                                    eintrag.langZaehler
+                                                    eintrag
+                                                        .langZaehler
                                                 )}
                                             </td>
 
                                             <td>
                                                 {formatiereZahl(
-                                                    eintrag.kurzZaehlschueler
+                                                    eintrag
+                                                        .kurzZaehlschueler
                                                 )}
                                             </td>
 
                                             <td>
                                                 {formatiereZahl(
-                                                    eintrag.langZaehlschueler
+                                                    eintrag
+                                                        .langZaehlschueler
                                                 )}
                                             </td>
                                         </tr>
                                     )
                                 )}
 
-                                {!berechnung.studenten?.length && (
+                                {!berechnung.studenten
+                                    ?.length && (
                                     <tr>
                                         <td
                                             colSpan="10"

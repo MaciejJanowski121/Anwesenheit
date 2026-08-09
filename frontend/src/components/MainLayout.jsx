@@ -13,44 +13,49 @@ function MainLayout() {
                         alt="Montessori Logo"
                         className="header-logo"
                     />
+
                     <h1 className="header-title">
                         Anwesenheitsliste
                     </h1>
                 </div>
             </header>
 
-            <nav className="main-nav">
-                <NavLink to="/" end>
-                    Startseite
-                </NavLink>
+            <div className="main-nav-wrapper">
+                <nav className="main-nav">
+                    <NavLink to="/" end>
+                        Startseite
+                    </NavLink>
 
-                <NavLink to="/gesamtuebersicht">
-                    Gesamtübersicht
-                </NavLink>
+                    <NavLink to="/gesamtuebersicht">
+                        Gesamtübersicht
+                    </NavLink>
 
-                <NavLink to="/kurse">
-                    Kurse
-                </NavLink>
+                    <NavLink to="/kurse">
+                        Kurse
+                    </NavLink>
 
-                <NavLink to="/anwesenheit">
-                    Anwesenheit
-                </NavLink>
+                    <NavLink to="/anwesenheit">
+                        Anwesenheit
+                    </NavLink>
 
-                <NavLink to="/zuschuesse">
-                    Zuschüsse
-                </NavLink>
+                    <NavLink to="/zuschuesse">
+                        Zuschüsse
+                    </NavLink>
 
-                <NavLink to="/gebuehren">
-                    Gebühren
-                </NavLink>
+                    <NavLink to="/gebuehren">
+                        Gebühren
+                    </NavLink>
 
-                <NavLink to="/import">
-                    Import
-                </NavLink>
-            </nav>
+                    <NavLink to="/import">
+                        Import
+                    </NavLink>
+                </nav>
+            </div>
 
             <main className="app-main">
-                <Outlet />
+                <div className="app-content">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );
