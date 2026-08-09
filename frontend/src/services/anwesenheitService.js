@@ -17,7 +17,29 @@ export const getAnwesenheitenByKurs = async (kursId) => {
     return response.data;
 };
 
-export const createAnwesenheit = async (studentId, kursId, anwesenheit) => {
+/*
+ * Liefert die Anwesenheitsstatistik eines Schülers.
+ *
+ * Beispiel:
+ * {
+ *     anzahlAnwesend: 12,
+ *     anzahlEntschuldigt: 3,
+ *     anzahlFehlend: 2
+ * }
+ */
+export const getAnwesenheitStatistikByStudent = async (studentId) => {
+    const response = await axios.get(
+        `${API_URL}/student/${studentId}/statistik`
+    );
+
+    return response.data;
+};
+
+export const createAnwesenheit = async (
+    studentId,
+    kursId,
+    anwesenheit
+) => {
     const response = await axios.post(
         `${API_URL}/student/${studentId}/kurs/${kursId}`,
         anwesenheit

@@ -20,6 +20,11 @@ public interface AnwesenheitRepository
             LocalDate datum
     );
 
+    long countByStudentIdAndStatusIgnoreCase(
+            Long studentId,
+            String status
+    );
+
 }
 
 

@@ -7,6 +7,7 @@ import com.example.anwesenheit.repository.AnwesenheitRepository;
 import com.example.anwesenheit.repository.KursRepository;
 import com.example.anwesenheit.repository.StudentRepository;
 import org.springframework.stereotype.Service;
+import java.util.Map;
 
 import java.util.List;
 
@@ -65,6 +66,36 @@ public class AnwesenheitService {
         return anwesenheitRepository.save(anwesenheit);
     }
 
+    public Map<String, Long> getStatistikByStudent(Long studentId) {
+
+        long anwesend =
+                anwesenheitRepository
+                        .countByStudentIdAndStatusIgnoreCase(
+                                studentId,
+                                "ANWESEND"
+                        );
+
+        long entschuldigt =
+                anwesenheitRepository
+                        .countByStudentIdAndStatusIgnoreCase(
+                                studentId,
+                                "ENTSCHULDIGT"
+                        );
+
+        long fehlend =
+                anwesenheitRepository
+                        .countByStudentIdAndStatusIgnoreCase(
+                                studentId,
+                                "FEHLT"
+                        );
+
+        return Map.of(
+                "anzahlAnwesend", anwesend,
+                "anzahlEntschuldigt", entschuldigt,
+                "anzahlFehlend", fehlend
+        );
+    }
+
     public void deleteAnwesenheit(Long id) {
         anwesenheitRepository.deleteById(id);
     }
@@ -77,3 +108,4 @@ public class AnwesenheitService {
         return anwesenheitRepository.findByKursId(kursId);
     }
 }
+

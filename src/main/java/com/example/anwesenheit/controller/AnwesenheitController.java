@@ -3,7 +3,7 @@ package com.example.anwesenheit.controller;
 import com.example.anwesenheit.model.Anwesenheit;
 import com.example.anwesenheit.service.AnwesenheitService;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -27,6 +27,13 @@ public class AnwesenheitController {
             @PathVariable Long studentId
     ) {
         return anwesenheitService.getAnwesenheitenByStudent(studentId);
+    }
+
+    @GetMapping("/student/{studentId}/statistik")
+    public Map<String, Long> getStatistikByStudent(
+            @PathVariable Long studentId
+    ) {
+        return anwesenheitService.getStatistikByStudent(studentId);
     }
 
     @GetMapping("/kurs/{kursId}")

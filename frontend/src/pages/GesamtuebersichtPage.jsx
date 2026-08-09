@@ -8,6 +8,10 @@ import {
     deleteStudent
 } from '../services/studentService';
 
+import {
+    getAnwesenheitStatistikByStudent
+} from '../services/anwesenheitService';
+
 import './GesamtuebersichtPage.css';
 
 const emptyStudent = {
@@ -56,11 +60,45 @@ function GesamtuebersichtPage() {
 
             const data = await getStudents();
 
-            setStudents(
-                Array.isArray(data)
-                    ? data
-                    : []
+            const studentList = Array.isArray(data)
+                ? data
+                : [];
+
+            const studentsWithStats = await Promise.all(
+                studentList.map(async (student) => {
+                    try {
+                        const statistik =
+                            await getAnwesenheitStatistikByStudent(
+                                student.id
+                            );
+
+                        return {
+                            ...student,
+                            anzahlAnwesend:
+                                statistik.anzahlAnwesend ?? 0,
+                            anzahlEntschuldigt:
+                                statistik.anzahlEntschuldigt ?? 0,
+                            anzahlFehlend:
+                                statistik.anzahlFehlend ?? 0
+                        };
+                    } catch (error) {
+                        console.error(
+                            `Statistik für Schüler ${student.id} konnte nicht geladen werden:`,
+                            error
+                        );
+
+                        return {
+                            ...student,
+                            anzahlAnwesend: 0,
+                            anzahlEntschuldigt: 0,
+                            anzahlFehlend: 0
+                        };
+                    }
+                })
             );
+
+            setStudents(studentsWithStats);
+
         } catch (error) {
             console.error(
                 'Fehler beim Laden der Schüler:',

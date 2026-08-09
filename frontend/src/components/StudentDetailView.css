@@ -1,21 +1,30 @@
 .student-detail-view {
+    width: 100%;
     max-width: 1100px;
 }
 
+/* =====================================================
+   BACK BUTTON
+   ===================================================== */
+
 .back-button {
+    margin-bottom: 24px;
     padding: 10px 18px;
-    background-color: #444;
-    color: #ffffff;
     border: none;
     border-radius: 8px;
+    background-color: #444444;
+    color: #ffffff;
     cursor: pointer;
-    margin-bottom: 24px;
-    transition: 0.2s ease;
+    transition: background-color 0.2s ease;
 }
 
 .back-button:hover {
-    background-color: #555;
+    background-color: #555555;
 }
+
+/* =====================================================
+   HEADER
+   ===================================================== */
 
 .detail-header {
     margin-bottom: 30px;
@@ -28,127 +37,165 @@
 }
 
 .detail-header p {
-    margin-top: 8px;
-    color: #999;
+    margin: 8px 0 0;
+    color: #999999;
 }
 
+/* =====================================================
+   SECTIONS
+   ===================================================== */
+
 .detail-section {
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 12px;
-    padding: 24px;
     margin-bottom: 20px;
+    padding: 24px;
+    overflow-x: auto;
+    border: 1px solid #444444;
+    border-radius: 12px;
+    background: #2a2a2a;
 }
 
 .detail-section h3 {
-    margin-top: 0;
-    margin-bottom: 18px;
+    margin: 0 0 18px;
     color: #ffffff;
     font-size: 1.1rem;
 }
 
+/* =====================================================
+   INFORMATION GRID
+   ===================================================== */
+
 .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
     gap: 16px;
 }
 
 .detail-item {
-    background: #333333;
-    border-radius: 8px;
     padding: 12px;
+    border-radius: 8px;
+    background: #333333;
 }
 
 .detail-label {
     display: block;
-    font-size: 0.8rem;
-    color: #999;
     margin-bottom: 6px;
+    color: #999999;
+    font-size: 0.8rem;
 }
 
 .detail-value {
     color: #ffffff;
-    font-weight: 500;
     font-size: 0.95rem;
+    font-weight: 500;
 }
 
-.detail-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.detail-table th {
-    text-align: left;
-    padding: 12px;
-    background-color: #333333;
-    color: #ffffff;
-    border-bottom: 2px solid #555;
-}
-
-.detail-table td {
-    padding: 12px;
-    border-bottom: 1px solid #444;
-}
-
-.detail-table tr:hover {
-    background-color: rgba(232, 121, 43, 0.08);
-}
-
-.empty-text {
-    color: #999;
-    font-style: italic;
-}
-
-@media (max-width: 768px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .detail-table {
-        display: block;
-        overflow-x: auto;
-    }
-}
+/* =====================================================
+   COURSE ASSIGNMENT
+   ===================================================== */
 
 .assign-kurs-box {
     margin-bottom: 16px;
 }
 
 .assign-kurs-box select {
-    min-width: 350px;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    border: 1px solid #555;
+    width: 100%;
+    max-width: 450px;
+    padding: 10px 12px;
+    border: 1px solid #555555;
     border-radius: 6px;
+    outline: none;
+    background-color: #333333;
+    color: #ffffff;
 }
 
+.assign-kurs-box select:focus {
+    border-color: #e8792b;
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+/* =====================================================
+   TABLES
+   ===================================================== */
+
+.detail-table {
+    width: 100%;
+    min-width: 900px;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.detail-table th {
+    padding: 12px;
+    border-bottom: 2px solid #555555;
+    background-color: #333333;
+    color: #ffffff;
+    text-align: left;
+}
+
+.detail-table td {
+    padding: 12px;
+    border-bottom: 1px solid #444444;
+    color: #dddddd;
+}
+
+.detail-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.detail-table tbody tr:hover {
+    background-color: rgba(232, 121, 43, 0.08);
+}
+
+/* =====================================================
+   REMOVE COURSE BUTTON
+   ===================================================== */
+
 .btn-remove-kurs {
-    background-color: #d94a4a;
-    color: white;
-    border: none;
-    border-radius: 4px;
     padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #d94a4a;
+    color: #ffffff;
+    font-weight: 600;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .btn-remove-kurs:hover {
     background-color: #bd3535;
 }
 
-.detail-section {
-    background: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-    overflow-x: auto;
+/* =====================================================
+   EMPTY STATE
+   ===================================================== */
+
+.empty-text {
+    margin: 16px 0 0;
+    color: #999999;
+    font-style: italic;
 }
 
-.detail-table {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
-    margin-top: 10px;
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-section {
+        padding: 18px;
+    }
+
+    .assign-kurs-box select {
+        max-width: none;
+    }
+
+    .detail-table {
+        min-width: 800px;
+    }
 }
