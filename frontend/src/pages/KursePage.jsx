@@ -38,7 +38,15 @@ const BUCHUNGSARTEN = [
 
 function KursePage() {
     const [kurse, setKurse] = useState([]);
+
     const [filter, setFilter] = useState('');
+    const [nameFilter, setNameFilter] = useState('');
+    const [kursleitungFilter, setKursleitungFilter] = useState('');
+    const [wochentagFilter, setWochentagFilter] = useState('');
+    const [buchungsartFilter, setBuchungsartFilter] = useState('');
+
+    const [sortKey, setSortKey] = useState(null);
+    const [sortDirection, setSortDirection] = useState('asc');
 
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({});
@@ -79,29 +87,128 @@ function KursePage() {
     };
 
     const filteredKurse = useMemo(() => {
-        const term = filter
-            .trim()
-            .toLowerCase();
+        const generalTerm =
+            filter.trim().toLowerCase();
 
-        if (!term) {
-            return kurse;
-        }
+        const nameTerm =
+            nameFilter.trim().toLowerCase();
+
+        const kursleitungTerm =
+            kursleitungFilter.trim().toLowerCase();
 
         return kurse.filter((kurs) => {
-            return [
-                kurs.name,
-                kurs.kursleitung,
-                kurs.wochentag,
-                kurs.uhrzeit,
-                kurs.buchungsart,
-                kurs.kursgebuehr
-            ].some((value) =>
-                String(value ?? '')
+            const matchesGeneral =
+                !generalTerm ||
+                [
+                    kurs.name,
+                    kurs.kursleitung,
+                    kurs.wochentag,
+                    kurs.uhrzeit,
+                    kurs.buchungsart,
+                    kurs.kursgebuehr
+                ].some((value) =>
+                    String(value ?? '')
+                        .toLowerCase()
+                        .includes(generalTerm)
+                );
+
+            const matchesName =
+                !nameTerm ||
+                String(kurs.name ?? '')
                     .toLowerCase()
-                    .includes(term)
+                    .includes(nameTerm);
+
+            const matchesKursleitung =
+                !kursleitungTerm ||
+                String(kurs.kursleitung ?? '')
+                    .toLowerCase()
+                    .includes(kursleitungTerm);
+
+            const matchesWochentag =
+                !wochentagFilter ||
+                String(kurs.wochentag ?? '') ===
+                String(wochentagFilter);
+
+            const matchesBuchungsart =
+                !buchungsartFilter ||
+                String(kurs.buchungsart ?? '') ===
+                String(buchungsartFilter);
+
+            return (
+                matchesGeneral &&
+                matchesName &&
+                matchesKursleitung &&
+                matchesWochentag &&
+                matchesBuchungsart
             );
         });
-    }, [kurse, filter]);
+    }, [
+        kurse,
+        filter,
+        nameFilter,
+        kursleitungFilter,
+        wochentagFilter,
+        buchungsartFilter
+    ]);
+
+    const sortedKurse = useMemo(() => {
+        return [...filteredKurse].sort((a, b) => {
+            if (!sortKey) {
+                return 0;
+            }
+
+            const valA = a[sortKey];
+            const valB = b[sortKey];
+
+            if (sortKey === 'kursgebuehr') {
+                const numberA = Number(valA) || 0;
+                const numberB = Number(valB) || 0;
+
+                return sortDirection === 'asc'
+                    ? numberA - numberB
+                    : numberB - numberA;
+            }
+
+            const strA =
+                String(valA ?? '')
+                    .toLowerCase();
+
+            const strB =
+                String(valB ?? '')
+                    .toLowerCase();
+
+            return sortDirection === 'asc'
+                ? strA.localeCompare(strB, 'de')
+                : strB.localeCompare(strA, 'de');
+        });
+    }, [
+        filteredKurse,
+        sortKey,
+        sortDirection
+    ]);
+
+    const handleSort = (key) => {
+        if (sortKey === key) {
+            setSortDirection((direction) =>
+                direction === 'asc'
+                    ? 'desc'
+                    : 'asc'
+            );
+        } else {
+            setSortKey(key);
+            setSortDirection('asc');
+        }
+    };
+
+    const renderSortIndicator = (key) => {
+        if (sortKey !== key) {
+            return null;
+        }
+
+        return sortDirection === 'asc'
+            ? ' ▲'
+            : ' ▼';
+    };
 
     const kursartenCount = useMemo(() => {
         return new Set(
@@ -342,6 +449,21 @@ function KursePage() {
         }
     };
 
+    const resetFilters = () => {
+        setFilter('');
+        setNameFilter('');
+        setKursleitungFilter('');
+        setWochentagFilter('');
+        setBuchungsartFilter('');
+    };
+
+    const hasActiveFilters =
+        filter ||
+        nameFilter ||
+        kursleitungFilter ||
+        wochentagFilter ||
+        buchungsartFilter;
+
     const formatKursgebuehr = (value) => {
         if (
             value === null ||
@@ -536,33 +658,18 @@ function KursePage() {
 
             <section className="kurse-stats">
                 <div className="kurse-stat-card">
-                    <span>
-                        Alle Kurse
-                    </span>
-
-                    <strong>
-                        {kurse.length}
-                    </strong>
+                    <span>Alle Kurse</span>
+                    <strong>{kurse.length}</strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>
-                        Buchungsarten
-                    </span>
-
-                    <strong>
-                        {kursartenCount}
-                    </strong>
+                    <span>Buchungsarten</span>
+                    <strong>{kursartenCount}</strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>
-                        Mit Kursgebühr
-                    </span>
-
-                    <strong>
-                        {kostenpflichtigeKurse}
-                    </strong>
+                    <span>Mit Kursgebühr</span>
+                    <strong>{kostenpflichtigeKurse}</strong>
                 </div>
             </section>
 
@@ -572,31 +679,147 @@ function KursePage() {
                 </div>
             )}
 
-            <section className="kurse-content">
+            <section className="kurse-filter-section">
+                <div className="kurse-filter-header">
+                    <div>
+                        <h2>Filter</h2>
 
-                <div className="kurse-toolbar">
-                    <div className="kurse-search">
-                        <span className="kurse-search-icon">
-                            ⌕
-                        </span>
+                        <p>
+                            Kurse nach Name, Kursleitung,
+                            Wochentag oder Buchungsart filtern
+                        </p>
+                    </div>
+
+                    {hasActiveFilters && (
+                        <button
+                            type="button"
+                            className="kurse-reset-button"
+                            onClick={resetFilters}
+                        >
+                            Filter zurücksetzen
+                        </button>
+                    )}
+                </div>
+
+                <div className="kurse-filter-grid">
+                    <div className="kurse-filter-field kurse-filter-field-wide">
+                        <label htmlFor="kurs-allgemeine-suche">
+                            Allgemeine Suche
+                        </label>
 
                         <input
-                            className="kurse-filter-input"
+                            id="kurs-allgemeine-suche"
                             type="text"
-                            placeholder="Nach Kurs, Kursleitung oder Buchungsart suchen..."
                             value={filter}
+                            placeholder="Kurs, Kursleitung, Uhrzeit..."
                             onChange={(event) =>
-                                setFilter(
+                                setFilter(event.target.value)
+                            }
+                        />
+                    </div>
+
+                    <div className="kurse-filter-field">
+                        <label htmlFor="kurs-name-filter">
+                            Name
+                        </label>
+
+                        <input
+                            id="kurs-name-filter"
+                            type="text"
+                            value={nameFilter}
+                            placeholder="Kursname..."
+                            onChange={(event) =>
+                                setNameFilter(
                                     event.target.value
                                 )
                             }
                         />
                     </div>
 
-                    <span className="kurse-result-count">
-                        {filteredKurse.length}{' '}
+                    <div className="kurse-filter-field">
+                        <label htmlFor="kursleitung-filter">
+                            Kursleitung
+                        </label>
 
-                        {filteredKurse.length === 1
+                        <input
+                            id="kursleitung-filter"
+                            type="text"
+                            value={kursleitungFilter}
+                            placeholder="Kursleitung..."
+                            onChange={(event) =>
+                                setKursleitungFilter(
+                                    event.target.value
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div className="kurse-filter-field">
+                        <label htmlFor="wochentag-filter">
+                            Wochentag
+                        </label>
+
+                        <select
+                            id="wochentag-filter"
+                            value={wochentagFilter}
+                            onChange={(event) =>
+                                setWochentagFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Wochentage
+                            </option>
+
+                            {WOCHENTAGE.map((tag) => (
+                                <option
+                                    key={tag}
+                                    value={tag}
+                                >
+                                    {tag}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="kurse-filter-field">
+                        <label htmlFor="buchungsart-filter">
+                            Buchungsart
+                        </label>
+
+                        <select
+                            id="buchungsart-filter"
+                            value={buchungsartFilter}
+                            onChange={(event) =>
+                                setBuchungsartFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Buchungsarten
+                            </option>
+
+                            {BUCHUNGSARTEN.map((art) => (
+                                <option
+                                    key={art}
+                                    value={art}
+                                >
+                                    {art}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section className="kurse-content">
+
+                <div className="kurse-toolbar">
+                    <span className="kurse-result-count">
+                        {sortedKurse.length}{' '}
+                        {sortedKurse.length === 1
                             ? 'Kurs'
                             : 'Kurse'}
                     </span>
@@ -606,12 +829,53 @@ function KursePage() {
                     <table className="kurse-table">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Kursleitung</th>
-                            <th>Wochentag</th>
-                            <th>Uhrzeit</th>
-                            <th>Buchungsart</th>
-                            <th>Kursgebühr</th>
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('name')}
+                            >
+                                Name
+                                {renderSortIndicator('name')}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('kursleitung')}
+                            >
+                                Kursleitung
+                                {renderSortIndicator('kursleitung')}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('wochentag')}
+                            >
+                                Wochentag
+                                {renderSortIndicator('wochentag')}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('uhrzeit')}
+                            >
+                                Uhrzeit
+                                {renderSortIndicator('uhrzeit')}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('buchungsart')}
+                            >
+                                Buchungsart
+                                {renderSortIndicator('buchungsart')}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() => handleSort('kursgebuehr')}
+                            >
+                                Kursgebühr
+                                {renderSortIndicator('kursgebuehr')}
+                            </th>
 
                             <th className="aktionen-header">
                                 Aktionen
@@ -629,7 +893,7 @@ function KursePage() {
                                     Kurse werden geladen...
                                 </td>
                             </tr>
-                        ) : filteredKurse.length === 0 ? (
+                        ) : sortedKurse.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan="7"
@@ -639,7 +903,7 @@ function KursePage() {
                                 </td>
                             </tr>
                         ) : (
-                            filteredKurse.map((kurs) => (
+                            sortedKurse.map((kurs) => (
                                 <tr
                                     key={kurs.id}
                                     className={
@@ -649,45 +913,27 @@ function KursePage() {
                                     }
                                 >
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'name'
-                                        )}
+                                        {renderCell(kurs, 'name')}
                                     </td>
 
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'kursleitung'
-                                        )}
+                                        {renderCell(kurs, 'kursleitung')}
                                     </td>
 
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'wochentag'
-                                        )}
+                                        {renderCell(kurs, 'wochentag')}
                                     </td>
 
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'uhrzeit'
-                                        )}
+                                        {renderCell(kurs, 'uhrzeit')}
                                     </td>
 
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'buchungsart'
-                                        )}
+                                        {renderCell(kurs, 'buchungsart')}
                                     </td>
 
                                     <td>
-                                        {renderCell(
-                                            kurs,
-                                            'kursgebuehr'
-                                        )}
+                                        {renderCell(kurs, 'kursgebuehr')}
                                     </td>
 
                                     <td className="kurse-action-cell">
@@ -719,9 +965,7 @@ function KursePage() {
                                                     type="button"
                                                     className="kurse-edit-button"
                                                     onClick={() =>
-                                                        handleEditStart(
-                                                            kurs
-                                                        )
+                                                        handleEditStart(kurs)
                                                     }
                                                     disabled={
                                                         editingId !== null
@@ -734,14 +978,11 @@ function KursePage() {
                                                     type="button"
                                                     className="kurse-delete-button"
                                                     onClick={() =>
-                                                        handleDelete(
-                                                            kurs
-                                                        )
+                                                        handleDelete(kurs)
                                                     }
                                                     disabled={
                                                         editingId !== null
                                                     }
-                                                    aria-label={`${kurs.name} löschen`}
                                                 >
                                                     Löschen
                                                 </button>

@@ -552,7 +552,7 @@
     color: #ffffff;
 }
 
-//* =====================================================
+/* =====================================================
    ACTIONS
    ===================================================== */
 
@@ -694,6 +694,137 @@
 
 @media (max-width: 760px) {
     .kurse-add-button {
+        width: 100%;
+    }
+}
+
+
+
+.kurse-filter-section {
+    margin-bottom: 18px;
+    overflow: hidden;
+    border: 1px solid #414141;
+    border-radius: 12px;
+    background: #252525;
+}
+
+.kurse-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 17px 20px;
+    border-bottom: 1px solid #414141;
+    background: #292929;
+}
+
+.kurse-filter-header h2 {
+    margin: 0 0 4px;
+    color: #ffffff;
+    font-size: 18px;
+}
+
+.kurse-filter-header p {
+    margin: 0;
+    color: #999999;
+    font-size: 13px;
+}
+
+.kurse-filter-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(220px, 1.4fr)
+        repeat(4, minmax(150px, 1fr));
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.kurse-filter-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.kurse-filter-field label {
+    color: #c7c7c7;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kurse-filter-field input,
+.kurse-filter-field select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid #505050;
+    border-radius: 7px;
+    outline: none;
+    background: #202020;
+    color: #ffffff;
+    font-size: 0.86rem;
+}
+
+.kurse-filter-field input:focus,
+.kurse-filter-field select:focus {
+    border-color: #e8792b;
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.kurse-reset-button {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border: 1px solid #555555;
+    border-radius: 7px;
+    background: #333333;
+    color: #dddddd;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.kurse-reset-button:hover {
+    border-color: #e8792b;
+    color: #ffffff;
+}
+
+.kurse-sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.kurse-sortable-header:hover {
+    background: #383838;
+}
+
+@media (max-width: 1200px) {
+    .kurse-filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .kurse-filter-field-wide {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 760px) {
+    .kurse-filter-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .kurse-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kurse-filter-field-wide {
+        grid-column: auto;
+    }
+
+    .kurse-reset-button {
         width: 100%;
     }
 }
