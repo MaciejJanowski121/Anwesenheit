@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import StudentDetailView from '../components/StudentDetailView';
-import { getStudentById } from '../services/studentService';
+
+import {
+    getStudentById,
+    updateStudent
+} from '../services/studentService';
+
 import { getKurse } from '../services/kursService';
+
 import {
     getBuchungenByStudent,
     createBuchung,
     deleteBuchung
 } from '../services/buchungService';
-import { getAnwesenheitenByStudent } from '../services/anwesenheitService';
+
+import {
+    getAnwesenheitenByStudent
+} from '../services/anwesenheitService';
+
 import './StudentDetailsPage.css';
 
 function StudentDetailsPage() {
@@ -19,6 +30,7 @@ function StudentDetailsPage() {
     const [buchungen, setBuchungen] = useState([]);
     const [kurse, setKurse] = useState([]);
     const [anwesenheiten, setAnwesenheiten] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -31,7 +43,12 @@ function StudentDetailsPage() {
             getKurse(),
             getAnwesenheitenByStudent(id)
         ])
-            .then(([studentData, buchungenData, kurseData, anwesenheitenData]) => {
+            .then(([
+                       studentData,
+                       buchungenData,
+                       kurseData,
+                       anwesenheitenData
+                   ]) => {
                 setStudent(studentData);
                 setBuchungen(buchungenData);
                 setKurse(kurseData);
@@ -40,39 +57,118 @@ function StudentDetailsPage() {
             })
             .catch((error) => {
                 console.error(error);
-                setError('Schüler konnte nicht geladen werden.');
+
+                setError(
+                    'Schüler konnte nicht geladen werden.'
+                );
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                setLoading(false);
+            });
+
     }, [id]);
 
     const handleAssignKurs = async (kursId) => {
         try {
-            const newBuchung = await createBuchung(id, kursId);
-            setBuchungen((prev) => [...prev, newBuchung]);
+            const newBuchung =
+                await createBuchung(
+                    id,
+                    kursId
+                );
+
+            setBuchungen((previous) => [
+                ...previous,
+                newBuchung
+            ]);
+
         } catch (error) {
             console.error(error);
-            setError('Kurs konnte nicht zugewiesen werden.');
+
+            setError(
+                'Kurs konnte nicht zugewiesen werden.'
+            );
         }
     };
 
-    const handleDeleteBuchung = async (buchungId) => {
+    const handleDeleteBuchung = async (
+        buchungId
+    ) => {
         try {
-            await deleteBuchung(buchungId);
-            setBuchungen((prev) =>
-                prev.filter((buchung) => buchung.id !== buchungId)
+            await deleteBuchung(
+                buchungId
             );
+
+            setBuchungen((previous) =>
+                previous.filter(
+                    (buchung) =>
+                        buchung.id !== buchungId
+                )
+            );
+
         } catch (error) {
             console.error(error);
-            setError('Kurs konnte nicht entfernt werden.');
+
+            setError(
+                'Kurs konnte nicht entfernt werden.'
+            );
+        }
+    };
+
+    const handleUpdateGehtUm1530 = async (
+        value
+    ) => {
+        try {
+            setError('');
+
+            const updatedStudent =
+                await updateStudent(
+                    id,
+                    {
+                        ...student,
+                        gehtUm1530: value
+                    }
+                );
+
+            setStudent(updatedStudent);
+
+            return updatedStudent;
+
+        } catch (error) {
+            console.error(
+                'Fehler beim Speichern von gehtUm1530:',
+                error
+            );
+
+            setError(
+                'Die 15:30-Einstellung konnte nicht gespeichert werden.'
+            );
+
+            throw error;
         }
     };
 
     if (loading) {
-        return <p className="details-message">Schüler wird geladen...</p>;
+        return (
+            <p className="details-message">
+                Schüler wird geladen...
+            </p>
+        );
     }
 
     if (error) {
-        return <p className="details-message error">{error}</p>;
+        return (
+            <p className="details-message error">
+                {error}
+            </p>
+        );
+    }
+
+    if (!student) {
+        return (
+            <p className="details-message error">
+                Schüler nicht gefunden.
+            </p>
+        );
     }
 
     return (
@@ -82,9 +178,24 @@ function StudentDetailsPage() {
                 buchungen={buchungen}
                 kurse={kurse}
                 anwesenheiten={anwesenheiten}
-                onAssignKurs={handleAssignKurs}
-                onDeleteBuchung={handleDeleteBuchung}
-                onClose={() => navigate('/gesamtuebersicht')}
+
+                onAssignKurs={
+                    handleAssignKurs
+                }
+
+                onDeleteBuchung={
+                    handleDeleteBuchung
+                }
+
+                onUpdateGehtUm1530={
+                    handleUpdateGehtUm1530
+                }
+
+                onClose={() =>
+                    navigate(
+                        '/gesamtuebersicht'
+                    )
+                }
             />
         </div>
     );

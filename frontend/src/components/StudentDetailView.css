@@ -10,7 +10,6 @@
 
 .back-button {
     margin-bottom: 24px;
-
     padding: 10px 18px;
 
     border: none;
@@ -69,7 +68,6 @@
     box-sizing: border-box;
 
     margin-bottom: 20px;
-
     padding: 24px;
 
     border: 1px solid #444444;
@@ -137,6 +135,110 @@
 }
 
 /* =====================================================
+   15:30 SETTING
+   ===================================================== */
+
+.detail-item-1530 {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    min-width: 0;
+
+    padding: 12px;
+}
+
+/*
+ * Kontener dla napisu oraz przycisków.
+ * Układ pionowy:
+ *
+ * Geht um 15:30 Uhr
+ * [ Ja | Nein ]
+ */
+.detail-1530-header {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    width: auto;
+
+    gap: 10px;
+}
+
+.detail-item-1530 .detail-label {
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+/* =====================================================
+   15:30 JA / NEIN SWITCH
+   ===================================================== */
+
+.detail-1530-options {
+    display: inline-flex;
+
+    width: auto;
+    max-width: max-content;
+
+    flex: 0 0 auto;
+
+    padding: 3px;
+
+    border: 1px solid #4a4a4a;
+    border-radius: 8px;
+
+    background: #252525;
+}
+
+.detail-1530-option {
+    width: auto;
+    min-width: 50px;
+
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #999999;
+
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            color 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.detail-1530-option:hover:not(.active):not(:disabled) {
+    background: #303030;
+    color: #ffffff;
+}
+
+.detail-1530-option.active {
+    background: #e8792b;
+    color: #ffffff;
+}
+
+.detail-1530-option:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+/* =====================================================
    COURSE ASSIGNMENT
    ===================================================== */
 
@@ -176,7 +278,6 @@
     box-sizing: border-box;
 
     width: 100%;
-
     min-width: 0;
 
     padding: 10px 12px;
@@ -214,6 +315,10 @@
     background: #262626;
     color: #ffffff;
 }
+
+/* =====================================================
+   ASSIGN COURSE BUTTON
+   ===================================================== */
 
 .assign-kurs-button {
     min-height: 38px;
@@ -261,6 +366,7 @@
     padding-bottom: 8px;
 
     scrollbar-width: thin;
+
     scrollbar-color:
             #666666
             #2a2a2a;
@@ -278,6 +384,7 @@
 
 .detail-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
+
     background: #666666;
 }
 
@@ -386,10 +493,11 @@
 }
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE - TABLET
    ===================================================== */
 
 @media (max-width: 900px) {
+
     .assign-kurs-box {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
@@ -397,11 +505,17 @@
 
     .assign-kurs-button {
         grid-column: span 2;
+
         width: 100%;
     }
 }
 
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
 @media (max-width: 768px) {
+
     .student-detail-view {
         max-width: none;
     }
@@ -418,14 +532,44 @@
         padding: 18px;
     }
 
+    /* 15:30 */
+
+    .detail-item-1530 {
+        padding: 12px;
+    }
+
+    .detail-1530-header {
+        width: auto;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+    .detail-1530-options {
+        width: auto;
+        max-width: max-content;
+    }
+
+    .detail-1530-option {
+        min-width: 48px;
+
+        padding: 6px 9px;
+    }
+
+    /* Kurszuweisung */
+
     .assign-kurs-box {
         grid-template-columns: 1fr;
     }
 
     .assign-kurs-button {
         grid-column: auto;
+
         width: 100%;
     }
+
+    /* Tabellen */
 
     .detail-table {
         min-width: 800px;

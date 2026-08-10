@@ -46,4 +46,6 @@ public class Student {
     private String telefon2;
 
     private String mobil2;
+
+    private Boolean gehtUm1530 = false;
 }

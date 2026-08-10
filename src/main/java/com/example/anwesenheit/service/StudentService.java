@@ -47,6 +47,9 @@ public class StudentService {
         student.setTelefon2(updatedStudent.getTelefon2());
         student.setMobil2(updatedStudent.getMobil2());
 
+        // Darf der Schüler um 15:30 Uhr gehen?
+        student.setGehtUm1530(updatedStudent.getGehtUm1530());
+
         return studentRepository.save(student);
     }
 
