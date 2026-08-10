@@ -27,3 +27,11 @@ export const createBuchung = async (studentId, kursId) => {
 export const deleteBuchung = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
 };
+
+export const getBuchungenByKurs = async (kursId) => {
+    const response = await axios.get(
+        `${API_URL}/kurs/${kursId}`
+    );
+
+    return response.data;
+};

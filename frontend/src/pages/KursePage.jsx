@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
     getKurse,
@@ -37,6 +38,8 @@ const BUCHUNGSARTEN = [
 ];
 
 function KursePage() {
+    const navigate = useNavigate();
+
     const [kurse, setKurse] = useState([]);
 
     const [filter, setFilter] = useState('');
@@ -161,8 +164,11 @@ function KursePage() {
             const valB = b[sortKey];
 
             if (sortKey === 'kursgebuehr') {
-                const numberA = Number(valA) || 0;
-                const numberB = Number(valB) || 0;
+                const numberA =
+                    Number(valA) || 0;
+
+                const numberB =
+                    Number(valB) || 0;
 
                 return sortDirection === 'asc'
                     ? numberA - numberB
@@ -228,12 +234,25 @@ function KursePage() {
         }).length;
     }, [kurse]);
 
+    const handleKursOpen = (kurs) => {
+        if (editingId !== null) {
+            return;
+        }
+
+        if (typeof kurs.id !== 'number') {
+            return;
+        }
+
+        navigate(`/kurse/${kurs.id}`);
+    };
+
     const handleAdd = () => {
         if (editingId !== null) {
             return;
         }
 
-        const tempId = `new-${Date.now()}`;
+        const tempId =
+            `new-${Date.now()}`;
 
         const newKurs = {
             ...emptyKurs,
@@ -259,13 +278,17 @@ function KursePage() {
 
         setEditData({
             ...kurs,
-            kursgebuehr: kurs.kursgebuehr ?? ''
+            kursgebuehr:
+                kurs.kursgebuehr ?? ''
         });
 
         setError('');
     };
 
-    const handleEditChange = (field, value) => {
+    const handleEditChange = (
+        field,
+        value
+    ) => {
         setEditData((previous) => ({
             ...previous,
             [field]: value
@@ -294,7 +317,9 @@ function KursePage() {
                 editData.kursgebuehr === null ||
                 editData.kursgebuehr === undefined
                     ? null
-                    : Number(editData.kursgebuehr)
+                    : Number(
+                        editData.kursgebuehr
+                    )
         };
     };
 
@@ -333,7 +358,9 @@ function KursePage() {
 
         if (
             editData.kursgebuehr !== '' &&
-            Number(editData.kursgebuehr) < 0
+            Number(
+                editData.kursgebuehr
+            ) < 0
         ) {
             setError(
                 'Die Kursgebühr darf nicht negativ sein.'
@@ -354,19 +381,24 @@ function KursePage() {
             setSaving(true);
             setError('');
 
-            const payload = createPayload();
+            const payload =
+                createPayload();
 
             let savedKurs;
 
-            if (typeof editingId === 'number') {
-                savedKurs = await updateKurs(
-                    editingId,
-                    payload
-                );
+            if (
+                typeof editingId === 'number'
+            ) {
+                savedKurs =
+                    await updateKurs(
+                        editingId,
+                        payload
+                    );
             } else {
-                savedKurs = await createKurs(
-                    payload
-                );
+                savedKurs =
+                    await createKurs(
+                        payload
+                    );
             }
 
             setKurse((previous) =>
@@ -395,7 +427,9 @@ function KursePage() {
     };
 
     const handleEditCancel = () => {
-        if (typeof editingId !== 'number') {
+        if (
+            typeof editingId !== 'number'
+        ) {
             setKurse((previous) =>
                 previous.filter(
                     (kurs) =>
@@ -410,9 +444,10 @@ function KursePage() {
     };
 
     const handleDelete = async (kurs) => {
-        const confirmed = window.confirm(
-            `Möchten Sie den Kurs „${kurs.name}“ wirklich löschen?`
-        );
+        const confirmed =
+            window.confirm(
+                `Möchten Sie den Kurs „${kurs.name}“ wirklich löschen?`
+            );
 
         if (!confirmed) {
             return;
@@ -421,8 +456,12 @@ function KursePage() {
         try {
             setError('');
 
-            if (typeof kurs.id === 'number') {
-                await deleteKurs(kurs.id);
+            if (
+                typeof kurs.id === 'number'
+            ) {
+                await deleteKurs(
+                    kurs.id
+                );
             }
 
             setKurse((previous) =>
@@ -432,7 +471,9 @@ function KursePage() {
                 )
             );
 
-            if (editingId === kurs.id) {
+            if (
+                editingId === kurs.id
+            ) {
                 setEditingId(null);
                 setEditData({});
             }
@@ -464,7 +505,9 @@ function KursePage() {
         wochentagFilter ||
         buchungsartFilter;
 
-    const formatKursgebuehr = (value) => {
+    const formatKursgebuehr = (
+        value
+    ) => {
         if (
             value === null ||
             value === undefined ||
@@ -473,28 +516,39 @@ function KursePage() {
             return '–';
         }
 
-        return new Intl.NumberFormat('de-DE', {
-            style: 'currency',
-            currency: 'EUR'
-        }).format(Number(value));
+        return new Intl.NumberFormat(
+            'de-DE',
+            {
+                style: 'currency',
+                currency: 'EUR'
+            }
+        ).format(Number(value));
     };
 
-    const getBadgeClass = (buchungsart) => {
-        const normalized = String(
-            buchungsart || ''
-        )
-            .toLowerCase()
-            .replace(/\s+/g, '-');
+    const getBadgeClass = (
+        buchungsart
+    ) => {
+        const normalized =
+            String(
+                buchungsart || ''
+            )
+                .toLowerCase()
+                .replace(/\s+/g, '-');
 
         return `kurs-badge kurs-badge-${normalized}`;
     };
 
-    const renderCell = (kurs, field) => {
+    const renderCell = (
+        kurs,
+        field
+    ) => {
         const isEditing =
             editingId === kurs.id;
 
         if (!isEditing) {
-            if (field === 'kursgebuehr') {
+            if (
+                field === 'kursgebuehr'
+            ) {
                 return (
                     <span className="kurs-fee">
                         {formatKursgebuehr(
@@ -504,7 +558,9 @@ function KursePage() {
                 );
             }
 
-            if (field === 'buchungsart') {
+            if (
+                field === 'buchungsart'
+            ) {
                 return kurs.buchungsart ? (
                     <span
                         className={getBadgeClass(
@@ -531,7 +587,8 @@ function KursePage() {
                             </strong>
 
                             <small>
-                                {kurs.wochentag || 'Kein Tag'}
+                                {kurs.wochentag ||
+                                    'Kein Tag'}
 
                                 {kurs.uhrzeit
                                     ? ` · ${kurs.uhrzeit}`
@@ -542,14 +599,24 @@ function KursePage() {
                 );
             }
 
-            return kurs[field] || '–';
+            return (
+                kurs[field] || '–'
+            );
         }
 
-        if (field === 'wochentag') {
+        if (
+            field === 'wochentag'
+        ) {
             return (
                 <select
                     className="kurs-edit-input"
-                    value={editData[field] ?? ''}
+                    value={
+                        editData[field] ??
+                        ''
+                    }
+                    onClick={(event) =>
+                        event.stopPropagation()
+                    }
                     onChange={(event) =>
                         handleEditChange(
                             field,
@@ -561,23 +628,33 @@ function KursePage() {
                         Bitte wählen
                     </option>
 
-                    {WOCHENTAGE.map((tag) => (
-                        <option
-                            key={tag}
-                            value={tag}
-                        >
-                            {tag}
-                        </option>
-                    ))}
+                    {WOCHENTAGE.map(
+                        (tag) => (
+                            <option
+                                key={tag}
+                                value={tag}
+                            >
+                                {tag}
+                            </option>
+                        )
+                    )}
                 </select>
             );
         }
 
-        if (field === 'buchungsart') {
+        if (
+            field === 'buchungsart'
+        ) {
             return (
                 <select
                     className="kurs-edit-input"
-                    value={editData[field] ?? ''}
+                    value={
+                        editData[field] ??
+                        ''
+                    }
+                    onClick={(event) =>
+                        event.stopPropagation()
+                    }
                     onChange={(event) =>
                         handleEditChange(
                             field,
@@ -589,14 +666,16 @@ function KursePage() {
                         Bitte wählen
                     </option>
 
-                    {BUCHUNGSARTEN.map((art) => (
-                        <option
-                            key={art}
-                            value={art}
-                        >
-                            {art}
-                        </option>
-                    ))}
+                    {BUCHUNGSARTEN.map(
+                        (art) => (
+                            <option
+                                key={art}
+                                value={art}
+                            >
+                                {art}
+                            </option>
+                        )
+                    )}
                 </select>
             );
         }
@@ -621,7 +700,12 @@ function KursePage() {
                         ? '0.01'
                         : undefined
                 }
-                value={editData[field] ?? ''}
+                value={
+                    editData[field] ?? ''
+                }
+                onClick={(event) =>
+                    event.stopPropagation()
+                }
                 onChange={(event) =>
                     handleEditChange(
                         field,
@@ -649,7 +733,9 @@ function KursePage() {
                     type="button"
                     className="kurse-add-button"
                     onClick={handleAdd}
-                    disabled={editingId !== null}
+                    disabled={
+                        editingId !== null
+                    }
                 >
                     <span>+</span>
                     Neuer Kurs
@@ -658,18 +744,33 @@ function KursePage() {
 
             <section className="kurse-stats">
                 <div className="kurse-stat-card">
-                    <span>Alle Kurse</span>
-                    <strong>{kurse.length}</strong>
+                    <span>
+                        Alle Kurse
+                    </span>
+
+                    <strong>
+                        {kurse.length}
+                    </strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>Buchungsarten</span>
-                    <strong>{kursartenCount}</strong>
+                    <span>
+                        Buchungsarten
+                    </span>
+
+                    <strong>
+                        {kursartenCount}
+                    </strong>
                 </div>
 
                 <div className="kurse-stat-card">
-                    <span>Mit Kursgebühr</span>
-                    <strong>{kostenpflichtigeKurse}</strong>
+                    <span>
+                        Mit Kursgebühr
+                    </span>
+
+                    <strong>
+                        {kostenpflichtigeKurse}
+                    </strong>
                 </div>
             </section>
 
@@ -682,7 +783,9 @@ function KursePage() {
             <section className="kurse-filter-section">
                 <div className="kurse-filter-header">
                     <div>
-                        <h2>Filter</h2>
+                        <h2>
+                            Filter
+                        </h2>
 
                         <p>
                             Kurse nach Name, Kursleitung,
@@ -694,7 +797,9 @@ function KursePage() {
                         <button
                             type="button"
                             className="kurse-reset-button"
-                            onClick={resetFilters}
+                            onClick={
+                                resetFilters
+                            }
                         >
                             Filter zurücksetzen
                         </button>
@@ -713,7 +818,9 @@ function KursePage() {
                             value={filter}
                             placeholder="Kurs, Kursleitung, Uhrzeit..."
                             onChange={(event) =>
-                                setFilter(event.target.value)
+                                setFilter(
+                                    event.target.value
+                                )
                             }
                         />
                     </div>
@@ -744,7 +851,9 @@ function KursePage() {
                         <input
                             id="kursleitung-filter"
                             type="text"
-                            value={kursleitungFilter}
+                            value={
+                                kursleitungFilter
+                            }
                             placeholder="Kursleitung..."
                             onChange={(event) =>
                                 setKursleitungFilter(
@@ -761,7 +870,9 @@ function KursePage() {
 
                         <select
                             id="wochentag-filter"
-                            value={wochentagFilter}
+                            value={
+                                wochentagFilter
+                            }
                             onChange={(event) =>
                                 setWochentagFilter(
                                     event.target.value
@@ -772,14 +883,16 @@ function KursePage() {
                                 Alle Wochentage
                             </option>
 
-                            {WOCHENTAGE.map((tag) => (
-                                <option
-                                    key={tag}
-                                    value={tag}
-                                >
-                                    {tag}
-                                </option>
-                            ))}
+                            {WOCHENTAGE.map(
+                                (tag) => (
+                                    <option
+                                        key={tag}
+                                        value={tag}
+                                    >
+                                        {tag}
+                                    </option>
+                                )
+                            )}
                         </select>
                     </div>
 
@@ -790,7 +903,9 @@ function KursePage() {
 
                         <select
                             id="buchungsart-filter"
-                            value={buchungsartFilter}
+                            value={
+                                buchungsartFilter
+                            }
                             onChange={(event) =>
                                 setBuchungsartFilter(
                                     event.target.value
@@ -801,14 +916,16 @@ function KursePage() {
                                 Alle Buchungsarten
                             </option>
 
-                            {BUCHUNGSARTEN.map((art) => (
-                                <option
-                                    key={art}
-                                    value={art}
-                                >
-                                    {art}
-                                </option>
-                            ))}
+                            {BUCHUNGSARTEN.map(
+                                (art) => (
+                                    <option
+                                        key={art}
+                                        value={art}
+                                    >
+                                        {art}
+                                    </option>
+                                )
+                            )}
                         </select>
                     </div>
                 </div>
@@ -819,6 +936,7 @@ function KursePage() {
                 <div className="kurse-toolbar">
                     <span className="kurse-result-count">
                         {sortedKurse.length}{' '}
+
                         {sortedKurse.length === 1
                             ? 'Kurs'
                             : 'Kurse'}
@@ -831,50 +949,86 @@ function KursePage() {
                         <tr>
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('name')}
+                                onClick={() =>
+                                    handleSort(
+                                        'name'
+                                    )
+                                }
                             >
                                 Name
-                                {renderSortIndicator('name')}
+                                {renderSortIndicator(
+                                    'name'
+                                )}
                             </th>
 
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('kursleitung')}
+                                onClick={() =>
+                                    handleSort(
+                                        'kursleitung'
+                                    )
+                                }
                             >
                                 Kursleitung
-                                {renderSortIndicator('kursleitung')}
+                                {renderSortIndicator(
+                                    'kursleitung'
+                                )}
                             </th>
 
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('wochentag')}
+                                onClick={() =>
+                                    handleSort(
+                                        'wochentag'
+                                    )
+                                }
                             >
                                 Wochentag
-                                {renderSortIndicator('wochentag')}
+                                {renderSortIndicator(
+                                    'wochentag'
+                                )}
                             </th>
 
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('uhrzeit')}
+                                onClick={() =>
+                                    handleSort(
+                                        'uhrzeit'
+                                    )
+                                }
                             >
                                 Uhrzeit
-                                {renderSortIndicator('uhrzeit')}
+                                {renderSortIndicator(
+                                    'uhrzeit'
+                                )}
                             </th>
 
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('buchungsart')}
+                                onClick={() =>
+                                    handleSort(
+                                        'buchungsart'
+                                    )
+                                }
                             >
                                 Buchungsart
-                                {renderSortIndicator('buchungsart')}
+                                {renderSortIndicator(
+                                    'buchungsart'
+                                )}
                             </th>
 
                             <th
                                 className="kurse-sortable-header"
-                                onClick={() => handleSort('kursgebuehr')}
+                                onClick={() =>
+                                    handleSort(
+                                        'kursgebuehr'
+                                    )
+                                }
                             >
                                 Kursgebühr
-                                {renderSortIndicator('kursgebuehr')}
+                                {renderSortIndicator(
+                                    'kursgebuehr'
+                                )}
                             </th>
 
                             <th className="aktionen-header">
@@ -903,94 +1057,140 @@ function KursePage() {
                                 </td>
                             </tr>
                         ) : (
-                            sortedKurse.map((kurs) => (
-                                <tr
-                                    key={kurs.id}
-                                    className={
-                                        editingId === kurs.id
-                                            ? 'kurs-row-editing'
-                                            : ''
-                                    }
-                                >
-                                    <td>
-                                        {renderCell(kurs, 'name')}
-                                    </td>
+                            sortedKurse.map(
+                                (kurs) => (
+                                    <tr
+                                        key={kurs.id}
+                                        className={
+                                            editingId ===
+                                            kurs.id
+                                                ? 'kurs-row-editing'
+                                                : 'kurs-row-clickable'
+                                        }
+                                        onClick={() =>
+                                            handleKursOpen(
+                                                kurs
+                                            )
+                                        }
+                                    >
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'name'
+                                            )}
+                                        </td>
 
-                                    <td>
-                                        {renderCell(kurs, 'kursleitung')}
-                                    </td>
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'kursleitung'
+                                            )}
+                                        </td>
 
-                                    <td>
-                                        {renderCell(kurs, 'wochentag')}
-                                    </td>
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'wochentag'
+                                            )}
+                                        </td>
 
-                                    <td>
-                                        {renderCell(kurs, 'uhrzeit')}
-                                    </td>
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'uhrzeit'
+                                            )}
+                                        </td>
 
-                                    <td>
-                                        {renderCell(kurs, 'buchungsart')}
-                                    </td>
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'buchungsart'
+                                            )}
+                                        </td>
 
-                                    <td>
-                                        {renderCell(kurs, 'kursgebuehr')}
-                                    </td>
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'kursgebuehr'
+                                            )}
+                                        </td>
 
-                                    <td className="kurse-action-cell">
-                                        {editingId === kurs.id ? (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="kurse-save-button"
-                                                    onClick={handleEditSave}
-                                                    disabled={saving}
-                                                >
-                                                    {saving
-                                                        ? 'Speichern...'
-                                                        : 'Speichern'}
-                                                </button>
+                                        <td
+                                            className="kurse-action-cell"
+                                            onClick={(event) =>
+                                                event.stopPropagation()
+                                            }
+                                        >
+                                            {editingId ===
+                                            kurs.id ? (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        className="kurse-save-button"
+                                                        onClick={
+                                                            handleEditSave
+                                                        }
+                                                        disabled={
+                                                            saving
+                                                        }
+                                                    >
+                                                        {saving
+                                                            ? 'Speichern...'
+                                                            : 'Speichern'}
+                                                    </button>
 
-                                                <button
-                                                    type="button"
-                                                    className="kurse-cancel-button"
-                                                    onClick={handleEditCancel}
-                                                    disabled={saving}
-                                                >
-                                                    Abbrechen
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button
-                                                    type="button"
-                                                    className="kurse-edit-button"
-                                                    onClick={() =>
-                                                        handleEditStart(kurs)
-                                                    }
-                                                    disabled={
-                                                        editingId !== null
-                                                    }
-                                                >
-                                                    Bearbeiten
-                                                </button>
+                                                    <button
+                                                        type="button"
+                                                        className="kurse-cancel-button"
+                                                        onClick={
+                                                            handleEditCancel
+                                                        }
+                                                        disabled={
+                                                            saving
+                                                        }
+                                                    >
+                                                        Abbrechen
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        className="kurse-edit-button"
+                                                        onClick={() =>
+                                                            handleEditStart(
+                                                                kurs
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            editingId !==
+                                                            null
+                                                        }
+                                                    >
+                                                        Bearbeiten
+                                                    </button>
 
-                                                <button
-                                                    type="button"
-                                                    className="kurse-delete-button"
-                                                    onClick={() =>
-                                                        handleDelete(kurs)
-                                                    }
-                                                    disabled={
-                                                        editingId !== null
-                                                    }
-                                                >
-                                                    Löschen
-                                                </button>
-                                            </>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
+                                                    <button
+                                                        type="button"
+                                                        className="kurse-delete-button"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                kurs
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            editingId !==
+                                                            null
+                                                        }
+                                                    >
+                                                        Löschen
+                                                    </button>
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+                                )
+                            )
                         )}
                         </tbody>
                     </table>

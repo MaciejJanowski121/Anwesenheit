@@ -19,6 +19,11 @@ public class KursService {
         return kursRepository.findAll();
     }
 
+    public Kurs getKursById(Long id) {
+        return kursRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kurs nicht gefunden"));
+    }
+
     public Kurs createKurs(Kurs kurs) {
         return kursRepository.save(kurs);
     }

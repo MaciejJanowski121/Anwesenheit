@@ -20,3 +20,11 @@ export const updateKurs = async (id, kurs) => {
 export const deleteKurs = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
 };
+
+export const getKursById = async (id) => {
+    const response = await axios.get(
+        `${API_URL}/${id}`
+    );
+
+    return response.data;
+};

@@ -828,3 +828,11 @@
         width: 100%;
     }
 }
+
+.kurs-row-clickable {
+    cursor: pointer;
+}
+
+.kurs-row-clickable:hover {
+    background: rgba(232, 121, 43, 0.07);
+}

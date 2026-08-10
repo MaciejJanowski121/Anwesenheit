@@ -26,6 +26,11 @@ public class KursController {
         return kursService.createKurs(kurs);
     }
 
+    @GetMapping("/{id}")
+    public Kurs getKursById(@PathVariable Long id) {
+        return kursService.getKursById(id);
+    }
+
     @PutMapping("/{id}")
     public Kurs updateKurs(@PathVariable Long id, @RequestBody Kurs kurs) {
         return kursService.updateKurs(id, kurs);
