@@ -28,6 +28,17 @@ export const deleteBuchung = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
 };
 
+export const addJahrgangToKurs = async (
+    kursId,
+    jahrgang
+) => {
+    const response = await axios.post(
+        `${API_URL}/kurs/${kursId}/jahrgang/${jahrgang}`
+    );
+
+    return response.data;
+};
+
 export const getBuchungenByKurs = async (kursId) => {
     const response = await axios.get(
         `${API_URL}/kurs/${kursId}`

@@ -7,8 +7,8 @@ import com.example.anwesenheit.repository.BuchungRepository;
 import com.example.anwesenheit.repository.KursRepository;
 import com.example.anwesenheit.repository.StudentRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -28,34 +28,180 @@ public class BuchungService {
         this.kursRepository = kursRepository;
     }
 
-    public Buchung createBuchung(Long studentId, Long kursId) {
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student nicht gefunden"));
+    /* =====================================================
+       EINZELNEN SCHÜLER EINEM KURS ZUORDNEN
+       ===================================================== */
 
-        Kurs kurs = kursRepository.findById(kursId)
-                .orElseThrow(() -> new RuntimeException("Kurs nicht gefunden"));
+    public Buchung createBuchung(
+            Long studentId,
+            Long kursId
+    ) {
+
+        Student student = studentRepository
+                .findById(studentId)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Student nicht gefunden"
+                        )
+                );
+
+        Kurs kurs = kursRepository
+                .findById(kursId)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Kurs nicht gefunden"
+                        )
+                );
+
+        /*
+         * Prüfen, ob der Schüler bereits
+         * diesem Kurs zugeordnet ist.
+         */
+        boolean exists = buchungRepository
+                .existsByStudentIdAndKursId(
+                        studentId,
+                        kursId
+                );
+
+        if (exists) {
+            throw new RuntimeException(
+                    "Der Schüler ist bereits diesem Kurs zugeordnet."
+            );
+        }
 
         Buchung buchung = new Buchung();
+
         buchung.setStudent(student);
         buchung.setKurs(kurs);
-        buchung.setBuchungsdatum(LocalDate.now());
+        buchung.setBuchungsdatum(
+                LocalDate.now()
+        );
 
-        return buchungRepository.save(buchung);
-
-
+        return buchungRepository.save(
+                buchung
+        );
     }
 
+    /* =====================================================
+       BUCHUNGEN EINES SCHÜLERS
+       ===================================================== */
 
-
-    public List<Buchung> getBuchungenByStudentId(Long studentId) {
-        return buchungRepository.findByStudentId(studentId);
+    public List<Buchung> getBuchungenByStudentId(
+            Long studentId
+    ) {
+        return buchungRepository
+                .findByStudentId(studentId);
     }
 
-    public List<Buchung> getBuchungenByKursId(Long kursId) {
-        return buchungRepository.findByKursId(kursId);
+    /* =====================================================
+       BUCHUNGEN EINES KURSES
+       ===================================================== */
+
+    public List<Buchung> getBuchungenByKursId(
+            Long kursId
+    ) {
+        return buchungRepository
+                .findByKursId(kursId);
     }
 
-    public void deleteBuchung(Long id) {
+    /* =====================================================
+       BUCHUNG LÖSCHEN
+       ===================================================== */
+
+    public void deleteBuchung(
+            Long id
+    ) {
         buchungRepository.deleteById(id);
+    }
+
+    /* =====================================================
+       GANZEN JAHRGANG EINEM KURS ZUORDNEN
+       ===================================================== */
+
+    /*
+     * Ordnet alle Schüler eines bestimmten Jahrgangs
+     * einem Kurs zu.
+     *
+     * Bereits vorhandene Buchungen werden übersprungen.
+     *
+     * Beispiel:
+     *
+     * Jahrgang 7 -> Pflichtunterricht Mathematik
+     *
+     * Rückgabewert:
+     * Anzahl der neu erstellten Buchungen.
+     */
+    public int addJahrgangToKurs(
+            Long kursId,
+            Integer jahrgang
+    ) {
+
+        /*
+         * Kurs laden.
+         */
+        Kurs kurs = kursRepository
+                .findById(kursId)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Kurs nicht gefunden"
+                        )
+                );
+
+        /*
+         * Alle Schüler des ausgewählten
+         * Jahrgangs laden.
+         */
+        List<Student> students =
+                studentRepository
+                        .findByJahrgang(
+                                jahrgang
+                        );
+
+        int hinzugefuegt = 0;
+
+        /*
+         * Jeden Schüler einzeln prüfen
+         * und gegebenenfalls buchen.
+         */
+        for (Student student : students) {
+
+            boolean exists =
+                    buchungRepository
+                            .existsByStudentIdAndKursId(
+                                    student.getId(),
+                                    kursId
+                            );
+
+            /*
+             * Schüler ist bereits im Kurs.
+             * Keine zweite Buchung erstellen.
+             */
+            if (exists) {
+                continue;
+            }
+
+            Buchung buchung =
+                    new Buchung();
+
+            buchung.setStudent(
+                    student
+            );
+
+            buchung.setKurs(
+                    kurs
+            );
+
+            buchung.setBuchungsdatum(
+                    LocalDate.now()
+            );
+
+            buchungRepository.save(
+                    buchung
+            );
+
+            hinzugefuegt++;
+        }
+
+        return hinzugefuegt;
     }
 }
