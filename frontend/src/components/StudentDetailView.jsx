@@ -19,18 +19,51 @@ function StudentDetailView({
                                onUpdateGehtUm1530,
                                onClose
                            }) {
-    const [selectedWochentag, setSelectedWochentag] = useState('');
-    const [selectedKursId, setSelectedKursId] = useState('');
+
+    /* =====================================================
+       KURSZUWEISUNG
+       ===================================================== */
+
+    const [selectedWochentag, setSelectedWochentag] =
+        useState('');
+
+    const [selectedKursId, setSelectedKursId] =
+        useState('');
+
+    /* =====================================================
+       15:30
+       ===================================================== */
 
     const [gehtUm1530, setGehtUm1530] = useState(
         student.gehtUm1530 ?? false
     );
 
-    const [saving1530, setSaving1530] = useState(false);
+    const [saving1530, setSaving1530] =
+        useState(false);
 
-    /*
-     * Zeigt nur die Kurse des ausgewählten Wochentags an.
-     */
+    /* =====================================================
+       ANWESENHEIT FILTER
+       ===================================================== */
+
+    const [
+        anwesenheitDatumFilter,
+        setAnwesenheitDatumFilter
+    ] = useState('');
+
+    const [
+        anwesenheitKursFilter,
+        setAnwesenheitKursFilter
+    ] = useState('');
+
+    const [
+        anwesenheitStatusFilter,
+        setAnwesenheitStatusFilter
+    ] = useState('');
+
+    /* =====================================================
+       KURSE NACH WOCHENTAG FILTERN
+       ===================================================== */
+
     const filteredKurse = useMemo(() => {
         if (!selectedWochentag) {
             return [];
@@ -42,45 +75,158 @@ function StudentDetailView({
         );
     }, [kurse, selectedWochentag]);
 
+    /* =====================================================
+       KURSE AUS ANWESENHEITEN
+       ===================================================== */
+
+    const anwesenheitKurse = useMemo(() => {
+        const kursMap = new Map();
+
+        (anwesenheiten || []).forEach(
+            (anwesenheit) => {
+                const kurs = anwesenheit.kurs;
+
+                if (kurs?.id) {
+                    kursMap.set(
+                        String(kurs.id),
+                        kurs
+                    );
+                }
+            }
+        );
+
+        return [...kursMap.values()].sort(
+            (a, b) =>
+                String(a.name ?? '')
+                    .localeCompare(
+                        String(b.name ?? ''),
+                        'de'
+                    )
+        );
+    }, [anwesenheiten]);
+
+    /* =====================================================
+       VERFÜGBARE STATUS
+       ===================================================== */
+
     /*
-     * Wochentag für Kurszuweisung ändern.
+     * Die Statuswerte werden direkt aus den vorhandenen
+     * Anwesenheitsdaten erzeugt.
+     *
+     * Dadurch funktioniert der Filter unabhängig davon,
+     * ob der Backend-Status z.B. "ANWESEND",
+     * "Anwesend", "FEHLT" usw. lautet.
      */
+    const anwesenheitStatus = useMemo(() => {
+        return [
+            ...new Set(
+                (anwesenheiten || [])
+                    .map(
+                        (anwesenheit) =>
+                            anwesenheit.status
+                    )
+                    .filter(Boolean)
+            )
+        ].sort((a, b) =>
+            String(a).localeCompare(
+                String(b),
+                'de'
+            )
+        );
+    }, [anwesenheiten]);
+
+    /* =====================================================
+       ANWESENHEITEN FILTERN UND SORTIEREN
+       ===================================================== */
+
+    const filteredAnwesenheiten = useMemo(() => {
+        return [...(anwesenheiten || [])]
+            .filter((anwesenheit) => {
+
+                const matchesDatum =
+                    !anwesenheitDatumFilter ||
+                    String(
+                        anwesenheit.datum ?? ''
+                    ) === anwesenheitDatumFilter;
+
+                const matchesKurs =
+                    !anwesenheitKursFilter ||
+                    String(
+                        anwesenheit.kurs?.id ?? ''
+                    ) ===
+                    String(anwesenheitKursFilter);
+
+                const matchesStatus =
+                    !anwesenheitStatusFilter ||
+                    String(
+                        anwesenheit.status ?? ''
+                    ) ===
+                    anwesenheitStatusFilter;
+
+                return (
+                    matchesDatum &&
+                    matchesKurs &&
+                    matchesStatus
+                );
+            })
+            .sort((a, b) =>
+                String(b.datum ?? '')
+                    .localeCompare(
+                        String(a.datum ?? '')
+                    )
+            );
+    }, [
+        anwesenheiten,
+        anwesenheitDatumFilter,
+        anwesenheitKursFilter,
+        anwesenheitStatusFilter
+    ]);
+
+    const hasAnwesenheitFilter =
+        Boolean(
+            anwesenheitDatumFilter ||
+            anwesenheitKursFilter ||
+            anwesenheitStatusFilter
+        );
+
+    /* =====================================================
+       KURSZUWEISUNG HANDLER
+       ===================================================== */
+
     const handleWochentagChange = (event) => {
-        setSelectedWochentag(event.target.value);
+        setSelectedWochentag(
+            event.target.value
+        );
+
         setSelectedKursId('');
     };
 
-    /*
-     * Kurs auswählen.
-     */
     const handleKursChange = (event) => {
-        setSelectedKursId(event.target.value);
+        setSelectedKursId(
+            event.target.value
+        );
     };
 
-    /*
-     * Kurs dem Schüler zuweisen.
-     */
     const handleAssign = async () => {
         if (!selectedKursId) {
             return;
         }
 
-        await onAssignKurs(selectedKursId);
+        await onAssignKurs(
+            selectedKursId
+        );
 
         setSelectedKursId('');
     };
 
-    /*
-     * 15:30-Einstellung speichern.
-     *
-     * Der Wert wird direkt gespeichert,
-     * sobald Ja oder Nein ausgewählt wird.
-     */
-    const handle1530Change = async (newValue) => {
-        /*
-         * Wenn bereits derselbe Wert gesetzt ist,
-         * muss nichts gespeichert werden.
-         */
+    /* =====================================================
+       15:30 HANDLER
+       ===================================================== */
+
+    const handle1530Change = async (
+        newValue
+    ) => {
+
         if (newValue === gehtUm1530) {
             return;
         }
@@ -89,15 +235,19 @@ function StudentDetailView({
             setSaving1530(true);
 
             /*
-             * Erst Backend aktualisieren.
+             * Zuerst im Backend speichern.
              */
-            await onUpdateGehtUm1530(newValue);
+            await onUpdateGehtUm1530(
+                newValue
+            );
 
             /*
-             * Lokalen Zustand erst nach erfolgreichem
-             * Speichern ändern.
+             * Lokalen Zustand erst nach
+             * erfolgreichem Speichern ändern.
              */
-            setGehtUm1530(newValue);
+            setGehtUm1530(
+                newValue
+            );
 
         } catch (error) {
             console.error(
@@ -109,12 +259,22 @@ function StudentDetailView({
         }
     };
 
+    /* =====================================================
+       ANWESENHEIT FILTER ZURÜCKSETZEN
+       ===================================================== */
+
+    const resetAnwesenheitFilter = () => {
+        setAnwesenheitDatumFilter('');
+        setAnwesenheitKursFilter('');
+        setAnwesenheitStatusFilter('');
+    };
+
     return (
         <div className="student-detail-view">
 
-            {/* =====================================================
+            {/* =================================================
                 ZURÜCK
-               ===================================================== */}
+               ================================================= */}
 
             <button
                 type="button"
@@ -124,28 +284,30 @@ function StudentDetailView({
                 Zurück zur Übersicht
             </button>
 
-            {/* =====================================================
+            {/* =================================================
                 HEADER
-               ===================================================== */}
+               ================================================= */}
 
             <div className="detail-header">
                 <h2>
-                    {student.nachname}, {student.vorname}
+                    {student.nachname},{' '}
+                    {student.vorname}
                 </h2>
 
                 <p>Schülerdetails</p>
             </div>
 
-            {/* =====================================================
+            {/* =================================================
                 ALLGEMEINE INFORMATIONEN
-               ===================================================== */}
+               ================================================= */}
 
             <section className="detail-section">
-                <h3>Allgemeine Informationen</h3>
+
+                <h3>
+                    Allgemeine Informationen
+                </h3>
 
                 <div className="detail-grid">
-
-                    {/* Vorname */}
 
                     <div className="detail-item">
                         <span className="detail-label">
@@ -157,8 +319,6 @@ function StudentDetailView({
                         </span>
                     </div>
 
-                    {/* Nachname */}
-
                     <div className="detail-item">
                         <span className="detail-label">
                             Nachname
@@ -168,8 +328,6 @@ function StudentDetailView({
                             {student.nachname || '–'}
                         </span>
                     </div>
-
-                    {/* Jahrgang */}
 
                     <div className="detail-item">
                         <span className="detail-label">
@@ -181,8 +339,6 @@ function StudentDetailView({
                         </span>
                     </div>
 
-                    {/* Klasse */}
-
                     <div className="detail-item">
                         <span className="detail-label">
                             Klasse
@@ -192,8 +348,6 @@ function StudentDetailView({
                             {student.klasse || '–'}
                         </span>
                     </div>
-
-                    {/* Fotofreigabe */}
 
                     <div className="detail-item">
                         <span className="detail-label">
@@ -205,12 +359,16 @@ function StudentDetailView({
                         </span>
                     </div>
 
-                    {/* =================================================
-                        15:30 EINSTELLUNG
-                       ================================================= */}
+                    {/* =============================================
+                        15:30
+                       ============================================= */}
 
-                    <div className="detail-item detail-item-1530">
-
+                    <div
+                        className="
+                            detail-item
+                            detail-item-1530
+                        "
+                    >
                         <div className="detail-1530-header">
 
                             <span className="detail-label">
@@ -219,8 +377,6 @@ function StudentDetailView({
 
                             <div className="detail-1530-options">
 
-                                {/* JA */}
-
                                 <button
                                     type="button"
                                     className={
@@ -228,15 +384,17 @@ function StudentDetailView({
                                             ? 'detail-1530-option active'
                                             : 'detail-1530-option'
                                     }
-                                    disabled={saving1530}
+                                    disabled={
+                                        saving1530
+                                    }
                                     onClick={() =>
-                                        handle1530Change(true)
+                                        handle1530Change(
+                                            true
+                                        )
                                     }
                                 >
                                     Ja
                                 </button>
-
-                                {/* NEIN */}
 
                                 <button
                                     type="button"
@@ -245,9 +403,13 @@ function StudentDetailView({
                                             ? 'detail-1530-option active'
                                             : 'detail-1530-option'
                                     }
-                                    disabled={saving1530}
+                                    disabled={
+                                        saving1530
+                                    }
                                     onClick={() =>
-                                        handle1530Change(false)
+                                        handle1530Change(
+                                            false
+                                        )
                                     }
                                 >
                                     Nein
@@ -256,14 +418,16 @@ function StudentDetailView({
                             </div>
                         </div>
                     </div>
+
                 </div>
             </section>
 
-            {/* =====================================================
+            {/* =================================================
                 KONTAKT 1
-               ===================================================== */}
+               ================================================= */}
 
             <section className="detail-section">
+
                 <h3>Kontakt 1</h3>
 
                 <div className="detail-grid">
@@ -301,11 +465,12 @@ function StudentDetailView({
                 </div>
             </section>
 
-            {/* =====================================================
+            {/* =================================================
                 KONTAKT 2
-               ===================================================== */}
+               ================================================= */}
 
             <section className="detail-section">
+
                 <h3>Kontakt 2</h3>
 
                 <div className="detail-grid">
@@ -343,102 +508,124 @@ function StudentDetailView({
                 </div>
             </section>
 
-            {/* =====================================================
+            {/* =================================================
                 KURSBUCHUNGEN
-               ===================================================== */}
+               ================================================= */}
 
             <section className="detail-section">
-                <h3>Kursbuchungen</h3>
 
-                {/* Kurs hinzufügen */}
+                <h3>Kursbuchungen</h3>
 
                 <div className="assign-kurs-box">
 
                     {/* Wochentag */}
 
                     <div className="assign-kurs-field">
+
                         <label htmlFor="kurs-wochentag">
                             Wochentag
                         </label>
 
                         <select
                             id="kurs-wochentag"
-                            value={selectedWochentag}
-                            onChange={handleWochentagChange}
+                            value={
+                                selectedWochentag
+                            }
+                            onChange={
+                                handleWochentagChange
+                            }
                         >
                             <option value="">
                                 Wochentag auswählen...
                             </option>
 
-                            {WOCHENTAGE.map((tag) => (
-                                <option
-                                    key={tag}
-                                    value={tag}
-                                >
-                                    {tag}
-                                </option>
-                            ))}
+                            {WOCHENTAGE.map(
+                                (tag) => (
+                                    <option
+                                        key={tag}
+                                        value={tag}
+                                    >
+                                        {tag}
+                                    </option>
+                                )
+                            )}
+
                         </select>
                     </div>
 
                     {/* Kurs */}
 
                     <div className="assign-kurs-field">
+
                         <label htmlFor="kurs-auswahl">
                             Kurs
                         </label>
 
                         <select
                             id="kurs-auswahl"
-                            value={selectedKursId}
-                            onChange={handleKursChange}
-                            disabled={!selectedWochentag}
+                            value={
+                                selectedKursId
+                            }
+                            onChange={
+                                handleKursChange
+                            }
+                            disabled={
+                                !selectedWochentag
+                            }
                         >
+
                             <option value="">
                                 {!selectedWochentag
                                     ? 'Zuerst Wochentag auswählen...'
                                     : 'Kurs auswählen...'}
                             </option>
 
-                            {filteredKurse.map((kurs) => (
-                                <option
-                                    key={kurs.id}
-                                    value={kurs.id}
-                                >
-                                    {kurs.name}
-                                    {kurs.uhrzeit
-                                        ? ` | ${kurs.uhrzeit}`
-                                        : ''}
-                                </option>
-                            ))}
+                            {filteredKurse.map(
+                                (kurs) => (
+                                    <option
+                                        key={kurs.id}
+                                        value={kurs.id}
+                                    >
+                                        {kurs.name}
+
+                                        {kurs.uhrzeit
+                                            ? ` | ${kurs.uhrzeit}`
+                                            : ''}
+                                    </option>
+                                )
+                            )}
+
                         </select>
                     </div>
-
-                    {/* Hinzufügen */}
 
                     <button
                         type="button"
                         className="assign-kurs-button"
-                        onClick={handleAssign}
-                        disabled={!selectedKursId}
+                        onClick={
+                            handleAssign
+                        }
+                        disabled={
+                            !selectedKursId
+                        }
                     >
                         Kurs hinzufügen
                     </button>
 
                 </div>
 
-                {/* Keine Kurse am ausgewählten Tag */}
-
                 {selectedWochentag &&
                     filteredKurse.length === 0 && (
                         <p className="empty-text">
-                            Für {selectedWochentag} sind keine Kurse vorhanden.
+                            Für{' '}
+                            {selectedWochentag}{' '}
+                            sind keine Kurse
+                            vorhanden.
                         </p>
                     )}
 
-                {/* Kursbuchungen */}
+                {buchungen &&
+                buchungen.length > 0 ? (
 
-                {buchungen && buchungen.length > 0 ? (
                     <div className="detail-table-scroll">
 
                         <table className="detail-table">
@@ -457,73 +644,239 @@ function StudentDetailView({
 
                             <tbody>
 
-                            {buchungen.map((buchung) => (
-                                <tr key={buchung.id}>
+                            {buchungen.map(
+                                (buchung) => (
+                                    <tr
+                                        key={
+                                            buchung.id
+                                        }
+                                    >
+                                        <td>
+                                            {buchung.kurs
+                                                    ?.name ||
+                                                '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.name || '–'}
-                                    </td>
+                                        <td>
+                                            {buchung.kurs
+                                                    ?.kursleitung ||
+                                                '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.kursleitung || '–'}
-                                    </td>
+                                        <td>
+                                            {buchung.kurs
+                                                    ?.wochentag ||
+                                                '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.wochentag || '–'}
-                                    </td>
+                                        <td>
+                                            {buchung.kurs
+                                                    ?.uhrzeit ||
+                                                '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.uhrzeit || '–'}
-                                    </td>
+                                        <td>
+                                            {buchung.kurs
+                                                    ?.buchungsart ||
+                                                '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.buchungsart || '–'}
-                                    </td>
+                                        <td>
+                                            {buchung.kurs
+                                                ?.kursgebuehr != null
+                                                ? `${buchung.kurs.kursgebuehr} €`
+                                                : '–'}
+                                        </td>
 
-                                    <td>
-                                        {buchung.kurs?.kursgebuehr != null
-                                            ? `${buchung.kurs.kursgebuehr} €`
-                                            : '–'}
-                                    </td>
-
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className="btn-remove-kurs"
-                                            onClick={() =>
-                                                onDeleteBuchung(
-                                                    buchung.id
-                                                )
-                                            }
-                                        >
-                                            Entfernen
-                                        </button>
-                                    </td>
-
-                                </tr>
-                            ))}
+                                        <td>
+                                            <button
+                                                type="button"
+                                                className="btn-remove-kurs"
+                                                onClick={() =>
+                                                    onDeleteBuchung(
+                                                        buchung.id
+                                                    )
+                                                }
+                                            >
+                                                Entfernen
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            )}
 
                             </tbody>
-
                         </table>
                     </div>
+
                 ) : (
                     <p className="empty-text">
-                        Noch keine Kursbuchungen vorhanden.
+                        Noch keine Kursbuchungen
+                        vorhanden.
                     </p>
                 )}
 
             </section>
 
-            {/* =====================================================
+            {/* =================================================
                 ANWESENHEIT
-               ===================================================== */}
+               ================================================= */}
 
             <section className="detail-section">
-                <h3>Anwesenheit</h3>
 
-                {anwesenheiten &&
-                anwesenheiten.length > 0 ? (
+                <div className="detail-anwesenheit-header">
+
+                    <div>
+                        <h3>Anwesenheit</h3>
+
+                        <p>
+                            Anwesenheiten nach Datum,
+                            Kurs oder Status filtern
+                        </p>
+                    </div>
+
+                    {hasAnwesenheitFilter && (
+                        <button
+                            type="button"
+                            className="detail-filter-reset"
+                            onClick={
+                                resetAnwesenheitFilter
+                            }
+                        >
+                            Filter zurücksetzen
+                        </button>
+                    )}
+
+                </div>
+
+                {/* =============================================
+                    FILTER
+                   ============================================= */}
+
+                <div className="detail-anwesenheit-filter">
+
+                    {/* Datum */}
+
+                    <div className="detail-filter-field">
+
+                        <label htmlFor="anwesenheit-datum">
+                            Datum
+                        </label>
+
+                        <input
+                            id="anwesenheit-datum"
+                            type="date"
+                            value={
+                                anwesenheitDatumFilter
+                            }
+                            onChange={(event) =>
+                                setAnwesenheitDatumFilter(
+                                    event.target.value
+                                )
+                            }
+                        />
+
+                    </div>
+
+                    {/* Kurs */}
+
+                    <div className="detail-filter-field">
+
+                        <label htmlFor="anwesenheit-kurs">
+                            Kurs
+                        </label>
+
+                        <select
+                            id="anwesenheit-kurs"
+                            value={
+                                anwesenheitKursFilter
+                            }
+                            onChange={(event) =>
+                                setAnwesenheitKursFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Kurse
+                            </option>
+
+                            {anwesenheitKurse.map(
+                                (kurs) => (
+                                    <option
+                                        key={kurs.id}
+                                        value={kurs.id}
+                                    >
+                                        {kurs.name}
+                                    </option>
+                                )
+                            )}
+
+                        </select>
+                    </div>
+
+                    {/* Status */}
+
+                    <div className="detail-filter-field">
+
+                        <label htmlFor="anwesenheit-status">
+                            Status
+                        </label>
+
+                        <select
+                            id="anwesenheit-status"
+                            value={
+                                anwesenheitStatusFilter
+                            }
+                            onChange={(event) =>
+                                setAnwesenheitStatusFilter(
+                                    event.target.value
+                                )
+                            }
+                        >
+                            <option value="">
+                                Alle Status
+                            </option>
+
+                            {anwesenheitStatus.map(
+                                (status) => (
+                                    <option
+                                        key={status}
+                                        value={status}
+                                    >
+                                        {status}
+                                    </option>
+                                )
+                            )}
+
+                        </select>
+                    </div>
+
+                </div>
+
+                {/* =============================================
+                    ERGEBNISANZAHL
+                   ============================================= */}
+
+                <div className="detail-anwesenheit-count">
+
+                    <strong>
+                        {filteredAnwesenheiten.length}
+                    </strong>
+
+                    {' '}
+
+                    {filteredAnwesenheiten.length === 1
+                        ? 'Eintrag'
+                        : 'Einträge'}
+
+                </div>
+
+                {/* =============================================
+                    TABELLE
+                   ============================================= */}
+
+                {filteredAnwesenheiten.length > 0 ? (
 
                     <div className="detail-table-scroll">
 
@@ -540,46 +893,55 @@ function StudentDetailView({
 
                             <tbody>
 
-                            {[...anwesenheiten]
-                                .sort((a, b) =>
-                                    String(b.datum ?? '')
-                                        .localeCompare(
-                                            String(a.datum ?? '')
-                                        )
-                                )
-                                .map((anwesenheit) => (
+                            {filteredAnwesenheiten.map(
+                                (anwesenheit) => (
 
-                                    <tr key={anwesenheit.id}>
+                                    <tr
+                                        key={
+                                            anwesenheit.id
+                                        }
+                                    >
 
                                         <td>
-                                            {anwesenheit.datum || '–'}
+                                            {anwesenheit.datum ||
+                                                '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.kurs?.name || '–'}
+                                            {anwesenheit.kurs
+                                                    ?.name ||
+                                                '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.status || '–'}
+                                            {anwesenheit.status ||
+                                                '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.bemerkung || '–'}
+                                            {anwesenheit.bemerkung ||
+                                                '–'}
                                         </td>
 
                                     </tr>
-                                ))}
+                                )
+                            )}
 
                             </tbody>
-
                         </table>
 
                     </div>
 
                 ) : (
+
                     <p className="empty-text">
-                        Noch keine Anwesenheitsdaten vorhanden.
+
+                        {anwesenheiten?.length > 0
+                            ? 'Keine Anwesenheiten für die aktuelle Filterauswahl gefunden.'
+                            : 'Noch keine Anwesenheitsdaten vorhanden.'}
+
                     </p>
+
                 )}
 
             </section>

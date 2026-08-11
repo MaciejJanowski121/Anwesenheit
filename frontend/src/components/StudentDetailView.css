@@ -150,13 +150,6 @@
     padding: 12px;
 }
 
-/*
- * Kontener dla napisu oraz przycisków.
- * Układ pionowy:
- *
- * Geht um 15:30 Uhr
- * [ Ja | Nein ]
- */
 .detail-1530-header {
     display: flex;
     flex-direction: column;
@@ -259,11 +252,8 @@
 
 .assign-kurs-field {
     display: flex;
-
     min-width: 0;
-
     flex-direction: column;
-
     gap: 6px;
 }
 
@@ -350,6 +340,204 @@
 .assign-kurs-button:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+}
+
+/* =====================================================
+   ANWESENHEIT HEADER
+   ===================================================== */
+
+.detail-anwesenheit-header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 58px;
+
+    margin-bottom: 22px;
+
+    text-align: center;
+}
+
+.detail-anwesenheit-header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.detail-anwesenheit-header h3 {
+    margin: 0 0 6px;
+
+    color: #ffffff;
+
+    font-size: 1.1rem;
+    font-weight: 650;
+}
+
+.detail-anwesenheit-header p {
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 0.86rem;
+}
+
+.detail-filter-reset {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
+    transform: translateY(-50%);
+}
+
+/* =====================================================
+   ANWESENHEIT FILTER
+   ===================================================== */
+
+.detail-anwesenheit-filter {
+    display: grid;
+
+    grid-template-columns:
+        minmax(160px, 0.8fr)
+        minmax(240px, 1.4fr)
+        minmax(180px, 0.9fr);
+
+    gap: 14px;
+
+    margin-bottom: 16px;
+}
+
+.detail-filter-field {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    gap: 7px;
+}
+
+.detail-filter-field label {
+    color: #b8b8b8;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.detail-filter-field input,
+.detail-filter-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+
+    padding: 9px 11px;
+
+    border: 1px solid #505050;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #202020;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 0.86rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease,
+            background-color 0.15s ease;
+}
+
+.detail-filter-field input:focus,
+.detail-filter-field select:focus {
+    border-color: #e8792b;
+
+    background: #242424;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.detail-filter-field select option {
+    background: #262626;
+    color: #ffffff;
+}
+
+/* Date input */
+
+.detail-filter-field input[type="date"] {
+    color-scheme: dark;
+}
+
+/* =====================================================
+   FILTER RESET
+   ===================================================== */
+
+.detail-filter-reset {
+    flex-shrink: 0;
+
+    padding: 8px 12px;
+
+    border: 1px solid #555555;
+    border-radius: 7px;
+
+    background: #333333;
+    color: #d5d5d5;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease,
+            color 0.15s ease;
+}
+
+.detail-filter-reset:hover {
+    border-color: #e8792b;
+
+    background:
+            rgba(232, 121, 43, 0.1);
+
+    color: #f29a5b;
+}
+
+/* =====================================================
+   ANWESENHEIT RESULT COUNT
+   ===================================================== */
+
+.detail-anwesenheit-count {
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-bottom: 14px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background:
+            rgba(232, 121, 43, 0.11);
+
+    color: #d6d6d6;
+
+    font-size: 0.78rem;
+}
+
+.detail-anwesenheit-count strong {
+    margin-right: 4px;
+
+    color: #f29a5b;
+
+    font-weight: 700;
 }
 
 /* =====================================================
@@ -486,10 +674,14 @@
 .empty-text {
     margin: 16px 0 0;
 
+    padding: 14px 0;
+
     color: #999999;
 
     font-size: 0.88rem;
     font-style: italic;
+
+    text-align: left;
 }
 
 /* =====================================================
@@ -507,6 +699,15 @@
         grid-column: span 2;
 
         width: 100%;
+    }
+
+    .detail-anwesenheit-filter {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .detail-filter-field:last-child {
+        grid-column: span 2;
     }
 }
 
@@ -567,6 +768,28 @@
         grid-column: auto;
 
         width: 100%;
+    }
+
+    /* Anwesenheit */
+
+    .detail-anwesenheit-header {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+    }
+
+    .detail-filter-reset {
+        align-self: flex-start;
+    }
+
+    .detail-anwesenheit-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-filter-field:last-child {
+        grid-column: auto;
     }
 
     /* Tabellen */
