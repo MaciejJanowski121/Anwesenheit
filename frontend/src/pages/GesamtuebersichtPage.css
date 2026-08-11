@@ -1,6 +1,10 @@
 .gesamtuebersicht-page {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+
+    box-sizing: border-box;
+
     overflow: visible;
 }
 
@@ -9,9 +13,17 @@
    ===================================================== */
 
 .gesamtuebersicht-count {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
     display: inline-flex;
     align-items: center;
+
     flex-shrink: 0;
+
+    transform: translateY(-50%);
 
     padding: 7px 12px;
 
@@ -62,6 +74,11 @@
    ===================================================== */
 
 .gesamtuebersicht-filter-section {
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
     margin-bottom: 18px;
 
     overflow: hidden;
@@ -74,16 +91,19 @@
 
 .gesamtuebersicht-filter-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
-    gap: 20px;
+    gap: 6px;
 
     padding: 17px 20px;
 
     border-bottom: 1px solid #414141;
 
     background: #292929;
+
+    text-align: center;
 }
 
 .gesamtuebersicht-filter-header h2 {
@@ -103,6 +123,10 @@
     font-size: 13px;
 }
 
+/* =====================================================
+   FILTER GRID
+   ===================================================== */
+
 .gesamtuebersicht-filter-grid {
     display: grid;
 
@@ -117,6 +141,7 @@
 
 .gesamtuebersicht-filter-field {
     display: flex;
+
     min-width: 0;
 
     flex-direction: column;
@@ -136,6 +161,7 @@
     box-sizing: border-box;
 
     width: 100%;
+    min-width: 0;
 
     padding: 9px 11px;
 
@@ -215,6 +241,11 @@
     align-items: center;
     justify-content: space-between;
 
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
     gap: 16px;
 
     margin-bottom: 14px;
@@ -255,14 +286,18 @@
 
 .gesamtuebersicht-add-button:disabled {
     cursor: not-allowed;
+
     opacity: 0.5;
 }
 
+
+
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE - TABLET
    ===================================================== */
 
 @media (max-width: 1200px) {
+
     .gesamtuebersicht-filter-grid {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
@@ -273,13 +308,25 @@
     }
 }
 
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
 @media (max-width: 760px) {
+
     .gesamtuebersicht-count {
-        align-self: flex-start;
+        position: static;
+
+        transform: none;
+
+        align-self: center;
+
+        margin-top: 10px;
     }
 
     .gesamtuebersicht-filter-header {
         align-items: stretch;
+
         flex-direction: column;
     }
 
@@ -297,10 +344,15 @@
 
     .gesamtuebersicht-toolbar {
         align-items: stretch;
+
         flex-direction: column;
     }
 
     .gesamtuebersicht-add-button {
         width: 100%;
+    }
+
+    .gesamtuebersicht-page .student-table {
+        min-width: 1800px;
     }
 }

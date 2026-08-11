@@ -1,20 +1,36 @@
-html, body, #root {
+/* =====================================================
+   GLOBAL RESET
+   ===================================================== */
+
+html,
+body,
+#root {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+
     margin: 0;
     padding: 0;
+
+    overflow-x: hidden;
 }
 
-.app-layout {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-    min-height: 100vh;
+body {
+    margin: 0;
+
+    background: #1e1e1e;
 }
+
 /* =====================================================
-   PAGE HEADER
+   GLOBAL PAGE HEADER
    ===================================================== */
+
+/*
+ * Einheitlicher Seitenheader.
+ *
+ * Wird auf Startseite, Gesamtübersicht,
+ * Kurse, Anwesenheit, Zuschüsse,
+ * Gebühren und Import verwendet.
+ */
 
 .page-header {
     position: relative;
@@ -28,29 +44,81 @@ html, body, #root {
 
     box-sizing: border-box;
 
+    margin-bottom: 24px;
+
     text-align: center;
 }
 
 .page-header-content {
     display: flex;
+
+    min-width: 0;
+
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 
     text-align: center;
 }
 
-.page-header-content h1 {
+.page-header-content h1,
+.page-header h1 {
     margin: 0 0 8px;
 
     color: #ffffff;
 
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.15;
+
     text-align: center;
 }
 
-.page-header-content p {
+.page-header-content p,
+.page-header p {
     margin: 0;
 
     color: #999999;
 
+    font-size: 14px;
+    line-height: 1.5;
+
     text-align: center;
+}
+
+/* =====================================================
+   RESPONSIVE PAGE HEADER
+   ===================================================== */
+
+@media (max-width: 900px) {
+    .page-header {
+        min-height: 105px;
+
+        margin-bottom: 22px;
+    }
+
+    .page-header-content h1,
+    .page-header h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-header {
+        min-height: 90px;
+
+        margin-bottom: 20px;
+
+        padding: 0 10px;
+    }
+
+    .page-header-content h1,
+    .page-header h1 {
+        font-size: 25px;
+    }
+
+    .page-header-content p,
+    .page-header p {
+        font-size: 13px;
+    }
 }

@@ -1,5 +1,11 @@
-import React from 'react';
+import React, {
+    useEffect,
+    useRef,
+    useState
+} from 'react';
+
 import { useNavigate } from 'react-router-dom';
+
 import './StudentTable.css';
 
 const columns = [
@@ -9,17 +15,30 @@ const columns = [
     { key: 'klasse', label: 'Klasse' },
     { key: 'fotoFreigabe', label: 'Fotofreigabe' },
 
-    // Anwesenheitsstatistik
-    { key: 'anzahlAnwesend', label: 'Anzahl Anwesend', readOnly: true },
-    { key: 'anzahlEntschuldigt', label: 'Anzahl Entschuldigt', readOnly: true },
-    { key: 'anzahlFehlend', label: 'Anzahl Fehlend', readOnly: true },
+    {
+        key: 'anzahlAnwesend',
+        label: 'Anzahl Anwesend',
+        readOnly: true
+    },
+
+    {
+        key: 'anzahlEntschuldigt',
+        label: 'Anzahl Entschuldigt',
+        readOnly: true
+    },
+
+    {
+        key: 'anzahlFehlend',
+        label: 'Anzahl Fehlend',
+        readOnly: true
+    },
 
     { key: 'email1', label: 'Email 1' },
     { key: 'telefon1', label: 'Telefon 1' },
     { key: 'mobil1', label: 'Mobil 1' },
     { key: 'email2', label: 'Email 2' },
     { key: 'telefon2', label: 'Telefon 2' },
-    { key: 'mobil2', label: 'Mobil 2' },
+    { key: 'mobil2', label: 'Mobil 2' }
 ];
 
 function StudentTable({
@@ -33,9 +52,81 @@ function StudentTable({
                           onEditChange,
                           onEditSave,
                           onEditCancel,
-                          onDelete,
+                          onDelete
                       }) {
     const navigate = useNavigate();
+
+    const topScrollRef = useRef(null);
+    const tableScrollRef = useRef(null);
+    const tableContentRef = useRef(null);
+
+    const [scrollWidth, setScrollWidth] =
+        useState(0);
+
+    /*
+     * Breite der Tabelle messen.
+     *
+     * Diese Breite wird für den künstlichen
+     * oberen Scrollbereich verwendet.
+     */
+    useEffect(() => {
+        const updateScrollWidth = () => {
+            if (!tableContentRef.current) {
+                return;
+            }
+
+            setScrollWidth(
+                tableContentRef.current.scrollWidth
+            );
+        };
+
+        updateScrollWidth();
+
+        window.addEventListener(
+            'resize',
+            updateScrollWidth
+        );
+
+        return () => {
+            window.removeEventListener(
+                'resize',
+                updateScrollWidth
+            );
+        };
+    }, [students]);
+
+    /*
+     * Wenn oben gescrollt wird,
+     * wird die Tabelle mitbewegt.
+     */
+    const handleTopScroll = () => {
+        if (
+            !topScrollRef.current ||
+            !tableScrollRef.current
+        ) {
+            return;
+        }
+
+        tableScrollRef.current.scrollLeft =
+            topScrollRef.current.scrollLeft;
+    };
+
+    /*
+     * Wenn die Tabelle z. B. mit Trackpad,
+     * Magic Mouse oder Shift + Mausrad
+     * bewegt wird, folgt der obere Balken.
+     */
+    const handleTableScroll = () => {
+        if (
+            !topScrollRef.current ||
+            !tableScrollRef.current
+        ) {
+            return;
+        }
+
+        topScrollRef.current.scrollLeft =
+            tableScrollRef.current.scrollLeft;
+    };
 
     const renderSortIndicator = (key) => {
         if (sortKey !== key) {
@@ -48,32 +139,29 @@ function StudentTable({
     };
 
     const handleRowClick = (student) => {
-        /*
-         * Während der Bearbeitung soll ein Klick
-         * auf die Zeile nicht zur Detailansicht führen.
-         */
         if (editingId === student.id) {
             return;
         }
 
-        /*
-         * Temporär angelegte Schüler besitzen noch
-         * keine echte Datenbank-ID.
-         */
         if (typeof student.id !== 'number') {
             return;
         }
 
-        navigate(`/students/${student.id}`);
+        navigate(
+            `/students/${student.id}`
+        );
     };
 
-    const renderCell = (student, col) => {
+    const renderCell = (
+        student,
+        col
+    ) => {
         const isEditing =
             editingId === student.id;
 
         /*
-         * Anwesenheitswerte werden automatisch
-         * berechnet und dürfen hier nicht bearbeitet werden.
+         * Anwesenheitsstatistik wird automatisch
+         * berechnet und ist nicht editierbar.
          */
         if (col.readOnly) {
             return student[col.key] ?? 0;
@@ -110,13 +198,7 @@ function StudentTable({
             );
         }
 
-        /*
-         * 0 soll bei Zahlen auch wirklich als 0
-         * angezeigt werden und nicht als "–".
-         */
-        if (
-            student[col.key] === 0
-        ) {
+        if (student[col.key] === 0) {
             return 0;
         }
 
@@ -124,19 +206,53 @@ function StudentTable({
     };
 
     return (
-        <div className="student-table-scroll">
-            <div className="student-table-container">
-                <table className="student-table">
-                    <thead>
-                    <tr>
-                        {columns.map((col) => (
-                            <th
-                                key={col.key}
-                                className="sortable-header"
-                                onClick={() =>
-                                    onSort(col.key)
-                                }
-                            >
+        <div className="student-table-wrapper">
+
+            {/* =================================================
+                OBERER HORIZONTALER SCROLLBALKEN
+               ================================================= */}
+
+            <div
+                ref={topScrollRef}
+                className="student-table-top-scroll"
+                onScroll={handleTopScroll}
+            >
+                <div
+                    className="student-table-top-scroll-content"
+                    style={{
+                        width: `${scrollWidth}px`
+                    }}
+                />
+            </div>
+
+            {/* =================================================
+                TABELLE
+               ================================================= */}
+
+            <div
+                ref={tableScrollRef}
+                className="student-table-scroll"
+                onScroll={handleTableScroll}
+            >
+                <div
+                    ref={tableContentRef}
+                    className="student-table-container"
+                >
+                    <table className="student-table">
+
+                        <thead>
+                        <tr>
+
+                            {columns.map((col) => (
+                                <th
+                                    key={col.key}
+                                    className="sortable-header"
+                                    onClick={() =>
+                                        onSort(
+                                            col.key
+                                        )
+                                    }
+                                >
                                     <span className="header-content">
                                         {col.label}
 
@@ -144,139 +260,147 @@ function StudentTable({
                                             col.key
                                         )}
                                     </span>
+                                </th>
+                            ))}
+
+                            <th className="actions-header">
+                                Aktionen
                             </th>
-                        ))}
 
-                        <th className="actions-header">
-                            Aktionen
-                        </th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {students.length === 0 && (
-                        <tr>
-                            <td
-                                colSpan={
-                                    columns.length + 1
-                                }
-                                className="empty-row"
-                            >
-                                Keine Einträge gefunden.
-                            </td>
                         </tr>
-                    )}
+                        </thead>
 
-                    {students.map(
-                        (student, index) => (
-                            <tr
-                                key={
-                                    student.id ??
-                                    index
-                                }
-                                className={
-                                    editingId ===
-                                    student.id
-                                        ? 'student-row student-row-editing'
-                                        : 'student-row'
-                                }
-                                onClick={() =>
-                                    handleRowClick(
-                                        student
-                                    )
-                                }
-                            >
-                                {columns.map(
-                                    (col) => (
-                                        <td
-                                            key={
-                                                col.key
-                                            }
-                                        >
-                                            {renderCell(
-                                                student,
-                                                col
-                                            )}
-                                        </td>
-                                    )
-                                )}
+                        <tbody>
 
+                        {students.length === 0 && (
+                            <tr>
                                 <td
-                                    className="action-cell"
-                                    onClick={(
-                                        event
-                                    ) =>
-                                        event.stopPropagation()
+                                    colSpan={
+                                        columns.length + 1
                                     }
+                                    className="empty-row"
                                 >
-                                    {editingId ===
-                                    student.id ? (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="btn-save"
-                                                onClick={
-                                                    onEditSave
-                                                }
-                                            >
-                                                Speichern
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="btn-cancel"
-                                                onClick={
-                                                    onEditCancel
-                                                }
-                                            >
-                                                Abbrechen
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                type="button"
-                                                className="btn-details"
-                                                onClick={() =>
-                                                    navigate(
-                                                        `/students/${student.id}`
-                                                    )
-                                                }
-                                            >
-                                                Details
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="btn-edit"
-                                                onClick={() =>
-                                                    onEditStart(
-                                                        student
-                                                    )
-                                                }
-                                            >
-                                                Bearbeiten
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                className="btn-delete"
-                                                onClick={() =>
-                                                    onDelete(
-                                                        student.id
-                                                    )
-                                                }
-                                            >
-                                                Löschen
-                                            </button>
-                                        </>
-                                    )}
+                                    Keine Einträge gefunden.
                                 </td>
                             </tr>
-                        )
-                    )}
-                    </tbody>
-                </table>
+                        )}
+
+                        {students.map(
+                            (
+                                student,
+                                index
+                            ) => (
+                                <tr
+                                    key={
+                                        student.id ??
+                                        index
+                                    }
+                                    className={
+                                        editingId ===
+                                        student.id
+                                            ? 'student-row student-row-editing'
+                                            : 'student-row'
+                                    }
+                                    onClick={() =>
+                                        handleRowClick(
+                                            student
+                                        )
+                                    }
+                                >
+
+                                    {columns.map(
+                                        (col) => (
+                                            <td
+                                                key={
+                                                    col.key
+                                                }
+                                            >
+                                                {renderCell(
+                                                    student,
+                                                    col
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                    <td
+                                        className="action-cell"
+                                        onClick={(event) =>
+                                            event.stopPropagation()
+                                        }
+                                    >
+                                        {editingId ===
+                                        student.id ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="btn-save"
+                                                    onClick={
+                                                        onEditSave
+                                                    }
+                                                >
+                                                    Speichern
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="btn-cancel"
+                                                    onClick={
+                                                        onEditCancel
+                                                    }
+                                                >
+                                                    Abbrechen
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="btn-details"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/students/${student.id}`
+                                                        )
+                                                    }
+                                                >
+                                                    Details
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="btn-edit"
+                                                    onClick={() =>
+                                                        onEditStart(
+                                                            student
+                                                        )
+                                                    }
+                                                >
+                                                    Bearbeiten
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="btn-delete"
+                                                    onClick={() =>
+                                                        onDelete(
+                                                            student.id
+                                                        )
+                                                    }
+                                                >
+                                                    Löschen
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+
+                                </tr>
+                            )
+                        )}
+
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
         </div>
     );
