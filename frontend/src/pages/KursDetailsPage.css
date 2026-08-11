@@ -1,0 +1,535 @@
+.kurs-details-page {
+    width: 100%;
+    min-width: 0;
+}
+
+/* =====================================================
+   PAGE HEADER
+   ===================================================== */
+
+.kurs-details-page .page-header {
+    position: relative;
+
+    justify-content: center;
+
+    text-align: center;
+}
+
+.kurs-details-page .page-header-content {
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+}
+
+.kurs-details-page .page-header-content h1,
+.kurs-details-page .page-header-content p {
+    text-align: center;
+}
+
+.kurs-details-count {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
+    transform: translateY(-50%);
+
+    padding: 7px 12px;
+
+    border: 1px solid rgba(232, 121, 43, 0.25);
+    border-radius: 999px;
+
+    background: rgba(232, 121, 43, 0.1);
+    color: #f29a5b;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+/* =====================================================
+   KURS INFORMATIONEN
+   ===================================================== */
+
+.kurs-details-info {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+.kurs-details-info > div {
+    padding: 16px 18px;
+
+    border: 1px solid #414141;
+    border-radius: 10px;
+
+    background: #252525;
+}
+
+.kurs-details-info span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #999999;
+
+    font-size: 12px;
+}
+
+.kurs-details-info strong {
+    color: #ffffff;
+
+    font-size: 15px;
+}
+
+/* =====================================================
+   JAHRGANG ZUORDNEN
+   ===================================================== */
+
+.kurs-jahrgang-section {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    border: 1px solid #414141;
+    border-radius: 12px;
+
+    background: #252525;
+}
+
+.kurs-jahrgang-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px 22px;
+
+    border-bottom: 1px solid #414141;
+
+    background: #292929;
+
+    text-align: center;
+}
+
+.kurs-jahrgang-header > div {
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+
+    gap: 5px;
+}
+
+.kurs-jahrgang-header h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 650;
+}
+
+.kurs-jahrgang-header p {
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 13px;
+}
+
+.kurs-jahrgang-content {
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 14px;
+
+    padding: 18px 22px;
+}
+
+.kurs-jahrgang-field {
+    display: flex;
+
+    width: min(320px, 100%);
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.kurs-jahrgang-field label {
+    color: #c7c7c7;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kurs-jahrgang-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-height: 40px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #505050;
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #202020;
+    color: #ffffff;
+
+    font-size: 0.88rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.kurs-jahrgang-field select:focus {
+    border-color: #e8792b;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.kurs-jahrgang-field select option {
+    background: #262626;
+    color: #ffffff;
+}
+
+.kurs-jahrgang-button {
+    min-height: 40px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #e8792b;
+    color: #ffffff;
+
+    font-size: 0.86rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.kurs-jahrgang-button:hover:not(:disabled) {
+    background: #d06820;
+}
+
+.kurs-jahrgang-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.5;
+}
+
+.kurs-jahrgang-message {
+    margin: 0 22px 18px;
+
+    padding: 10px 12px;
+
+    border: 1px solid rgba(90, 158, 62, 0.3);
+    border-radius: 8px;
+
+    background: rgba(90, 158, 62, 0.1);
+    color: #99d47e;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.kurs-details-content {
+    width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid #414141;
+    border-radius: 12px;
+
+    background: #252525;
+}
+
+/* =====================================================
+   TOOLBAR
+   ===================================================== */
+
+.kurs-details-toolbar {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 16px 18px;
+
+    border-bottom: 1px solid #414141;
+
+    background: #292929;
+}
+
+.kurs-details-toolbar input {
+    box-sizing: border-box;
+
+    width: min(460px, 100%);
+
+    padding: 10px 12px;
+
+    border: 1px solid #505050;
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #202020;
+    color: #ffffff;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.kurs-details-toolbar input:focus {
+    border-color: #e8792b;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.kurs-details-toolbar span {
+    color: #999999;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+/* =====================================================
+   TABLE SCROLL
+   ===================================================== */
+
+.kurs-details-table-scroll {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 8px;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+            #666666
+            #252525;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.kurs-details-table-scroll::-webkit-scrollbar {
+    height: 10px;
+}
+
+.kurs-details-table-scroll::-webkit-scrollbar-track {
+    background: #252525;
+}
+
+.kurs-details-table-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background: #666666;
+}
+
+.kurs-details-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7a7a7a;
+}
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.kurs-details-table {
+    width: 100%;
+
+    min-width: 1900px;
+
+    border-collapse: collapse;
+}
+
+.kurs-details-table th,
+.kurs-details-table td {
+    padding: 11px 13px;
+
+    border-bottom: 1px solid #414141;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.kurs-details-table th {
+    background: #303030;
+    color: #bdbdbd;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+.kurs-details-table td {
+    color: #dddddd;
+
+    font-size: 13px;
+}
+
+.kurs-details-table tbody tr {
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease;
+}
+
+.kurs-details-table tbody tr:hover {
+    background:
+            rgba(232, 121, 43, 0.07);
+}
+
+.kurs-details-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =====================================================
+   15:30
+   ===================================================== */
+
+.kurs-1530-cell {
+    color: #f29a5b !important;
+
+    font-weight: 700;
+}
+
+/* =====================================================
+   EMPTY / ERROR
+   ===================================================== */
+
+.kurs-details-empty {
+    padding: 35px !important;
+
+    color: #999999 !important;
+
+    text-align: center !important;
+}
+
+.kurs-details-message {
+    padding: 30px;
+
+    color: #999999;
+
+    text-align: center;
+}
+
+.kurs-details-error {
+    color: #ff9999;
+}
+
+/* =====================================================
+   RESPONSIVE - TABLET
+   ===================================================== */
+
+@media (max-width: 900px) {
+    .kurs-details-info {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .kurs-jahrgang-content {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .kurs-jahrgang-field {
+        width: 100%;
+    }
+
+    .kurs-jahrgang-button {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
+@media (max-width: 600px) {
+    .kurs-details-info {
+        grid-template-columns: 1fr;
+    }
+
+    .kurs-details-page .page-header {
+        flex-direction: column;
+    }
+
+    .kurs-details-count {
+        position: static;
+
+        transform: none;
+
+        margin-top: 12px;
+    }
+
+    .kurs-jahrgang-header {
+        padding: 16px 18px;
+    }
+
+    .kurs-jahrgang-content {
+        padding: 16px 18px;
+    }
+
+    .kurs-jahrgang-message {
+        margin:
+                0 18px
+                16px;
+    }
+
+    .kurs-details-toolbar {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    .kurs-details-toolbar input {
+        width: 100%;
+    }
+}
