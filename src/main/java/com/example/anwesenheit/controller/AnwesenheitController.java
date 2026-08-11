@@ -3,7 +3,16 @@ package com.example.anwesenheit.controller;
 import com.example.anwesenheit.model.Anwesenheit;
 import com.example.anwesenheit.service.AnwesenheitService;
 import org.springframework.web.bind.annotation.*;
+import com.example.anwesenheit.service.AnwesenheitExportService;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +23,17 @@ import java.util.Map;
 public class AnwesenheitController {
 
     private final AnwesenheitService anwesenheitService;
+    private final AnwesenheitExportService anwesenheitExportService;
 
     public AnwesenheitController(
-            AnwesenheitService anwesenheitService
+            AnwesenheitService anwesenheitService,
+            AnwesenheitExportService anwesenheitExportService
     ) {
         this.anwesenheitService =
                 anwesenheitService;
+
+        this.anwesenheitExportService =
+                anwesenheitExportService;
     }
 
     @GetMapping
@@ -90,5 +104,57 @@ public class AnwesenheitController {
     ) {
         anwesenheitService
                 .deleteAnwesenheit(id);
+    }
+
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportAnwesenheiten(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate von,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate bis,
+
+            @RequestParam(required = false)
+            Long kursId
+    ) throws IOException {
+
+        if (von.isAfter(bis)) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        byte[] excel =
+                anwesenheitExportService
+                        .exportAnwesenheiten(
+                                von,
+                                bis,
+                                kursId
+                        );
+
+        String filename =
+                "Anwesenheit_" +
+                        von +
+                        "_bis_" +
+                        bis +
+                        ".xlsx";
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" +
+                                filename +
+                                "\""
+                )
+                .contentType(
+                        MediaType.parseMediaType(
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+                )
+                .body(excel);
     }
 }

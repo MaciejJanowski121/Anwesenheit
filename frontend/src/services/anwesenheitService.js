@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const API_URL = '/api/anwesenheiten';
 
+/* =====================================================
+   ALLE ANWESENHEITEN
+   ===================================================== */
+
 export const getAllAnwesenheiten = async () => {
     const response = await axios.get(
         API_URL
@@ -9,6 +13,10 @@ export const getAllAnwesenheiten = async () => {
 
     return response.data;
 };
+
+/* =====================================================
+   ANWESENHEITEN NACH ZEITRAUM
+   ===================================================== */
 
 export const getAnwesenheitenByZeitraum = async (
     von,
@@ -27,6 +35,10 @@ export const getAnwesenheitenByZeitraum = async (
     return response.data;
 };
 
+/* =====================================================
+   ANWESENHEITEN NACH SCHÜLER
+   ===================================================== */
+
 export const getAnwesenheitenByStudent = async (
     studentId
 ) => {
@@ -36,6 +48,10 @@ export const getAnwesenheitenByStudent = async (
 
     return response.data;
 };
+
+/* =====================================================
+   ANWESENHEITEN NACH KURS
+   ===================================================== */
 
 export const getAnwesenheitenByKurs = async (
     kursId
@@ -47,6 +63,10 @@ export const getAnwesenheitenByKurs = async (
     return response.data;
 };
 
+/* =====================================================
+   STATISTIK EINES SCHÜLERS
+   ===================================================== */
+
 export const getAnwesenheitStatistikByStudent = async (
     studentId
 ) => {
@@ -56,6 +76,10 @@ export const getAnwesenheitStatistikByStudent = async (
 
     return response.data;
 };
+
+/* =====================================================
+   ANWESENHEIT SPEICHERN / AKTUALISIEREN
+   ===================================================== */
 
 export const createAnwesenheit = async (
     studentId,
@@ -70,10 +94,50 @@ export const createAnwesenheit = async (
     return response.data;
 };
 
+/* =====================================================
+   ANWESENHEIT LÖSCHEN
+   ===================================================== */
+
 export const deleteAnwesenheit = async (
     id
 ) => {
     await axios.delete(
         `${API_URL}/${id}`
     );
+};
+
+/* =====================================================
+   ANWESENHEITEN ALS EXCEL EXPORTIEREN
+   ===================================================== */
+
+/*
+ * Exportiert Anwesenheiten als Excel-Datei.
+ *
+ * von     = Startdatum
+ * bis     = Enddatum
+ * kursId  = optionaler Kursfilter
+ */
+export const exportAnwesenheiten = async (
+    von,
+    bis,
+    kursId = ''
+) => {
+    const params = {
+        von,
+        bis
+    };
+
+    if (kursId) {
+        params.kursId = kursId;
+    }
+
+    const response = await axios.get(
+        `${API_URL}/export`,
+        {
+            params,
+            responseType: 'blob'
+        }
+    );
+
+    return response.data;
 };

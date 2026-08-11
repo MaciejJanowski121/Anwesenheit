@@ -4,7 +4,8 @@ import { getKurse } from '../services/kursService';
 import {
     createAnwesenheit,
     getAnwesenheitenByZeitraum,
-    deleteAnwesenheit
+    deleteAnwesenheit,
+    exportAnwesenheiten
 } from '../services/anwesenheitService';
 
 import './AnwesenheitPage.css';
@@ -17,113 +18,54 @@ const wochentage = [
     'Freitag'
 ];
 
-/*
- * Gibt das heutige Datum im Format YYYY-MM-DD zurück.
- */
 const getToday = () => {
     return new Date().toISOString().split('T')[0];
 };
 
 function AnwesenheitPage() {
-
-    /* =====================================================
-       GRUNDDATEN
-       ===================================================== */
-
     const [kurse, setKurse] = useState([]);
-
     const [selectedKurs, setSelectedKurs] = useState('');
-
     const [students, setStudents] = useState([]);
 
     const [statuses, setStatuses] = useState({});
-
     const [bemerkungen, setBemerkungen] = useState({});
 
     const [message, setMessage] = useState('');
+    const [savedAnwesenheiten, setSavedAnwesenheiten] = useState([]);
 
-    const [savedAnwesenheiten, setSavedAnwesenheiten] =
-        useState([]);
+    const [activeTab, setActiveTab] = useState('erfassen');
 
-    /* =====================================================
-       TABS
-       ===================================================== */
+    const [datum, setDatum] = useState(getToday());
 
-    const [activeTab, setActiveTab] =
-        useState('erfassen');
+    const [filterVon, setFilterVon] = useState(getToday());
+    const [filterBis, setFilterBis] = useState(getToday());
+    const [filterKurs, setFilterKurs] = useState('');
 
-    /* =====================================================
-       ANWESENHEIT ERFASSEN
-       ===================================================== */
+    const [anzeigeModus, setAnzeigeModus] = useState('gesamt');
 
-    const [datum, setDatum] =
-        useState(getToday());
+    const [historyLoading, setHistoryLoading] = useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
 
-    /* =====================================================
-       VERLAUF / ZEITRAUM
-       ===================================================== */
-
-    const [filterVon, setFilterVon] =
-        useState(getToday());
-
-    const [filterBis, setFilterBis] =
-        useState(getToday());
-
-    const [filterKurs, setFilterKurs] =
-        useState('');
-
-    /*
-     * Mögliche Werte:
-     *
-     * gesamt
-     * kurse
-     * kinder
-     */
-    const [anzeigeModus, setAnzeigeModus] =
-        useState('gesamt');
-
-    const [historyLoading, setHistoryLoading] =
-        useState(false);
-
-    /* =====================================================
-       BEARBEITUNG
-       ===================================================== */
-
-    const [editingId, setEditingId] =
-        useState(null);
-
-    const [editStatus, setEditStatus] =
-        useState('');
-
-    const [editBemerkung, setEditBemerkung] =
-        useState('');
-
-    /* =====================================================
-       INITIALISIERUNG
-       ===================================================== */
+    const [editingId, setEditingId] = useState(null);
+    const [editStatus, setEditStatus] = useState('');
+    const [editBemerkung, setEditBemerkung] = useState('');
 
     useEffect(() => {
         loadKurse();
+
         loadZeitraum(
             getToday(),
             getToday()
         );
     }, []);
 
-    /* =====================================================
-       HILFSFUNKTIONEN
-       ===================================================== */
-
     const formatStudentName = (student) => {
         if (!student) {
             return '–';
         }
 
-        const nachname =
-            student.nachname || '';
-
-        const vorname =
-            student.vorname || '';
+        const nachname = student.nachname || '';
+        const vorname = student.vorname || '';
 
         if (!nachname && !vorname) {
             return '–';
@@ -148,21 +90,15 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       KURSE LADEN
-       ===================================================== */
-
     const loadKurse = async () => {
         try {
-            const data =
-                await getKurse();
+            const data = await getKurse();
 
             setKurse(
                 Array.isArray(data)
                     ? data
                     : []
             );
-
         } catch (error) {
             console.error(error);
 
@@ -172,15 +108,10 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       ANWESENHEITEN NACH ZEITRAUM LADEN
-       ===================================================== */
-
     const loadZeitraum = async (
         von = filterVon,
         bis = filterBis
     ) => {
-
         if (!von || !bis) {
             setMessage(
                 'Bitte Von- und Bis-Datum auswählen.'
@@ -212,7 +143,6 @@ function AnwesenheitPage() {
                     ? data
                     : []
             );
-
         } catch (error) {
             console.error(error);
 
@@ -221,95 +151,68 @@ function AnwesenheitPage() {
             setMessage(
                 'Anwesenheiten für den Zeitraum konnten nicht geladen werden.'
             );
-
         } finally {
             setHistoryLoading(false);
         }
     };
 
-    /* =====================================================
-       KURSE NACH WOCHENTAG
-       ===================================================== */
-
-    const getKurseByWochentag = (
-        wochentag
-    ) => {
+    const getKurseByWochentag = (wochentag) => {
         return kurse.filter(
             (kurs) =>
                 kurs.wochentag === wochentag
         );
     };
 
-    /* =====================================================
-       VERLAUF FILTERN
-       ===================================================== */
+    const filteredAnwesenheiten = useMemo(() => {
+        return savedAnwesenheiten
+            .filter((anwesenheit) => {
+                const matchesKurs =
+                    !filterKurs ||
+                    anwesenheit.kurs?.id ===
+                    Number(filterKurs);
 
-    const filteredAnwesenheiten =
-        useMemo(() => {
+                return matchesKurs;
+            })
+            .sort((a, b) => {
+                const datumA =
+                    String(a.datum ?? '');
 
-            return savedAnwesenheiten
-                .filter((anwesenheit) => {
+                const datumB =
+                    String(b.datum ?? '');
 
-                    const matchesKurs =
-                        !filterKurs ||
-                        anwesenheit.kurs?.id ===
-                        Number(filterKurs);
+                return datumB.localeCompare(
+                    datumA
+                );
+            });
+    }, [
+        savedAnwesenheiten,
+        filterKurs
+    ]);
 
-                    return matchesKurs;
-                })
-                .sort((a, b) => {
+    const gruppiertNachKurs = useMemo(() => {
+        const gruppen = {};
 
-                    const datumA =
-                        String(a.datum ?? '');
+        filteredAnwesenheiten.forEach(
+            (anwesenheit) => {
+                const kursId =
+                    anwesenheit.kurs?.id ??
+                    'ohne-kurs';
 
-                    const datumB =
-                        String(b.datum ?? '');
-
-                    return datumB.localeCompare(
-                        datumA
-                    );
-                });
-
-        }, [
-            savedAnwesenheiten,
-            filterKurs
-        ]);
-
-    /* =====================================================
-       GRUPPIERUNG NACH KURS
-       ===================================================== */
-
-    const gruppiertNachKurs =
-        useMemo(() => {
-
-            const gruppen = {};
-
-            filteredAnwesenheiten.forEach(
-                (anwesenheit) => {
-
-                    const kursId =
-                        anwesenheit.kurs?.id ??
-                        'ohne-kurs';
-
-                    if (!gruppen[kursId]) {
-                        gruppen[kursId] = {
-                            kurs:
-                            anwesenheit.kurs,
-                            eintraege: []
-                        };
-                    }
-
-                    gruppen[
-                        kursId
-                        ].eintraege.push(
-                        anwesenheit
-                    );
+                if (!gruppen[kursId]) {
+                    gruppen[kursId] = {
+                        kurs: anwesenheit.kurs,
+                        eintraege: []
+                    };
                 }
-            );
 
-            return Object.values(
-                gruppen
-            ).sort((a, b) =>
+                gruppen[kursId].eintraege.push(
+                    anwesenheit
+                );
+            }
+        );
+
+        return Object.values(gruppen).sort(
+            (a, b) =>
                 String(
                     a.kurs?.name ?? ''
                 ).localeCompare(
@@ -318,45 +221,36 @@ function AnwesenheitPage() {
                     ),
                     'de'
                 )
-            );
+        );
+    }, [filteredAnwesenheiten]);
 
-        }, [filteredAnwesenheiten]);
+    const gruppiertNachKind = useMemo(() => {
+        const gruppen = {};
 
-    /* =====================================================
-       GRUPPIERUNG NACH KIND
-       ===================================================== */
+        filteredAnwesenheiten.forEach(
+            (anwesenheit) => {
+                const studentId =
+                    anwesenheit.student?.id ??
+                    'ohne-student';
 
-    const gruppiertNachKind =
-        useMemo(() => {
-
-            const gruppen = {};
-
-            filteredAnwesenheiten.forEach(
-                (anwesenheit) => {
-
-                    const studentId =
-                        anwesenheit.student?.id ??
-                        'ohne-student';
-
-                    if (!gruppen[studentId]) {
-                        gruppen[studentId] = {
-                            student:
-                            anwesenheit.student,
-                            eintraege: []
-                        };
-                    }
-
-                    gruppen[
-                        studentId
-                        ].eintraege.push(
-                        anwesenheit
-                    );
+                if (!gruppen[studentId]) {
+                    gruppen[studentId] = {
+                        student:
+                        anwesenheit.student,
+                        eintraege: []
+                    };
                 }
-            );
 
-            return Object.values(
-                gruppen
-            ).sort((a, b) =>
+                gruppen[
+                    studentId
+                    ].eintraege.push(
+                    anwesenheit
+                );
+            }
+        );
+
+        return Object.values(gruppen).sort(
+            (a, b) =>
                 formatStudentName(
                     a.student
                 ).localeCompare(
@@ -365,20 +259,11 @@ function AnwesenheitPage() {
                     ),
                     'de'
                 )
-            );
+        );
+    }, [filteredAnwesenheiten]);
 
-        }, [filteredAnwesenheiten]);
-
-    /* =====================================================
-       KURS AUSWÄHLEN
-       ===================================================== */
-
-    const handleKursChange = async (
-        kursId
-    ) => {
-
+    const handleKursChange = async (kursId) => {
         setSelectedKurs(kursId);
-
         setMessage('');
 
         if (!kursId) {
@@ -411,16 +296,13 @@ function AnwesenheitPage() {
                     )
                     .filter(Boolean);
 
-            setStudents(
-                studentList
-            );
+            setStudents(studentList);
 
             const initialStatuses = {};
             const initialBemerkungen = {};
 
             studentList.forEach(
                 (student) => {
-
                     initialStatuses[
                         student.id
                         ] = 'ANWESEND';
@@ -438,7 +320,6 @@ function AnwesenheitPage() {
             setBemerkungen(
                 initialBemerkungen
             );
-
         } catch (error) {
             console.error(error);
 
@@ -452,50 +333,31 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       STATUS ÄNDERN
-       ===================================================== */
-
     const handleStatusChange = (
         studentId,
         status
     ) => {
-
         setStatuses(
             (previous) => ({
                 ...previous,
-
-                [studentId]:
-                status
+                [studentId]: status
             })
         );
     };
-
-    /* =====================================================
-       BEMERKUNG ÄNDERN
-       ===================================================== */
 
     const handleBemerkungChange = (
         studentId,
         bemerkung
     ) => {
-
         setBemerkungen(
             (previous) => ({
                 ...previous,
-
-                [studentId]:
-                bemerkung
+                [studentId]: bemerkung
             })
         );
     };
 
-    /* =====================================================
-       ANWESENHEIT SPEICHERN
-       ===================================================== */
-
     const handleSave = async () => {
-
         if (!selectedKurs) {
             setMessage(
                 'Bitte zuerst einen Kurs auswählen.'
@@ -513,11 +375,7 @@ function AnwesenheitPage() {
         }
 
         try {
-
-            for (
-                const student of students
-                ) {
-
+            for (const student of students) {
                 const anwesenheit = {
                     datum,
 
@@ -543,18 +401,12 @@ function AnwesenheitPage() {
                 'Anwesenheit erfolgreich gespeichert.'
             );
 
-            /*
-             * Wenn das gespeicherte Datum innerhalb
-             * des aktuell angezeigten Zeitraums liegt,
-             * aktualisieren wir direkt den Verlauf.
-             */
             if (
                 datum >= filterVon &&
                 datum <= filterBis
             ) {
                 await loadZeitraum();
             }
-
         } catch (error) {
             console.error(error);
 
@@ -564,14 +416,9 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       BEARBEITUNG STARTEN
-       ===================================================== */
-
     const handleEditStart = (
         anwesenheit
     ) => {
-
         setEditingId(
             anwesenheit.id
         );
@@ -587,29 +434,16 @@ function AnwesenheitPage() {
         );
     };
 
-    /* =====================================================
-       BEARBEITUNG ABBRECHEN
-       ===================================================== */
-
     const handleEditCancel = () => {
-
         setEditingId(null);
-
         setEditStatus('');
-
         setEditBemerkung('');
     };
-
-    /* =====================================================
-       BEARBEITUNG SPEICHERN
-       ===================================================== */
 
     const handleEditSave = async (
         anwesenheit
     ) => {
-
         try {
-
             await createAnwesenheit(
                 anwesenheit.student.id,
                 anwesenheit.kurs.id,
@@ -626,9 +460,7 @@ function AnwesenheitPage() {
             );
 
             setEditingId(null);
-
             setEditStatus('');
-
             setEditBemerkung('');
 
             setMessage(
@@ -636,7 +468,6 @@ function AnwesenheitPage() {
             );
 
             await loadZeitraum();
-
         } catch (error) {
             console.error(error);
 
@@ -646,14 +477,7 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       ANWESENHEIT LÖSCHEN
-       ===================================================== */
-
-    const handleDelete = async (
-        id
-    ) => {
-
+    const handleDelete = async (id) => {
         const confirmed =
             window.confirm(
                 'Möchten Sie diesen Anwesenheitseintrag wirklich löschen?'
@@ -664,17 +488,13 @@ function AnwesenheitPage() {
         }
 
         try {
-
-            await deleteAnwesenheit(
-                id
-            );
+            await deleteAnwesenheit(id);
 
             setMessage(
                 'Anwesenheit wurde gelöscht.'
             );
 
             await loadZeitraum();
-
         } catch (error) {
             console.error(error);
 
@@ -684,21 +504,81 @@ function AnwesenheitPage() {
         }
     };
 
-    /* =====================================================
-       RENDER
-       ===================================================== */
+    const handleExport = async () => {
+        if (!filterVon || !filterBis) {
+            setMessage(
+                'Bitte einen Zeitraum für den Export auswählen.'
+            );
+
+            return;
+        }
+
+        if (filterVon > filterBis) {
+            setMessage(
+                'Das Von-Datum darf nicht nach dem Bis-Datum liegen.'
+            );
+
+            return;
+        }
+
+        try {
+            setExportLoading(true);
+            setMessage('');
+
+            const blob =
+                await exportAnwesenheiten(
+                    filterVon,
+                    filterBis,
+                    filterKurs
+                );
+
+            const url =
+                window.URL.createObjectURL(
+                    blob
+                );
+
+            const link =
+                document.createElement('a');
+
+            link.href = url;
+
+            link.download =
+                `Anwesenheit_${filterVon}_bis_${filterBis}.xlsx`;
+
+            document.body.appendChild(
+                link
+            );
+
+            link.click();
+
+            link.remove();
+
+            window.URL.revokeObjectURL(
+                url
+            );
+
+            setMessage(
+                'Excel-Export wurde erfolgreich erstellt.'
+            );
+        } catch (error) {
+            console.error(
+                'Fehler beim Excel-Export:',
+                error
+            );
+
+            setMessage(
+                'Excel-Export konnte nicht erstellt werden.'
+            );
+        } finally {
+            setExportLoading(false);
+        }
+    };
 
     return (
         <div className="anwesenheit-page">
 
-            {/* =================================================
-                HEADER
-               ================================================= */}
-
             <header className="page-header">
-
                 <div className="page-header-content">
-
                     <h1>
                         Anwesenheit
                     </h1>
@@ -707,14 +587,8 @@ function AnwesenheitPage() {
                         Anwesenheiten erfassen und bereits
                         gespeicherte Einträge verwalten
                     </p>
-
                 </div>
-
             </header>
-
-            {/* =================================================
-                TABS
-               ================================================= */}
 
             <div className="anwesenheit-tabs">
 
@@ -752,19 +626,11 @@ function AnwesenheitPage() {
 
             </div>
 
-            {/* =================================================
-                MELDUNG
-               ================================================= */}
-
             {message && (
                 <div className="anwesenheit-message">
                     {message}
                 </div>
             )}
-
-            {/* =================================================
-                TAB: ANWESENHEIT ERFASSEN
-               ================================================= */}
 
             {activeTab === 'erfassen' && (
 
@@ -773,7 +639,6 @@ function AnwesenheitPage() {
                     <div className="anwesenheit-section-header">
 
                         <div>
-
                             <h2>
                                 Anwesenheit erfassen
                             </h2>
@@ -783,12 +648,9 @@ function AnwesenheitPage() {
                                 anschließend den Status der Schüler
                                 erfassen.
                             </p>
-
                         </div>
 
                     </div>
-
-                    {/* Auswahl */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -833,7 +695,6 @@ function AnwesenheitPage() {
 
                                 {wochentage.map(
                                     (tag) => {
-
                                         const kurseAmTag =
                                             getKurseByWochentag(
                                                 tag
@@ -853,7 +714,6 @@ function AnwesenheitPage() {
 
                                                 {kurseAmTag.map(
                                                     (kurs) => (
-
                                                         <option
                                                             key={kurs.id}
                                                             value={kurs.id}
@@ -863,7 +723,6 @@ function AnwesenheitPage() {
                                                                 ? ` | ${kurs.uhrzeit}`
                                                                 : ''}
                                                         </option>
-
                                                     )
                                                 )}
 
@@ -878,8 +737,6 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* Keine Schüler */}
-
                     {students.length === 0 ? (
 
                         <div className="anwesenheit-empty">
@@ -889,7 +746,6 @@ function AnwesenheitPage() {
                     ) : (
 
                         <>
-
                             <div className="anwesenheit-table-scroll">
 
                                 <table className="anwesenheit-table">
@@ -999,29 +855,20 @@ function AnwesenheitPage() {
                                 </button>
 
                             </div>
-
                         </>
 
                     )}
 
                 </section>
-
             )}
-
-            {/* =================================================
-                TAB: VERLAUF
-               ================================================= */}
 
             {activeTab === 'verlauf' && (
 
                 <section className="anwesenheit-section">
 
-                    {/* Header */}
-
                     <div className="anwesenheit-section-header">
 
                         <div>
-
                             <h2>
                                 Verlauf
                             </h2>
@@ -1030,7 +877,6 @@ function AnwesenheitPage() {
                                 Anwesenheiten nach Zeitraum anzeigen,
                                 filtern und auswerten.
                             </p>
-
                         </div>
 
                         <span className="anwesenheit-count">
@@ -1039,10 +885,6 @@ function AnwesenheitPage() {
                         </span>
 
                     </div>
-
-                    {/* =================================================
-                        ZEITRAUM + KURS
-                       ================================================= */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -1106,7 +948,6 @@ function AnwesenheitPage() {
 
                                 {wochentage.map(
                                     (tag) => {
-
                                         const kurseAmTag =
                                             getKurseByWochentag(
                                                 tag
@@ -1146,24 +987,35 @@ function AnwesenheitPage() {
 
                         </div>
 
-                        <button
-                            type="button"
-                            className="anwesenheit-load-button"
-                            onClick={() =>
-                                loadZeitraum()
-                            }
-                            disabled={historyLoading}
-                        >
-                            {historyLoading
-                                ? 'Wird geladen...'
-                                : 'Zeitraum anzeigen'}
-                        </button>
+                        <div className="anwesenheit-toolbar-actions">
+
+                            <button
+                                type="button"
+                                className="anwesenheit-load-button"
+                                onClick={() =>
+                                    loadZeitraum()
+                                }
+                                disabled={historyLoading}
+                            >
+                                {historyLoading
+                                    ? 'Wird geladen...'
+                                    : 'Zeitraum anzeigen'}
+                            </button>
+
+                            <button
+                                type="button"
+                                className="anwesenheit-export-button"
+                                onClick={handleExport}
+                                disabled={exportLoading}
+                            >
+                                {exportLoading
+                                    ? 'Export läuft...'
+                                    : 'Excel exportieren'}
+                            </button>
+
+                        </div>
 
                     </div>
-
-                    {/* =================================================
-                        ANZEIGEMODUS
-                       ================================================= */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -1217,10 +1069,6 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        KEINE DATEN
-                       ================================================= */}
-
                     {filteredAnwesenheiten.length === 0 ? (
 
                         <div className="anwesenheit-empty">
@@ -1231,11 +1079,6 @@ function AnwesenheitPage() {
                     ) : (
 
                         <>
-
-                            {/* =========================================
-                                GESAMT
-                               ========================================= */}
-
                             {anzeigeModus === 'gesamt' && (
 
                                 <div className="anwesenheit-table-scroll">
@@ -1279,7 +1122,6 @@ function AnwesenheitPage() {
                                                     anwesenheit.id ? (
 
                                                         <>
-
                                                             <td>
 
                                                                 <select
@@ -1345,13 +1187,11 @@ function AnwesenheitPage() {
                                                                 </button>
 
                                                             </td>
-
                                                         </>
 
                                                     ) : (
 
                                                         <>
-
                                                             <td>
                                                                 {formatStatus(
                                                                     anwesenheit.status
@@ -1390,7 +1230,6 @@ function AnwesenheitPage() {
                                                                 </button>
 
                                                             </td>
-
                                                         </>
 
                                                     )}
@@ -1405,12 +1244,7 @@ function AnwesenheitPage() {
                                     </table>
 
                                 </div>
-
                             )}
-
-                            {/* =========================================
-                                NACH KURSEN
-                               ========================================= */}
 
                             {anzeigeModus === 'kurse' && (
 
@@ -1499,12 +1333,7 @@ function AnwesenheitPage() {
                                     )}
 
                                 </div>
-
                             )}
-
-                            {/* =========================================
-                                NACH KINDERN
-                               ========================================= */}
 
                             {anzeigeModus === 'kinder' && (
 
@@ -1593,17 +1422,12 @@ function AnwesenheitPage() {
                                     )}
 
                                 </div>
-
                             )}
-
                         </>
-
                     )}
 
                 </section>
-
             )}
-
         </div>
     );
 }

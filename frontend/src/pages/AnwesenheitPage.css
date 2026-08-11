@@ -4,6 +4,27 @@
     margin: 0 auto;
 }
 
+
+/* =====================================================
+   PAGE HEADER - CENTER
+   ===================================================== */
+
+.anwesenheit-page .page-header {
+    justify-content: center;
+    text-align: center;
+}
+
+.anwesenheit-page .page-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.anwesenheit-page .page-header-content h1,
+.anwesenheit-page .page-header-content p {
+    text-align: center;
+}
+
 /* =====================================================
    TABS
    ===================================================== */
@@ -181,6 +202,7 @@
 
 .anwesenheit-field-large {
     min-width: 280px;
+
     flex: 1;
 }
 
@@ -235,6 +257,20 @@
 }
 
 /* =====================================================
+   TOOLBAR ACTIONS
+   ===================================================== */
+
+.anwesenheit-toolbar-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-shrink: 0;
+}
+
+/* =====================================================
    ZEITRAUM BUTTON
    ===================================================== */
 
@@ -269,6 +305,49 @@
 }
 
 .anwesenheit-load-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.5;
+}
+
+/* =====================================================
+   EXCEL EXPORT
+   ===================================================== */
+
+.anwesenheit-export-button {
+    min-height: 40px;
+
+    padding: 10px 16px;
+
+    border: 1px solid #4f8d3a;
+    border-radius: 7px;
+
+    background: #4f8d3a;
+    color: #ffffff;
+
+    font-size: 0.86rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease,
+            opacity 0.15s ease,
+            transform 0.15s ease;
+}
+
+.anwesenheit-export-button:hover:not(:disabled) {
+    border-color: #5a9e43;
+
+    background: #5a9e43;
+
+    transform: translateY(-1px);
+}
+
+.anwesenheit-export-button:disabled {
     cursor: not-allowed;
 
     opacity: 0.5;
@@ -687,14 +766,18 @@
    RESPONSIVE - TABLET
    ===================================================== */
 
-@media (max-width: 1000px) {
-
+@media (max-width: 1100px) {
     .anwesenheit-field-large {
         flex-basis: 100%;
     }
 
-    .anwesenheit-load-button {
-        min-width: 170px;
+    .anwesenheit-toolbar-actions {
+        width: 100%;
+    }
+
+    .anwesenheit-load-button,
+    .anwesenheit-export-button {
+        flex: 1;
     }
 
     .anwesenheit-view-switch {
@@ -715,12 +798,9 @@
    ===================================================== */
 
 @media (max-width: 760px) {
-
     .anwesenheit-tabs {
         width: 100%;
     }
-
-    /* Section Header */
 
     .anwesenheit-section-header {
         min-height: auto;
@@ -753,8 +833,6 @@
         margin-top: 10px;
     }
 
-    /* Toolbar */
-
     .anwesenheit-toolbar {
         align-items: stretch;
 
@@ -767,11 +845,16 @@
         min-width: 0;
     }
 
-    .anwesenheit-load-button {
+    .anwesenheit-toolbar-actions {
         width: 100%;
+
+        flex-direction: column;
     }
 
-    /* View Switch */
+    .anwesenheit-load-button,
+    .anwesenheit-export-button {
+        width: 100%;
+    }
 
     .anwesenheit-view-switch {
         display: grid;
@@ -787,8 +870,6 @@
         width: 100%;
     }
 
-    /* Actions */
-
     .anwesenheit-actions {
         justify-content: stretch;
     }
@@ -796,8 +877,6 @@
     .save-button {
         width: 100%;
     }
-
-    /* Grouped View */
 
     .anwesenheit-group-list {
         padding: 0 18px 18px;
@@ -808,8 +887,6 @@
 
         flex-direction: column;
     }
-
-    /* Empty */
 
     .anwesenheit-empty {
         margin: 0 18px 18px;
