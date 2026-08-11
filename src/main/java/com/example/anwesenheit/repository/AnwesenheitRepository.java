@@ -14,6 +14,11 @@ public interface AnwesenheitRepository
 
     List<Anwesenheit> findByKursId(Long kursId);
 
+    List<Anwesenheit> findByDatumBetweenOrderByDatumAsc(
+            LocalDate von,
+            LocalDate bis
+    );
+
     Optional<Anwesenheit> findByStudentIdAndKursIdAndDatum(
             Long studentId,
             Long kursId,
@@ -24,9 +29,4 @@ public interface AnwesenheitRepository
             Long studentId,
             String status
     );
-
 }
-
-
-
-

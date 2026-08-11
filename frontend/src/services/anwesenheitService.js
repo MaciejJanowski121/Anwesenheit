@@ -3,31 +3,53 @@ import axios from 'axios';
 const API_URL = '/api/anwesenheiten';
 
 export const getAllAnwesenheiten = async () => {
-    const response = await axios.get(API_URL);
+    const response = await axios.get(
+        API_URL
+    );
+
     return response.data;
 };
 
-export const getAnwesenheitenByStudent = async (studentId) => {
-    const response = await axios.get(`${API_URL}/student/${studentId}`);
+export const getAnwesenheitenByZeitraum = async (
+    von,
+    bis
+) => {
+    const response = await axios.get(
+        `${API_URL}/zeitraum`,
+        {
+            params: {
+                von,
+                bis
+            }
+        }
+    );
+
     return response.data;
 };
 
-export const getAnwesenheitenByKurs = async (kursId) => {
-    const response = await axios.get(`${API_URL}/kurs/${kursId}`);
+export const getAnwesenheitenByStudent = async (
+    studentId
+) => {
+    const response = await axios.get(
+        `${API_URL}/student/${studentId}`
+    );
+
     return response.data;
 };
 
-/*
- * Liefert die Anwesenheitsstatistik eines Schülers.
- *
- * Beispiel:
- * {
- *     anzahlAnwesend: 12,
- *     anzahlEntschuldigt: 3,
- *     anzahlFehlend: 2
- * }
- */
-export const getAnwesenheitStatistikByStudent = async (studentId) => {
+export const getAnwesenheitenByKurs = async (
+    kursId
+) => {
+    const response = await axios.get(
+        `${API_URL}/kurs/${kursId}`
+    );
+
+    return response.data;
+};
+
+export const getAnwesenheitStatistikByStudent = async (
+    studentId
+) => {
     const response = await axios.get(
         `${API_URL}/student/${studentId}/statistik`
     );
@@ -48,6 +70,10 @@ export const createAnwesenheit = async (
     return response.data;
 };
 
-export const deleteAnwesenheit = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+export const deleteAnwesenheit = async (
+    id
+) => {
+    await axios.delete(
+        `${API_URL}/${id}`
+    );
 };
