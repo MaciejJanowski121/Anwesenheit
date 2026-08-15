@@ -1,14 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {
+    useEffect,
+    useMemo,
+    useState
+} from 'react';
 
-import { getKursById } from '../services/kursService';
+import {
+    useNavigate,
+    useParams
+} from 'react-router-dom';
+
+import {
+    getKursById
+} from '../services/kursService';
 
 import {
     getBuchungenByKurs,
-    addJahrgangToKurs
+    addJahrgangToKurs,
+    addStudentsToKurs
 } from '../services/buchungService';
 
-import { getStudents } from '../services/studentService';
+import {
+    getStudents
+} from '../services/studentService';
 
 import {
     getAnwesenheitStatistikByStudent
@@ -17,28 +30,103 @@ import {
 import './KursDetailsPage.css';
 
 function KursDetailsPage() {
-    const { id } = useParams();
-    const navigate = useNavigate();
 
-    const [kurs, setKurs] = useState(null);
+    const { id } =
+        useParams();
 
-    const [students, setStudents] = useState([]);
-    const [allStudents, setAllStudents] = useState([]);
+    const navigate =
+        useNavigate();
 
-    const [filter, setFilter] = useState('');
+    /* =====================================================
+       GRUNDDATEN
+       ===================================================== */
 
-    const [sortKey, setSortKey] = useState('nachname');
-    const [sortDirection, setSortDirection] = useState('asc');
+    const [kurs, setKurs] =
+        useState(null);
 
-    const [selectedJahrgang, setSelectedJahrgang] = useState('');
+    const [students, setStudents] =
+        useState([]);
 
-    const [jahrgangLoading, setJahrgangLoading] = useState(false);
+    const [allStudents, setAllStudents] =
+        useState([]);
 
-    const [jahrgangMessage, setJahrgangMessage] = useState('');
+    const [loading, setLoading] =
+        useState(true);
 
-    const [loading, setLoading] = useState(true);
+    const [error, setError] =
+        useState('');
 
-    const [error, setError] = useState('');
+    /* =====================================================
+       KURSLISTE
+       ===================================================== */
+
+    const [filter, setFilter] =
+        useState('');
+
+    const [sortKey, setSortKey] =
+        useState('nachname');
+
+    const [
+        sortDirection,
+        setSortDirection
+    ] = useState('asc');
+
+    /* =====================================================
+       JAHRGANG HINZUFÜGEN
+       ===================================================== */
+
+    const [
+        selectedJahrgang,
+        setSelectedJahrgang
+    ] = useState('');
+
+    const [
+        jahrgangLoading,
+        setJahrgangLoading
+    ] = useState(false);
+
+    const [
+        jahrgangMessage,
+        setJahrgangMessage
+    ] = useState('');
+
+    /* =====================================================
+       SCHÜLER HINZUFÜGEN
+       ===================================================== */
+
+    const [
+        addStudentsOpen,
+        setAddStudentsOpen
+    ] = useState(false);
+
+    const [
+        addStudentSearch,
+        setAddStudentSearch
+    ] = useState('');
+
+    const [
+        addStudentJahrgang,
+        setAddStudentJahrgang
+    ] = useState('');
+
+    const [
+        selectedStudentIds,
+        setSelectedStudentIds
+    ] = useState([]);
+
+    const [
+        addStudentsLoading,
+        setAddStudentsLoading
+    ] = useState(false);
+
+    const [
+        addStudentsMessage,
+        setAddStudentsMessage
+    ] = useState('');
+
+    /* =====================================================
+       INITIALISIERUNG
+       ===================================================== */
 
     useEffect(() => {
         loadData();
@@ -49,7 +137,9 @@ function KursDetailsPage() {
        ===================================================== */
 
     const loadData = async () => {
+
         try {
+
             setLoading(true);
             setError('');
 
@@ -57,33 +147,40 @@ function KursDetailsPage() {
                 kursData,
                 buchungenData,
                 studentsData
-            ] = await Promise.all([
-                getKursById(id),
-                getBuchungenByKurs(id),
-                getStudents()
-            ]);
+            ] =
+                await Promise.all([
+                    getKursById(id),
+                    getBuchungenByKurs(id),
+                    getStudents()
+                ]);
 
-            setKurs(kursData);
+            setKurs(
+                kursData
+            );
 
             setAllStudents(
-                Array.isArray(studentsData)
+                Array.isArray(
+                    studentsData
+                )
                     ? studentsData
                     : []
             );
 
             const buchungen =
-                Array.isArray(buchungenData)
+                Array.isArray(
+                    buchungenData
+                )
                     ? buchungenData
                     : [];
 
-            /*
-             * Zu jedem eingebuchten Schüler
-             * die Anwesenheitsstatistik laden.
-             */
             const studentsWithStats =
                 await Promise.all(
+
                     buchungen.map(
-                        async (buchung) => {
+                        async (
+                            buchung
+                        ) => {
+
                             const student =
                                 buchung.student;
 
@@ -92,37 +189,44 @@ function KursDetailsPage() {
                             }
 
                             try {
+
                                 const statistik =
                                     await getAnwesenheitStatistikByStudent(
                                         student.id
                                     );
 
                                 return {
+
                                     ...student,
 
                                     buchungId:
                                     buchung.id,
 
                                     anzahlAnwesend:
-                                        statistik.anzahlAnwesend ??
+                                        statistik
+                                            .anzahlAnwesend ??
                                         0,
 
                                     anzahlEntschuldigt:
-                                        statistik.anzahlEntschuldigt ??
+                                        statistik
+                                            .anzahlEntschuldigt ??
                                         0,
 
                                     anzahlFehlend:
-                                        statistik.anzahlFehlend ??
+                                        statistik
+                                            .anzahlFehlend ??
                                         0
                                 };
 
                             } catch (error) {
+
                                 console.error(
                                     `Statistik für Schüler ${student.id} konnte nicht geladen werden.`,
                                     error
                                 );
 
                                 return {
+
                                     ...student,
 
                                     buchungId:
@@ -138,10 +242,12 @@ function KursDetailsPage() {
                 );
 
             setStudents(
-                studentsWithStats.filter(Boolean)
+                studentsWithStats
+                    .filter(Boolean)
             );
 
         } catch (error) {
+
             console.error(
                 'Kursübersicht konnte nicht geladen werden:',
                 error
@@ -152,229 +258,595 @@ function KursDetailsPage() {
             );
 
         } finally {
+
             setLoading(false);
         }
     };
 
     /* =====================================================
-       VERFÜGBARE JAHRGÄNGE
+       JAHRGÄNGE
        ===================================================== */
 
-    const jahrgaenge = useMemo(() => {
-        return [
-            ...new Set(
-                allStudents
-                    .map(
-                        (student) =>
-                            student.jahrgang
-                    )
-                    .filter(
-                        (jahrgang) =>
-                            jahrgang !== null &&
-                            jahrgang !== undefined &&
-                            jahrgang !== ''
-                    )
-            )
-        ].sort(
-            (a, b) =>
-                Number(a) - Number(b)
-        );
-    }, [allStudents]);
+    const jahrgaenge =
+        useMemo(() => {
+
+            return [
+                ...new Set(
+                    allStudents
+                        .map(
+                            (student) =>
+                                student.jahrgang
+                        )
+                        .filter(
+                            (jahrgang) =>
+                                jahrgang !== null &&
+                                jahrgang !== undefined &&
+                                jahrgang !== ''
+                        )
+                )
+            ].sort(
+                (a, b) =>
+                    Number(a) -
+                    Number(b)
+            );
+
+        }, [
+            allStudents
+        ]);
 
     /* =====================================================
        JAHRGANG ZUORDNEN
        ===================================================== */
 
-    const handleAddJahrgang = async () => {
-        if (!selectedJahrgang) {
-            return;
-        }
+    const handleAddJahrgang =
+        async () => {
 
-        const confirmed =
-            window.confirm(
-                `Möchten Sie wirklich alle Schüler des Jahrgangs ${selectedJahrgang} dem Kurs „${kurs.name}“ zuordnen?`
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
-        try {
-            setJahrgangLoading(true);
-            setJahrgangMessage('');
-            setError('');
-
-            const result =
-                await addJahrgangToKurs(
-                    id,
-                    selectedJahrgang
-                );
-
-            const hinzugefuegt =
-                result?.hinzugefuegt ?? 0;
-
-            if (hinzugefuegt === 0) {
-                setJahrgangMessage(
-                    `Alle Schüler des Jahrgangs ${selectedJahrgang} sind bereits diesem Kurs zugeordnet.`
-                );
-            } else {
-                setJahrgangMessage(
-                    `${hinzugefuegt} Schüler des Jahrgangs ${selectedJahrgang} wurden dem Kurs hinzugefügt.`
-                );
+            if (
+                !selectedJahrgang
+            ) {
+                return;
             }
 
-            setSelectedJahrgang('');
+            const confirmed =
+                window.confirm(
+                    `Möchten Sie wirklich alle Schüler des Jahrgangs ${selectedJahrgang} dem Kurs „${kurs.name}“ zuordnen?`
+                );
 
-            /*
-             * Liste direkt neu laden,
-             * damit die neuen Schüler sichtbar werden.
-             */
-            await loadData();
+            if (!confirmed) {
+                return;
+            }
 
-        } catch (error) {
-            console.error(
-                'Jahrgang konnte nicht zugeordnet werden:',
-                error
-            );
+            try {
 
-            setJahrgangMessage('');
+                setJahrgangLoading(
+                    true
+                );
 
-            setError(
-                'Der Jahrgang konnte nicht zugeordnet werden.'
-            );
+                setJahrgangMessage(
+                    ''
+                );
 
-        } finally {
-            setJahrgangLoading(false);
-        }
-    };
+                setError('');
+
+                const result =
+                    await addJahrgangToKurs(
+                        id,
+                        selectedJahrgang
+                    );
+
+                const hinzugefuegt =
+                    result
+                        ?.hinzugefuegt ??
+                    0;
+
+                if (
+                    hinzugefuegt === 0
+                ) {
+
+                    setJahrgangMessage(
+                        `Alle Schüler des Jahrgangs ${selectedJahrgang} sind bereits diesem Kurs zugeordnet.`
+                    );
+
+                } else {
+
+                    setJahrgangMessage(
+                        `${hinzugefuegt} Schüler des Jahrgangs ${selectedJahrgang} wurden dem Kurs hinzugefügt.`
+                    );
+                }
+
+                setSelectedJahrgang(
+                    ''
+                );
+
+                await loadData();
+
+            } catch (error) {
+
+                console.error(
+                    'Jahrgang konnte nicht zugeordnet werden:',
+                    error
+                );
+
+                setJahrgangMessage(
+                    ''
+                );
+
+                setError(
+                    'Der Jahrgang konnte nicht zugeordnet werden.'
+                );
+
+            } finally {
+
+                setJahrgangLoading(
+                    false
+                );
+            }
+        };
 
     /* =====================================================
-       FILTER
+       BEREITS EINGEBUCHTE SCHÜLER
        ===================================================== */
 
-    const filteredStudents = useMemo(() => {
-        const term =
-            filter.trim().toLowerCase();
+    const bookedStudentIds =
+        useMemo(() => {
 
-        if (!term) {
-            return students;
-        }
-
-        return students.filter(
-            (student) =>
-                [
-                    student.nachname,
-                    student.vorname,
-                    student.jahrgang,
-                    student.klasse,
-                    student.fotoFreigabe,
-                    student.email1,
-                    student.telefon1,
-                    student.mobil1,
-                    student.email2,
-                    student.telefon2,
-                    student.mobil2
-                ].some(
-                    (value) =>
-                        String(value ?? '')
-                            .toLowerCase()
-                            .includes(term)
+            return new Set(
+                students.map(
+                    (student) =>
+                        student.id
                 )
-        );
-    }, [
-        students,
-        filter
-    ]);
+            );
+
+        }, [
+            students
+        ]);
+
+    /* =====================================================
+       VERFÜGBARE SCHÜLER
+       ===================================================== */
+
+    const availableStudents =
+        useMemo(() => {
+
+            const search =
+                addStudentSearch
+                    .trim()
+                    .toLowerCase();
+
+            return allStudents
+                .filter(
+                    (student) =>
+                        !bookedStudentIds
+                            .has(
+                                student.id
+                            )
+                )
+                .filter(
+                    (student) => {
+
+                        if (
+                            addStudentJahrgang &&
+                            String(
+                                student.jahrgang
+                            ) !==
+                            String(
+                                addStudentJahrgang
+                            )
+                        ) {
+                            return false;
+                        }
+
+                        if (!search) {
+                            return true;
+                        }
+
+                        const fullName =
+                            `${student.nachname || ''} ${student.vorname || ''}`
+                                .toLowerCase();
+
+                        return (
+                            fullName
+                                .includes(
+                                    search
+                                ) ||
+                            String(
+                                student.klasse ??
+                                ''
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    search
+                                )
+                        );
+                    }
+                )
+                .sort(
+                    (a, b) => {
+
+                        const nachnameA =
+                            String(
+                                a.nachname ??
+                                ''
+                            );
+
+                        const nachnameB =
+                            String(
+                                b.nachname ??
+                                ''
+                            );
+
+                        const vergleich =
+                            nachnameA
+                                .localeCompare(
+                                    nachnameB,
+                                    'de'
+                                );
+
+                        if (
+                            vergleich !== 0
+                        ) {
+                            return vergleich;
+                        }
+
+                        return String(
+                            a.vorname ??
+                            ''
+                        ).localeCompare(
+                            String(
+                                b.vorname ??
+                                ''
+                            ),
+                            'de'
+                        );
+                    }
+                );
+
+        }, [
+            allStudents,
+            bookedStudentIds,
+            addStudentSearch,
+            addStudentJahrgang
+        ]);
+
+    /* =====================================================
+       CHECKBOX
+       ===================================================== */
+
+    const handleStudentSelection =
+        (
+            studentId
+        ) => {
+
+            setSelectedStudentIds(
+                (
+                    previous
+                ) => {
+
+                    if (
+                        previous.includes(
+                            studentId
+                        )
+                    ) {
+
+                        return previous
+                            .filter(
+                                (id) =>
+                                    id !==
+                                    studentId
+                            );
+                    }
+
+                    return [
+                        ...previous,
+                        studentId
+                    ];
+                }
+            );
+        };
+
+    /* =====================================================
+       ALLE SICHTBAREN AUSWÄHLEN
+       ===================================================== */
+
+    const handleSelectAllVisible =
+        () => {
+
+            const visibleIds =
+                availableStudents.map(
+                    (student) =>
+                        student.id
+                );
+
+            const allSelected =
+                visibleIds.length > 0 &&
+                visibleIds.every(
+                    (studentId) =>
+                        selectedStudentIds
+                            .includes(
+                                studentId
+                            )
+                );
+
+            if (allSelected) {
+
+                setSelectedStudentIds(
+                    (
+                        previous
+                    ) =>
+                        previous.filter(
+                            (studentId) =>
+                                !visibleIds
+                                    .includes(
+                                        studentId
+                                    )
+                        )
+                );
+
+            } else {
+
+                setSelectedStudentIds(
+                    (
+                        previous
+                    ) => [
+                        ...new Set([
+                            ...previous,
+                            ...visibleIds
+                        ])
+                    ]
+                );
+            }
+        };
+
+    /* =====================================================
+       AUSGEWÄHLTE SCHÜLER HINZUFÜGEN
+       ===================================================== */
+
+    const handleAddSelectedStudents =
+        async () => {
+
+            if (
+                selectedStudentIds
+                    .length === 0
+            ) {
+                return;
+            }
+
+            try {
+
+                setAddStudentsLoading(
+                    true
+                );
+
+                setAddStudentsMessage(
+                    ''
+                );
+
+                setError('');
+
+                const result =
+                    await addStudentsToKurs(
+                        id,
+                        selectedStudentIds
+                    );
+
+                const hinzugefuegt =
+                    result
+                        ?.hinzugefuegt ??
+                    0;
+
+                setAddStudentsMessage(
+                    `${hinzugefuegt} Schüler wurden dem Kurs hinzugefügt.`
+                );
+
+                setSelectedStudentIds(
+                    []
+                );
+
+                await loadData();
+
+            } catch (error) {
+
+                console.error(
+                    'Schüler konnten nicht hinzugefügt werden:',
+                    error
+                );
+
+                setError(
+                    'Die ausgewählten Schüler konnten nicht hinzugefügt werden.'
+                );
+
+            } finally {
+
+                setAddStudentsLoading(
+                    false
+                );
+            }
+        };
+
+    /* =====================================================
+       FILTER KURSTEILNEHMER
+       ===================================================== */
+
+    const filteredStudents =
+        useMemo(() => {
+
+            const term =
+                filter
+                    .trim()
+                    .toLowerCase();
+
+            if (!term) {
+                return students;
+            }
+
+            return students.filter(
+                (student) =>
+                    [
+                        student.nachname,
+                        student.vorname,
+                        student.jahrgang,
+                        student.klasse,
+                        student.fotoFreigabe,
+                        student.email1,
+                        student.telefon1,
+                        student.mobil1,
+                        student.email2,
+                        student.telefon2,
+                        student.mobil2
+                    ].some(
+                        (value) =>
+                            String(
+                                value ??
+                                ''
+                            )
+                                .toLowerCase()
+                                .includes(
+                                    term
+                                )
+                    )
+            );
+
+        }, [
+            students,
+            filter
+        ]);
 
     /* =====================================================
        SORTIERUNG
        ===================================================== */
 
-    const sortedStudents = useMemo(() => {
-        return [...filteredStudents].sort(
-            (a, b) => {
-                const valA =
-                    a[sortKey];
+    const sortedStudents =
+        useMemo(() => {
 
-                const valB =
-                    b[sortKey];
+            return [
+                ...filteredStudents
+            ].sort(
+                (a, b) => {
 
-                if (
-                    [
-                        'jahrgang',
-                        'anzahlAnwesend',
-                        'anzahlEntschuldigt',
-                        'anzahlFehlend'
-                    ].includes(sortKey)
-                ) {
-                    const numberA =
-                        Number(valA) || 0;
+                    const valA =
+                        a[sortKey];
 
-                    const numberB =
-                        Number(valB) || 0;
+                    const valB =
+                        b[sortKey];
 
-                    return sortDirection === 'asc'
-                        ? numberA - numberB
-                        : numberB - numberA;
+                    if (
+                        [
+                            'jahrgang',
+                            'anzahlAnwesend',
+                            'anzahlEntschuldigt',
+                            'anzahlFehlend'
+                        ].includes(
+                            sortKey
+                        )
+                    ) {
+
+                        const numberA =
+                            Number(
+                                valA
+                            ) || 0;
+
+                        const numberB =
+                            Number(
+                                valB
+                            ) || 0;
+
+                        return sortDirection ===
+                        'asc'
+                            ? numberA -
+                            numberB
+                            : numberB -
+                            numberA;
+                    }
+
+                    const stringA =
+                        String(
+                            valA ??
+                            ''
+                        )
+                            .toLowerCase();
+
+                    const stringB =
+                        String(
+                            valB ??
+                            ''
+                        )
+                            .toLowerCase();
+
+                    return sortDirection ===
+                    'asc'
+                        ? stringA
+                            .localeCompare(
+                                stringB,
+                                'de'
+                            )
+                        : stringB
+                            .localeCompare(
+                                stringA,
+                                'de'
+                            );
                 }
-
-                const stringA =
-                    String(valA ?? '')
-                        .toLowerCase();
-
-                const stringB =
-                    String(valB ?? '')
-                        .toLowerCase();
-
-                return sortDirection === 'asc'
-                    ? stringA.localeCompare(
-                        stringB,
-                        'de'
-                    )
-                    : stringB.localeCompare(
-                        stringA,
-                        'de'
-                    );
-            }
-        );
-    }, [
-        filteredStudents,
-        sortKey,
-        sortDirection
-    ]);
-
-    const handleSort = (key) => {
-        if (sortKey === key) {
-            setSortDirection(
-                (previous) =>
-                    previous === 'asc'
-                        ? 'desc'
-                        : 'asc'
             );
 
-            return;
-        }
+        }, [
+            filteredStudents,
+            sortKey,
+            sortDirection
+        ]);
 
-        setSortKey(key);
-        setSortDirection('asc');
-    };
+    const handleSort =
+        (key) => {
 
-    const sortIndicator = (key) => {
-        if (sortKey !== key) {
-            return '';
-        }
+            if (
+                sortKey === key
+            ) {
 
-        return sortDirection === 'asc'
-            ? ' ▲'
-            : ' ▼';
-    };
+                setSortDirection(
+                    (
+                        previous
+                    ) =>
+                        previous ===
+                        'asc'
+                            ? 'desc'
+                            : 'asc'
+                );
+
+                return;
+            }
+
+            setSortKey(
+                key
+            );
+
+            setSortDirection(
+                'asc'
+            );
+        };
+
+    const sortIndicator =
+        (key) => {
+
+            if (
+                sortKey !== key
+            ) {
+                return '';
+            }
+
+            return sortDirection ===
+            'asc'
+                ? ' ▲'
+                : ' ▼';
+        };
 
     /* =====================================================
-       15:30 ANZEIGE
+       15:30
        ===================================================== */
 
     const zeigt1530 =
-        ['OGS', 'OGSH', 'OGSF'].includes(
+        [
+            'OGS',
+            'OGSH',
+            'OGSF'
+        ].includes(
             String(
                 kurs?.buchungsart ||
                 ''
@@ -382,10 +854,11 @@ function KursDetailsPage() {
         );
 
     /* =====================================================
-       LOADING / ERROR
+       LOADING
        ===================================================== */
 
     if (loading) {
+
         return (
             <div className="kurs-details-message">
                 Kurs wird geladen...
@@ -393,10 +866,23 @@ function KursDetailsPage() {
         );
     }
 
-    if (error || !kurs) {
+    if (
+        error &&
+        !kurs
+    ) {
+
         return (
             <div className="kurs-details-message kurs-details-error">
-                {error || 'Kurs nicht gefunden.'}
+                {error}
+            </div>
+        );
+    }
+
+    if (!kurs) {
+
+        return (
+            <div className="kurs-details-message kurs-details-error">
+                Kurs nicht gefunden.
             </div>
         );
     }
@@ -406,13 +892,16 @@ function KursDetailsPage() {
        ===================================================== */
 
     return (
+
         <div className="kurs-details-page">
 
             <button
                 type="button"
                 className="back-button"
                 onClick={() =>
-                    navigate('/kurse')
+                    navigate(
+                        '/kurse'
+                    )
                 }
             >
                 Zurück zu den Kursen
@@ -421,12 +910,15 @@ function KursDetailsPage() {
             <header className="page-header">
 
                 <div className="page-header-content">
+
                     <h1>
                         {kurs.name}
                     </h1>
 
                     <p>
-                        {kurs.wochentag || '–'}
+
+                        {kurs.wochentag ||
+                            '–'}
 
                         {kurs.uhrzeit
                             ? ` · ${kurs.uhrzeit}`
@@ -435,7 +927,9 @@ function KursDetailsPage() {
                         {kurs.kursleitung
                             ? ` · ${kurs.kursleitung}`
                             : ''}
+
                     </p>
+
                 </div>
 
                 <span className="kurs-details-count">
@@ -443,6 +937,14 @@ function KursDetailsPage() {
                 </span>
 
             </header>
+
+            {error && (
+
+                <div className="kurs-details-error-box">
+                    {error}
+                </div>
+
+            )}
 
             {/* =================================================
                 KURSINFO
@@ -456,7 +958,8 @@ function KursDetailsPage() {
                     </span>
 
                     <strong>
-                        {kurs.buchungsart || '–'}
+                        {kurs.buchungsart ||
+                            '–'}
                     </strong>
                 </div>
 
@@ -466,7 +969,8 @@ function KursDetailsPage() {
                     </span>
 
                     <strong>
-                        {kurs.wochentag || '–'}
+                        {kurs.wochentag ||
+                            '–'}
                     </strong>
                 </div>
 
@@ -476,7 +980,8 @@ function KursDetailsPage() {
                     </span>
 
                     <strong>
-                        {kurs.uhrzeit || '–'}
+                        {kurs.uhrzeit ||
+                            '–'}
                     </strong>
                 </div>
 
@@ -486,14 +991,15 @@ function KursDetailsPage() {
                     </span>
 
                     <strong>
-                        {kurs.kursleitung || '–'}
+                        {kurs.kursleitung ||
+                            '–'}
                     </strong>
                 </div>
 
             </section>
 
             {/* =================================================
-                JAHRGANG ZUORDNEN
+                JAHRGANG
                ================================================= */}
 
             <section className="kurs-jahrgang-section">
@@ -501,14 +1007,15 @@ function KursDetailsPage() {
                 <div className="kurs-jahrgang-header">
 
                     <div>
+
                         <h2>
                             Jahrgang zuordnen
                         </h2>
 
                         <p>
-                            Alle Schüler eines Jahrgangs
-                            gleichzeitig diesem Kurs zuordnen.
+                            Alle Schüler eines Jahrgangs gleichzeitig diesem Kurs zuordnen.
                         </p>
+
                     </div>
 
                 </div>
@@ -523,27 +1030,47 @@ function KursDetailsPage() {
 
                         <select
                             id="jahrgang-select"
-                            value={selectedJahrgang}
-                            onChange={(event) => {
+                            value={
+                                selectedJahrgang
+                            }
+                            onChange={(
+                                event
+                            ) => {
+
                                 setSelectedJahrgang(
-                                    event.target.value
+                                    event
+                                        .target
+                                        .value
                                 );
 
-                                setJahrgangMessage('');
+                                setJahrgangMessage(
+                                    ''
+                                );
                             }}
                         >
+
                             <option value="">
                                 Jahrgang auswählen...
                             </option>
 
                             {jahrgaenge.map(
-                                (jahrgang) => (
+                                (
+                                    jahrgang
+                                ) => (
+
                                     <option
-                                        key={jahrgang}
-                                        value={jahrgang}
+                                        key={
+                                            jahrgang
+                                        }
+                                        value={
+                                            jahrgang
+                                        }
                                     >
-                                        {jahrgang}
+                                        {
+                                            jahrgang
+                                        }
                                     </option>
+
                                 )
                             )}
 
@@ -554,29 +1081,326 @@ function KursDetailsPage() {
                     <button
                         type="button"
                         className="kurs-jahrgang-button"
-                        onClick={handleAddJahrgang}
+                        onClick={
+                            handleAddJahrgang
+                        }
                         disabled={
                             !selectedJahrgang ||
                             jahrgangLoading
                         }
                     >
+
                         {jahrgangLoading
                             ? 'Wird hinzugefügt...'
                             : 'Jahrgang hinzufügen'}
+
                     </button>
 
                 </div>
 
                 {jahrgangMessage && (
+
                     <div className="kurs-jahrgang-message">
                         {jahrgangMessage}
                     </div>
+
                 )}
 
             </section>
 
             {/* =================================================
-                SCHÜLER
+                SCHÜLER HINZUFÜGEN
+               ================================================= */}
+
+            <section className="kurs-add-students-section">
+
+                <button
+                    type="button"
+                    className="kurs-add-students-toggle"
+                    onClick={() => {
+
+                        setAddStudentsOpen(
+                            (
+                                previous
+                            ) =>
+                                !previous
+                        );
+
+                        setAddStudentsMessage(
+                            ''
+                        );
+                    }}
+                >
+
+                    <span>
+                        Schüler/-innen hinzufügen
+                    </span>
+
+                    <span>
+                        {addStudentsOpen
+                            ? '−'
+                            : '+'}
+                    </span>
+
+                </button>
+
+                {addStudentsOpen && (
+
+                    <div className="kurs-add-students-content">
+
+                        <div className="kurs-add-students-filter">
+
+                            <div className="kurs-add-students-field">
+
+                                <label>
+                                    Suche
+                                </label>
+
+                                <input
+                                    type="text"
+                                    placeholder="Nachname oder Vorname..."
+                                    value={
+                                        addStudentSearch
+                                    }
+                                    onChange={(
+                                        event
+                                    ) =>
+                                        setAddStudentSearch(
+                                            event
+                                                .target
+                                                .value
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="kurs-add-students-field">
+
+                                <label>
+                                    Jahrgang
+                                </label>
+
+                                <select
+                                    value={
+                                        addStudentJahrgang
+                                    }
+                                    onChange={(
+                                        event
+                                    ) =>
+                                        setAddStudentJahrgang(
+                                            event
+                                                .target
+                                                .value
+                                        )
+                                    }
+                                >
+
+                                    <option value="">
+                                        Alle Jahrgänge
+                                    </option>
+
+                                    {jahrgaenge.map(
+                                        (
+                                            jahrgang
+                                        ) => (
+
+                                            <option
+                                                key={
+                                                    jahrgang
+                                                }
+                                                value={
+                                                    jahrgang
+                                                }
+                                            >
+                                                {
+                                                    jahrgang
+                                                }
+                                            </option>
+
+                                        )
+                                    )}
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div className="kurs-add-students-list-header">
+
+                            <label>
+
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        availableStudents
+                                            .length >
+                                        0 &&
+                                        availableStudents
+                                            .every(
+                                                (
+                                                    student
+                                                ) =>
+                                                    selectedStudentIds
+                                                        .includes(
+                                                            student.id
+                                                        )
+                                            )
+                                    }
+                                    onChange={
+                                        handleSelectAllVisible
+                                    }
+                                />
+
+                                Alle sichtbaren auswählen
+
+                            </label>
+
+                            <span>
+                                {
+                                    availableStudents
+                                        .length
+                                } verfügbar
+                            </span>
+
+                        </div>
+
+                        <div className="kurs-add-students-list">
+
+                            {availableStudents
+                                .length ===
+                            0 ? (
+
+                                <div className="kurs-add-students-empty">
+
+                                    Keine passenden Schüler verfügbar.
+
+                                </div>
+
+                            ) : (
+
+                                availableStudents
+                                    .map(
+                                        (
+                                            student
+                                        ) => (
+
+                                            <label
+                                                key={
+                                                    student.id
+                                                }
+                                                className="kurs-add-student-row"
+                                            >
+
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        selectedStudentIds
+                                                            .includes(
+                                                                student.id
+                                                            )
+                                                    }
+                                                    onChange={() =>
+                                                        handleStudentSelection(
+                                                            student.id
+                                                        )
+                                                    }
+                                                />
+
+                                                <div className="kurs-add-student-name">
+
+                                                    <strong>
+                                                        {
+                                                            student.nachname ||
+                                                            '–'
+                                                        },{' '}
+                                                        {
+                                                            student.vorname ||
+                                                            '–'
+                                                        }
+                                                    </strong>
+
+                                                    <span>
+
+                                                        Jahrgang{' '}
+                                                        {
+                                                            student.jahrgang ??
+                                                            '–'
+                                                        }
+
+                                                        {' · '}
+
+                                                        Klasse{' '}
+                                                        {
+                                                            student.klasse ||
+                                                            '–'
+                                                        }
+
+                                                    </span>
+
+                                                </div>
+
+                                            </label>
+
+                                        )
+                                    )
+
+                            )}
+
+                        </div>
+
+                        <div className="kurs-add-students-actions">
+
+                            <span>
+
+                                {
+                                    selectedStudentIds
+                                        .length
+                                } ausgewählt
+
+                            </span>
+
+                            <button
+                                type="button"
+                                className="kurs-add-students-button"
+                                disabled={
+                                    selectedStudentIds
+                                        .length ===
+                                    0 ||
+                                    addStudentsLoading
+                                }
+                                onClick={
+                                    handleAddSelectedStudents
+                                }
+                            >
+
+                                {addStudentsLoading
+                                    ? 'Wird hinzugefügt...'
+                                    : 'Ausgewählte Schüler hinzufügen'}
+
+                            </button>
+
+                        </div>
+
+                        {addStudentsMessage && (
+
+                            <div className="kurs-add-students-message">
+                                {
+                                    addStudentsMessage
+                                }
+                            </div>
+
+                        )}
+
+                    </div>
+
+                )}
+
+            </section>
+
+            {/* =================================================
+                KURSTEILNEHMER
                ================================================= */}
 
             <section className="kurs-details-content">
@@ -586,16 +1410,25 @@ function KursDetailsPage() {
                     <input
                         type="text"
                         placeholder="Schüler suchen..."
-                        value={filter}
-                        onChange={(event) =>
+                        value={
+                            filter
+                        }
+                        onChange={(
+                            event
+                        ) =>
                             setFilter(
-                                event.target.value
+                                event
+                                    .target
+                                    .value
                             )
                         }
                     />
 
                     <span>
-                        {sortedStudents.length} Schüler
+                        {
+                            sortedStudents
+                                .length
+                        } Schüler
                     </span>
 
                 </div>
@@ -605,6 +1438,7 @@ function KursDetailsPage() {
                     <table className="kurs-details-table">
 
                         <thead>
+
                         <tr>
 
                             <th
@@ -717,38 +1551,24 @@ function KursDetailsPage() {
                                 )}
                             </th>
 
-                            <th>
-                                Email 1
-                            </th>
-
-                            <th>
-                                Telefon 1
-                            </th>
-
-                            <th>
-                                Mobil 1
-                            </th>
-
-                            <th>
-                                Email 2
-                            </th>
-
-                            <th>
-                                Telefon 2
-                            </th>
-
-                            <th>
-                                Mobil 2
-                            </th>
+                            <th>Email 1</th>
+                            <th>Telefon 1</th>
+                            <th>Mobil 1</th>
+                            <th>Email 2</th>
+                            <th>Telefon 2</th>
+                            <th>Mobil 2</th>
 
                         </tr>
+
                         </thead>
 
                         <tbody>
 
-                        {sortedStudents.length === 0 ? (
+                        {sortedStudents.length ===
+                        0 ? (
 
                             <tr>
+
                                 <td
                                     colSpan={
                                         zeigt1530
@@ -757,17 +1577,24 @@ function KursDetailsPage() {
                                     }
                                     className="kurs-details-empty"
                                 >
+
                                     Keine Schüler gefunden.
+
                                 </td>
+
                             </tr>
 
                         ) : (
 
                             sortedStudents.map(
-                                (student) => (
+                                (
+                                    student
+                                ) => (
 
                                     <tr
-                                        key={student.id}
+                                        key={
+                                            student.id
+                                        }
                                         onClick={() =>
                                             navigate(
                                                 `/students/${student.id}`
@@ -776,83 +1603,117 @@ function KursDetailsPage() {
                                     >
 
                                         <td>
-                                            {student.nachname ||
-                                                '–'}
+                                            {
+                                                student.nachname ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.vorname ||
-                                                '–'}
+                                            {
+                                                student.vorname ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.jahrgang ??
-                                                '–'}
+                                            {
+                                                student.jahrgang ??
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.klasse ||
-                                                '–'}
+                                            {
+                                                student.klasse ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.fotoFreigabe ||
-                                                '–'}
+                                            {
+                                                student.fotoFreigabe ||
+                                                '–'
+                                            }
                                         </td>
 
                                         {zeigt1530 && (
+
                                             <td className="kurs-1530-cell">
+
                                                 {student.gehtUm1530
                                                     ? '15:30'
                                                     : ''}
+
                                             </td>
+
                                         )}
 
                                         <td>
-                                            {student.anzahlAnwesend}
+                                            {
+                                                student.anzahlAnwesend
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.anzahlEntschuldigt}
+                                            {
+                                                student.anzahlEntschuldigt
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.anzahlFehlend}
+                                            {
+                                                student.anzahlFehlend
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.email1 ||
-                                                '–'}
+                                            {
+                                                student.email1 ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.telefon1 ||
-                                                '–'}
+                                            {
+                                                student.telefon1 ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.mobil1 ||
-                                                '–'}
+                                            {
+                                                student.mobil1 ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.email2 ||
-                                                '–'}
+                                            {
+                                                student.email2 ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.telefon2 ||
-                                                '–'}
+                                            {
+                                                student.telefon2 ||
+                                                '–'
+                                            }
                                         </td>
 
                                         <td>
-                                            {student.mobil2 ||
-                                                '–'}
+                                            {
+                                                student.mobil2 ||
+                                                '–'
+                                            }
                                         </td>
 
                                     </tr>
+
                                 )
                             )
+
                         )}
 
                         </tbody>

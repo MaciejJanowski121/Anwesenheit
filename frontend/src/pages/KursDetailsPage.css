@@ -39,16 +39,44 @@
 
     padding: 7px 12px;
 
-    border: 1px solid rgba(232, 121, 43, 0.25);
+    border:
+            1px solid
+            rgba(232, 121, 43, 0.25);
+
     border-radius: 999px;
 
-    background: rgba(232, 121, 43, 0.1);
+    background:
+            rgba(232, 121, 43, 0.1);
+
     color: #f29a5b;
 
     font-size: 13px;
     font-weight: 600;
 
     white-space: nowrap;
+}
+
+/* =====================================================
+   ERROR
+   ===================================================== */
+
+.kurs-details-error-box {
+    margin-bottom: 18px;
+
+    padding: 11px 14px;
+
+    border:
+            1px solid
+            rgba(217, 74, 74, 0.35);
+
+    border-radius: 8px;
+
+    background:
+            rgba(217, 74, 74, 0.1);
+
+    color: #ff9999;
+
+    font-size: 13px;
 }
 
 /* =====================================================
@@ -59,7 +87,10 @@
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+            repeat(
+                    4,
+                    minmax(0, 1fr)
+            );
 
     gap: 14px;
 
@@ -118,7 +149,8 @@
 
     padding: 18px 22px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom:
+            1px solid #414141;
 
     background: #292929;
 
@@ -182,6 +214,7 @@
     box-sizing: border-box;
 
     width: 100%;
+
     min-height: 40px;
 
     padding: 10px 12px;
@@ -195,10 +228,6 @@
     color: #ffffff;
 
     font-size: 0.88rem;
-
-    transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
 }
 
 .kurs-jahrgang-field select:focus {
@@ -211,6 +240,7 @@
 
 .kurs-jahrgang-field select option {
     background: #262626;
+
     color: #ffffff;
 }
 
@@ -231,10 +261,6 @@
     cursor: pointer;
 
     white-space: nowrap;
-
-    transition:
-            background-color 0.15s ease,
-            opacity 0.15s ease;
 }
 
 .kurs-jahrgang-button:hover:not(:disabled) {
@@ -252,10 +278,361 @@
 
     padding: 10px 12px;
 
-    border: 1px solid rgba(90, 158, 62, 0.3);
+    border:
+            1px solid
+            rgba(90, 158, 62, 0.3);
+
     border-radius: 8px;
 
-    background: rgba(90, 158, 62, 0.1);
+    background:
+            rgba(90, 158, 62, 0.1);
+
+    color: #99d47e;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* =====================================================
+   SCHÜLER HINZUFÜGEN
+   ===================================================== */
+
+.kurs-add-students-section {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    border: 1px solid #414141;
+    border-radius: 12px;
+
+    background: #252525;
+}
+
+.kurs-add-students-toggle {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 17px 22px;
+
+    border: none;
+
+    background: #292929;
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.kurs-add-students-toggle:hover {
+    background: #303030;
+}
+
+.kurs-add-students-toggle span:last-child {
+    color: #e8792b;
+
+    font-size: 22px;
+    line-height: 1;
+}
+
+/* =====================================================
+   ADD STUDENTS CONTENT
+   ===================================================== */
+
+.kurs-add-students-content {
+    border-top:
+            1px solid #414141;
+}
+
+/* =====================================================
+   FILTER
+   ===================================================== */
+
+.kurs-add-students-filter {
+    display: grid;
+
+    grid-template-columns:
+            minmax(250px, 1fr)
+            minmax(180px, 280px);
+
+    gap: 14px;
+
+    padding: 18px 22px;
+
+    border-bottom:
+            1px solid #414141;
+}
+
+.kurs-add-students-field {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.kurs-add-students-field label {
+    color: #c7c7c7;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kurs-add-students-field input,
+.kurs-add-students-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+
+    min-height: 40px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #505050;
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #202020;
+    color: #ffffff;
+
+    font-size: 0.88rem;
+}
+
+.kurs-add-students-field input:focus,
+.kurs-add-students-field select:focus {
+    border-color: #e8792b;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.kurs-add-students-field select option {
+    background: #262626;
+
+    color: #ffffff;
+}
+
+/* =====================================================
+   LIST HEADER
+   ===================================================== */
+
+.kurs-add-students-list-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 12px 22px;
+
+    border-bottom:
+            1px solid #414141;
+
+    background: #2b2b2b;
+}
+
+.kurs-add-students-list-header label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: #dddddd;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.kurs-add-students-list-header span {
+    color: #999999;
+
+    font-size: 12px;
+}
+
+/* =====================================================
+   CHECKBOX
+   ===================================================== */
+
+.kurs-add-students-section input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+
+    accent-color: #e8792b;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   STUDENT LIST
+   ===================================================== */
+
+.kurs-add-students-list {
+    max-height: 380px;
+
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+            #666666
+            #252525;
+}
+
+.kurs-add-student-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 11px 22px;
+
+    border-bottom:
+            1px solid #3e3e3e;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease;
+}
+
+.kurs-add-student-row:hover {
+    background:
+            rgba(232, 121, 43, 0.06);
+}
+
+.kurs-add-student-row:last-child {
+    border-bottom: none;
+}
+
+.kurs-add-student-name {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.kurs-add-student-name strong {
+    color: #eeeeee;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kurs-add-student-name span {
+    color: #999999;
+
+    font-size: 12px;
+}
+
+/* =====================================================
+   EMPTY
+   ===================================================== */
+
+.kurs-add-students-empty {
+    padding: 28px 22px;
+
+    color: #999999;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+/* =====================================================
+   ADD ACTIONS
+   ===================================================== */
+
+.kurs-add-students-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 16px 22px;
+
+    border-top:
+            1px solid #414141;
+
+    background: #292929;
+}
+
+.kurs-add-students-actions > span {
+    color: #999999;
+
+    font-size: 13px;
+}
+
+.kurs-add-students-button {
+    min-height: 40px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #e8792b;
+    color: #ffffff;
+
+    font-size: 0.86rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.kurs-add-students-button:hover:not(:disabled) {
+    background: #d06820;
+}
+
+.kurs-add-students-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.5;
+}
+
+.kurs-add-students-message {
+    margin: 0 22px 18px;
+
+    padding: 10px 12px;
+
+    border:
+            1px solid
+            rgba(90, 158, 62, 0.3);
+
+    border-radius: 8px;
+
+    background:
+            rgba(90, 158, 62, 0.1);
+
     color: #99d47e;
 
     font-size: 13px;
@@ -292,7 +669,8 @@
 
     padding: 16px 18px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom:
+            1px solid #414141;
 
     background: #292929;
 }
@@ -311,10 +689,6 @@
 
     background: #202020;
     color: #ffffff;
-
-    transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
 }
 
 .kurs-details-toolbar input:focus {
@@ -347,6 +721,7 @@
     padding-bottom: 8px;
 
     scrollbar-width: thin;
+
     scrollbar-color:
             #666666
             #252525;
@@ -388,7 +763,8 @@
 .kurs-details-table td {
     padding: 11px 13px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom:
+            1px solid #414141;
 
     text-align: left;
 
@@ -397,6 +773,7 @@
 
 .kurs-details-table th {
     background: #303030;
+
     color: #bdbdbd;
 
     font-size: 12px;
@@ -464,13 +841,17 @@
 }
 
 /* =====================================================
-   RESPONSIVE - TABLET
+   RESPONSIVE TABLET
    ===================================================== */
 
 @media (max-width: 900px) {
+
     .kurs-details-info {
         grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+                repeat(
+                        2,
+                        minmax(0, 1fr)
+                );
     }
 
     .kurs-jahrgang-content {
@@ -486,15 +867,22 @@
     .kurs-jahrgang-button {
         width: 100%;
     }
+
+    .kurs-add-students-filter {
+        grid-template-columns:
+                1fr;
+    }
 }
 
 /* =====================================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE MOBILE
    ===================================================== */
 
 @media (max-width: 600px) {
+
     .kurs-details-info {
-        grid-template-columns: 1fr;
+        grid-template-columns:
+                1fr;
     }
 
     .kurs-details-page .page-header {
@@ -518,6 +906,44 @@
     }
 
     .kurs-jahrgang-message {
+        margin:
+                0 18px
+                16px;
+    }
+
+    .kurs-add-students-toggle {
+        padding: 16px 18px;
+    }
+
+    .kurs-add-students-filter {
+        padding: 16px 18px;
+    }
+
+    .kurs-add-students-list-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        padding: 12px 18px;
+    }
+
+    .kurs-add-student-row {
+        padding: 11px 18px;
+    }
+
+    .kurs-add-students-actions {
+        align-items: stretch;
+
+        flex-direction: column;
+
+        padding: 16px 18px;
+    }
+
+    .kurs-add-students-button {
+        width: 100%;
+    }
+
+    .kurs-add-students-message {
         margin:
                 0 18px
                 16px;

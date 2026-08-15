@@ -21,11 +21,18 @@ public class BuchungController {
                 buchungService;
     }
 
-    @PostMapping("/student/{studentId}/kurs/{kursId}")
+    /* =====================================================
+       EINZELNE BUCHUNG
+       ===================================================== */
+
+    @PostMapping(
+            "/student/{studentId}/kurs/{kursId}"
+    )
     public Buchung createBuchung(
             @PathVariable Long studentId,
             @PathVariable Long kursId
     ) {
+
         return buchungService
                 .createBuchung(
                         studentId,
@@ -33,35 +40,69 @@ public class BuchungController {
                 );
     }
 
-    @GetMapping("/student/{studentId}")
+    /* =====================================================
+       MEHRERE SCHÜLER HINZUFÜGEN
+       ===================================================== */
+
+    @PostMapping(
+            "/kurs/{kursId}/students"
+    )
+    public Map<String, Integer> addStudentsToKurs(
+            @PathVariable Long kursId,
+            @RequestBody List<Long> studentIds
+    ) {
+
+        int hinzugefuegt =
+                buchungService
+                        .addStudentsToKurs(
+                                kursId,
+                                studentIds
+                        );
+
+        return Map.of(
+                "hinzugefuegt",
+                hinzugefuegt
+        );
+    }
+
+    /* =====================================================
+       BUCHUNGEN NACH SCHÜLER
+       ===================================================== */
+
+    @GetMapping(
+            "/student/{studentId}"
+    )
     public List<Buchung> getBuchungenByStudentId(
             @PathVariable Long studentId
     ) {
+
         return buchungService
                 .getBuchungenByStudentId(
                         studentId
                 );
     }
 
-    @GetMapping("/kurs/{kursId}")
+    /* =====================================================
+       BUCHUNGEN NACH KURS
+       ===================================================== */
+
+    @GetMapping(
+            "/kurs/{kursId}"
+    )
     public List<Buchung> getBuchungenByKursId(
             @PathVariable Long kursId
     ) {
+
         return buchungService
                 .getBuchungenByKursId(
                         kursId
                 );
     }
 
-    /*
-     * Fügt alle Schüler eines Jahrgangs
-     * einem Kurs hinzu.
-     *
-     * Beispiel:
-     *
-     * POST
-     * /api/buchungen/kurs/12/jahrgang/7
-     */
+    /* =====================================================
+       JAHRGANG HINZUFÜGEN
+       ===================================================== */
+
     @PostMapping(
             "/kurs/{kursId}/jahrgang/{jahrgang}"
     )
@@ -83,11 +124,18 @@ public class BuchungController {
         );
     }
 
+    /* =====================================================
+       BUCHUNG LÖSCHEN
+       ===================================================== */
+
     @DeleteMapping("/{id}")
     public void deleteBuchung(
             @PathVariable Long id
     ) {
+
         buchungService
-                .deleteBuchung(id);
+                .deleteBuchung(
+                        id
+                );
     }
 }
