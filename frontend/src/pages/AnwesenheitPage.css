@@ -1,23 +1,27 @@
 .anwesenheit-page {
     width: 100%;
     min-width: 0;
+
     margin: 0 auto;
 }
 
-
 /* =====================================================
-   PAGE HEADER - CENTER
+   PAGE HEADER
    ===================================================== */
 
 .anwesenheit-page .page-header {
     justify-content: center;
+
     text-align: center;
 }
 
 .anwesenheit-page .page-header-content {
     display: flex;
+
     flex-direction: column;
     align-items: center;
+
+    text-align: center;
 }
 
 .anwesenheit-page .page-header-content h1,
@@ -31,9 +35,11 @@
 
 .anwesenheit-tabs {
     display: flex;
+
     gap: 8px;
 
     margin-bottom: 22px;
+
     padding-bottom: 1px;
 
     overflow-x: auto;
@@ -54,6 +60,7 @@
     font-weight: 600;
 
     cursor: pointer;
+
     white-space: nowrap;
 
     transition:
@@ -64,6 +71,7 @@
 
 .tab-button:hover {
     background: #333333;
+
     color: #ffffff;
 }
 
@@ -71,7 +79,95 @@
     border-color: #e8792b;
 
     background: #e8792b;
+
     color: #ffffff;
+}
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+.anwesenheit-message {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin-bottom: 18px;
+
+    padding: 13px 16px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-align: center;
+}
+
+/* Erfolg */
+
+.anwesenheit-message.success {
+    border:
+            1px solid
+            rgba(90, 158, 62, 0.4);
+
+    background:
+            rgba(90, 158, 62, 0.12);
+
+    color: #99d47e;
+}
+
+/* Fehler */
+
+.anwesenheit-message.error {
+    border:
+            1px solid
+            rgba(217, 74, 74, 0.4);
+
+    background:
+            rgba(217, 74, 74, 0.12);
+
+    color: #ff9b9b;
+}
+
+.anwesenheit-message-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.anwesenheit-message.success
+.anwesenheit-message-icon {
+    background:
+            rgba(90, 158, 62, 0.25);
+
+    color: #a6e68a;
+}
+
+.anwesenheit-message.error
+.anwesenheit-message-icon {
+    background:
+            rgba(217, 74, 74, 0.25);
+
+    color: #ffaaaa;
 }
 
 /* =====================================================
@@ -98,6 +194,7 @@
     position: relative;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -107,7 +204,8 @@
 
     padding: 20px 130px;
 
-    border-bottom: 1px solid #404040;
+    border-bottom:
+            1px solid #404040;
 
     text-align: center;
 }
@@ -153,17 +251,24 @@
     top: 50%;
     right: 22px;
 
-    transform: translateY(-50%);
-
     display: inline-flex;
+
     align-items: center;
+
+    transform:
+            translateY(-50%);
 
     padding: 7px 12px;
 
-    border: 1px solid rgba(232, 121, 43, 0.25);
+    border:
+            1px solid
+            rgba(232, 121, 43, 0.25);
+
     border-radius: 999px;
 
-    background: rgba(232, 121, 43, 0.1);
+    background:
+            rgba(232, 121, 43, 0.1);
+
     color: #f29a5b;
 
     font-size: 13px;
@@ -185,7 +290,8 @@
 
     padding: 20px 22px;
 
-    border-bottom: 1px solid #404040;
+    border-bottom:
+            1px solid #404040;
 
     flex-wrap: wrap;
 }
@@ -218,6 +324,7 @@
     box-sizing: border-box;
 
     width: 100%;
+
     min-height: 40px;
 
     padding: 10px 12px;
@@ -253,6 +360,7 @@
 .anwesenheit-toolbar select option,
 .anwesenheit-toolbar select optgroup {
     background: #262626;
+
     color: #ffffff;
 }
 
@@ -301,7 +409,8 @@
 .anwesenheit-load-button:hover:not(:disabled) {
     background: #cf6820;
 
-    transform: translateY(-1px);
+    transform:
+            translateY(-1px);
 }
 
 .anwesenheit-load-button:disabled {
@@ -344,7 +453,8 @@
 
     background: #5a9e43;
 
-    transform: translateY(-1px);
+    transform:
+            translateY(-1px);
 }
 
 .anwesenheit-export-button:disabled {
@@ -361,6 +471,7 @@
     display: inline-flex;
 
     margin: 18px 22px 20px;
+
     padding: 4px;
 
     border: 1px solid #444444;
@@ -392,11 +503,13 @@
 
 .anwesenheit-view-switch button:hover:not(.active) {
     background: #303030;
+
     color: #ffffff;
 }
 
 .anwesenheit-view-switch button.active {
     background: #e8792b;
+
     color: #ffffff;
 }
 
@@ -414,7 +527,10 @@
     padding-bottom: 8px;
 
     scrollbar-width: thin;
-    scrollbar-color: #666666 #252525;
+
+    scrollbar-color:
+            #666666
+            #252525;
 
     -webkit-overflow-scrolling: touch;
 }
@@ -443,6 +559,7 @@
 
 .anwesenheit-table {
     width: 100%;
+
     min-width: 950px;
 
     border-collapse: collapse;
@@ -457,7 +574,8 @@
 .anwesenheit-table th {
     padding: 12px 14px;
 
-    border-bottom: 2px solid #4b4b4b;
+    border-bottom:
+            2px solid #4b4b4b;
 
     background: #303030;
     color: #e5e5e5;
@@ -473,7 +591,8 @@
 .anwesenheit-table td {
     padding: 11px 14px;
 
-    border-bottom: 1px solid #3e3e3e;
+    border-bottom:
+            1px solid #3e3e3e;
 
     color: #dddddd;
 
@@ -521,6 +640,7 @@
 
 .status-select option {
     background: #262626;
+
     color: #ffffff;
 }
 
@@ -528,6 +648,7 @@
     box-sizing: border-box;
 
     width: 100%;
+
     min-width: 220px;
 
     padding: 8px 10px;
@@ -556,10 +677,13 @@
 
     padding: 18px 22px;
 
-    border-top: 1px solid #404040;
+    border-top:
+            1px solid #404040;
 }
 
 .save-button {
+    min-width: 190px;
+
     padding: 10px 17px;
 
     border: none;
@@ -574,11 +698,18 @@
     cursor: pointer;
 
     transition:
-            background-color 0.15s ease;
+            background-color 0.15s ease,
+            opacity 0.15s ease;
 }
 
-.save-button:hover {
+.save-button:hover:not(:disabled) {
     background: #cf6820;
+}
+
+.save-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.6;
 }
 
 .anwesenheit-action-cell {
@@ -683,7 +814,8 @@
 
     padding: 14px 16px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom:
+            1px solid #414141;
 
     background: #303030;
 }
@@ -706,7 +838,9 @@
 
     border-radius: 999px;
 
-    background: rgba(232, 121, 43, 0.12);
+    background:
+            rgba(232, 121, 43, 0.12);
+
     color: #f29a5b;
 
     font-size: 0.76rem;
@@ -721,25 +855,6 @@
 
 .anwesenheit-group .anwesenheit-table th {
     background: #2d2d2d;
-}
-
-/* =====================================================
-   MESSAGE
-   ===================================================== */
-
-.anwesenheit-message {
-    margin-bottom: 18px;
-
-    padding: 12px 14px;
-
-    border: 1px solid rgba(90, 158, 62, 0.3);
-    border-radius: 8px;
-
-    background: rgba(90, 158, 62, 0.1);
-    color: #99d47e;
-
-    font-size: 14px;
-    font-weight: 500;
 }
 
 /* =====================================================
@@ -767,6 +882,7 @@
    ===================================================== */
 
 @media (max-width: 1100px) {
+
     .anwesenheit-field-large {
         flex-basis: 100%;
     }
@@ -783,7 +899,10 @@
     .anwesenheit-view-switch {
         display: flex;
 
-        width: calc(100% - 44px);
+        width:
+                calc(
+                        100% - 44px
+                );
     }
 
     .anwesenheit-view-switch button {
@@ -798,6 +917,7 @@
    ===================================================== */
 
 @media (max-width: 760px) {
+
     .anwesenheit-tabs {
         width: 100%;
     }
@@ -842,6 +962,7 @@
     .anwesenheit-field,
     .anwesenheit-field-large {
         width: 100%;
+
         min-width: 0;
     }
 
@@ -890,5 +1011,13 @@
 
     .anwesenheit-empty {
         margin: 0 18px 18px;
+    }
+
+    .anwesenheit-message {
+        align-items: flex-start;
+
+        justify-content: flex-start;
+
+        text-align: left;
     }
 }

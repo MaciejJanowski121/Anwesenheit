@@ -24,7 +24,8 @@ public class AnwesenheitExportService {
     public AnwesenheitExportService(
             AnwesenheitRepository anwesenheitRepository
     ) {
-        this.anwesenheitRepository = anwesenheitRepository;
+        this.anwesenheitRepository =
+                anwesenheitRepository;
     }
 
     /*
@@ -62,17 +63,22 @@ public class AnwesenheitExportService {
         }
 
         try (
-                Workbook workbook = new XSSFWorkbook();
+                Workbook workbook =
+                        new XSSFWorkbook();
+
                 ByteArrayOutputStream outputStream =
                         new ByteArrayOutputStream()
         ) {
 
             Sheet sheet =
-                    workbook.createSheet("Anwesenheit");
+                    workbook.createSheet(
+                            "Anwesenheit"
+                    );
 
-            /*
-             * Header Style
-             */
+            /* =================================================
+               HEADER STYLE
+               ================================================= */
+
             CellStyle headerStyle =
                     workbook.createCellStyle();
 
@@ -81,16 +87,20 @@ public class AnwesenheitExportService {
 
             headerFont.setBold(true);
 
-            headerStyle.setFont(headerFont);
+            headerStyle.setFont(
+                    headerFont
+            );
 
-            /*
-             * Header erstellen
-             */
+            /* =================================================
+               HEADER
+               ================================================= */
+
             Row headerRow =
                     sheet.createRow(0);
 
             String[] headers = {
                     "Datum",
+                    "ID_Kind",
                     "Schüler",
                     "Klasse",
                     "Kurs",
@@ -104,9 +114,10 @@ public class AnwesenheitExportService {
                     column < headers.length;
                     column++
             ) {
-
                 Cell cell =
-                        headerRow.createCell(column);
+                        headerRow.createCell(
+                                column
+                        );
 
                 cell.setCellValue(
                         headers[column]
@@ -117,17 +128,19 @@ public class AnwesenheitExportService {
                 );
             }
 
-            /*
-             * Deutsches Datumsformat
-             */
+            /* =================================================
+               DATUMSFORMAT
+               ================================================= */
+
             DateTimeFormatter dateFormatter =
                     DateTimeFormatter.ofPattern(
                             "dd.MM.yyyy"
                     );
 
-            /*
-             * Datenzeilen
-             */
+            /* =================================================
+               DATENZEILEN
+               ================================================= */
+
             int rowIndex = 1;
 
             for (
@@ -136,11 +149,14 @@ public class AnwesenheitExportService {
             ) {
 
                 Row row =
-                        sheet.createRow(rowIndex++);
+                        sheet.createRow(
+                                rowIndex++
+                        );
 
-                /*
-                 * Datum
-                 */
+                /* =================================================
+                   DATUM
+                   ================================================= */
+
                 row.createCell(0)
                         .setCellValue(
                                 anwesenheit.getDatum() != null
@@ -152,9 +168,35 @@ public class AnwesenheitExportService {
                                         : ""
                         );
 
-                /*
-                 * Schüler
-                 */
+                /* =================================================
+                   ID_KIND
+                   ================================================= */
+
+                if (
+                        anwesenheit.getStudent() != null
+                                &&
+                                anwesenheit
+                                        .getStudent()
+                                        .getIdKind() != null
+                ) {
+                    /*
+                     * Als Zahl exportieren.
+                     */
+                    row.createCell(1)
+                            .setCellValue(
+                                    anwesenheit
+                                            .getStudent()
+                                            .getIdKind()
+                            );
+                } else {
+                    row.createCell(1)
+                            .setCellValue("");
+                }
+
+                /* =================================================
+                   SCHÜLER
+                   ================================================= */
+
                 String studentName = "";
 
                 if (
@@ -192,22 +234,22 @@ public class AnwesenheitExportService {
                                     vorname;
                 }
 
-                row.createCell(1)
+                row.createCell(2)
                         .setCellValue(
                                 studentName
                         );
 
-                /*
-                 * Klasse
-                 */
-                row.createCell(2)
+                /* =================================================
+                   KLASSE
+                   ================================================= */
+
+                row.createCell(3)
                         .setCellValue(
                                 anwesenheit.getStudent() != null
                                         &&
                                         anwesenheit
                                                 .getStudent()
-                                                .getKlasse()
-                                                != null
+                                                .getKlasse() != null
 
                                         ? anwesenheit
                                           .getStudent()
@@ -216,17 +258,17 @@ public class AnwesenheitExportService {
                                         : ""
                         );
 
-                /*
-                 * Kurs
-                 */
-                row.createCell(3)
+                /* =================================================
+                   KURS
+                   ================================================= */
+
+                row.createCell(4)
                         .setCellValue(
                                 anwesenheit.getKurs() != null
                                         &&
                                         anwesenheit
                                                 .getKurs()
-                                                .getName()
-                                                != null
+                                                .getName() != null
 
                                         ? anwesenheit
                                           .getKurs()
@@ -235,17 +277,17 @@ public class AnwesenheitExportService {
                                         : ""
                         );
 
-                /*
-                 * Kursleitung
-                 */
-                row.createCell(4)
+                /* =================================================
+                   KURSLEITUNG
+                   ================================================= */
+
+                row.createCell(5)
                         .setCellValue(
                                 anwesenheit.getKurs() != null
                                         &&
                                         anwesenheit
                                                 .getKurs()
-                                                .getKursleitung()
-                                                != null
+                                                .getKursleitung() != null
 
                                         ? anwesenheit
                                           .getKurs()
@@ -254,50 +296,48 @@ public class AnwesenheitExportService {
                                         : ""
                         );
 
-                /*
-                 * Status
-                 */
-                row.createCell(5)
-                        .setCellValue(
-                                anwesenheit.getStatus()
-                                        != null
+                /* =================================================
+                   STATUS
+                   ================================================= */
 
+                row.createCell(6)
+                        .setCellValue(
+                                anwesenheit.getStatus() != null
                                         ? anwesenheit
                                           .getStatus()
-
                                         : ""
                         );
 
-                /*
-                 * Bemerkung
-                 */
-                row.createCell(6)
-                        .setCellValue(
-                                anwesenheit.getBemerkung()
-                                        != null
+                /* =================================================
+                   BEMERKUNG
+                   ================================================= */
 
+                row.createCell(7)
+                        .setCellValue(
+                                anwesenheit.getBemerkung() != null
                                         ? anwesenheit
                                           .getBemerkung()
-
                                         : ""
                         );
             }
 
-            /*
-             * Spalten automatisch an Inhalt anpassen.
-             */
+            /* =================================================
+               SPALTENBREITE
+               ================================================= */
+
             for (
                     int column = 0;
                     column < headers.length;
                     column++
             ) {
-                sheet.autoSizeColumn(column);
+                sheet.autoSizeColumn(
+                        column
+                );
 
-                /*
-                 * Etwas zusätzlichen Platz hinzufügen.
-                 */
                 int currentWidth =
-                        sheet.getColumnWidth(column);
+                        sheet.getColumnWidth(
+                                column
+                        );
 
                 sheet.setColumnWidth(
                         column,
@@ -308,17 +348,19 @@ public class AnwesenheitExportService {
                 );
             }
 
-            /*
-             * Header beim Scrollen sichtbar lassen.
-             */
+            /* =================================================
+               FREEZE HEADER
+               ================================================= */
+
             sheet.createFreezePane(
                     0,
                     1
             );
 
-            /*
-             * Excel Filter aktivieren.
-             */
+            /* =================================================
+               FILTER
+               ================================================= */
+
             sheet.setAutoFilter(
                     new org.apache.poi.ss.util.CellRangeAddress(
                             0,
