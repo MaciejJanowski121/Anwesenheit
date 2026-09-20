@@ -2,10 +2,14 @@
     display: flex;
     width: 100%;
     min-width: 0;
+
     flex-direction: column;
+
     gap: 22px;
+
     margin: 0 auto;
-    color: #f5f5f5;
+
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -26,7 +30,7 @@
     background:
             rgba(232, 121, 43, 0.1);
 
-    color: #f29a5b;
+    color: var(--accent);
 
     font-size: 12px;
     font-weight: 600;
@@ -41,16 +45,11 @@
 .home-error {
     padding: 12px 14px;
 
-    border:
-            1px solid
-            rgba(239, 68, 68, 0.3);
-
+    border: 1px solid var(--error-border);
     border-radius: 8px;
 
-    background:
-            rgba(239, 68, 68, 0.1);
-
-    color: #ff9b9b;
+    background: var(--error-background);
+    color: var(--error-text);
 
     font-size: 14px;
 }
@@ -62,7 +61,7 @@
 .home-welcome {
     padding: 22px;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
     background:
@@ -71,13 +70,13 @@
                     rgba(232, 121, 43, 0.08),
                     rgba(232, 121, 43, 0.01)
             ),
-            #252525;
+            var(--surface-primary);
 }
 
 .home-welcome h2 {
     margin: 0 0 7px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 22px;
     font-weight: 650;
@@ -86,7 +85,7 @@
 .home-welcome p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 14px;
     line-height: 1.6;
@@ -115,13 +114,14 @@
 
     padding: 18px;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
 
-    background: #252525;
+    background: var(--surface-primary);
 
     transition:
             border-color 0.15s ease,
+            background-color 0.15s ease,
             transform 0.15s ease;
 }
 
@@ -148,7 +148,7 @@
     background:
             rgba(232, 121, 43, 0.13);
 
-    color: #f29a5b;
+    color: var(--accent);
 
     font-size: 13px;
     font-weight: 700;
@@ -165,7 +165,7 @@
 }
 
 .stat-value {
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 25px;
     font-weight: 700;
@@ -174,7 +174,7 @@
 }
 
 .stat-label {
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 }
@@ -197,25 +197,25 @@
 
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .dashboard-panel-header {
     padding: 18px 20px;
 
     border-bottom:
-            1px solid #414141;
+            1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .dashboard-panel-header h2 {
     margin: 0 0 5px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 19px;
     font-weight: 650;
@@ -224,7 +224,7 @@
 .dashboard-panel-header p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 }
@@ -253,12 +253,12 @@
 
     padding: 12px 14px;
 
-    border: 1px solid #454545;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #292929;
+    background: var(--surface-secondary);
 
-    color: #ffffff;
+    color: var(--text-primary);
 
     font-size: 0.88rem;
     font-weight: 500;
@@ -267,18 +267,21 @@
 
     transition:
             border-color 0.15s ease,
-            background-color 0.15s ease;
+            background-color 0.15s ease,
+            color 0.15s ease;
 }
 
 .quick-action-btn:hover {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     background:
             rgba(232, 121, 43, 0.08);
+
+    color: var(--text-heading);
 }
 
 .quick-action-arrow {
-    color: #e8792b;
+    color: var(--accent);
 
     font-size: 17px;
 }
@@ -299,7 +302,7 @@
     padding: 16px 20px;
 
     border-bottom:
-            1px solid #3e3e3e;
+            1px solid var(--table-row-border);
 }
 
 .dashboard-summary-item:last-child {
@@ -311,7 +314,7 @@
 
     margin-bottom: 5px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 14px;
 }
@@ -319,7 +322,7 @@
 .dashboard-summary-item p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
     line-height: 1.55;
@@ -330,6 +333,7 @@
    ===================================================== */
 
 @media (max-width: 1100px) {
+
     .dashboard-stats {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
@@ -337,12 +341,14 @@
 }
 
 @media (max-width: 850px) {
+
     .dashboard-sections {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 600px) {
+
     .dashboard-stats {
         grid-template-columns: 1fr;
     }

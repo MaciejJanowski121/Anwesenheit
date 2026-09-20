@@ -14,8 +14,12 @@
             Verdana,
             sans-serif;
 
-    background: #1f1f1f;
-    color: #e0e0e0;
+    background: var(--bg-layout);
+    color: var(--text-primary);
+
+    transition:
+            background-color 0.25s ease,
+            color 0.25s ease;
 }
 
 /* =====================================================
@@ -26,6 +30,7 @@
     display: flex;
 
     align-items: center;
+    justify-content: space-between;
 
     min-height: 84px;
 
@@ -33,14 +38,16 @@
 
     padding: 14px 32px;
 
-    border-bottom: 3px solid #e8792b;
+    border-bottom: 3px solid var(--accent-color);
 
     background:
             linear-gradient(
                     135deg,
-                    #2d2d2d 0%,
-                    #3a3a3a 100%
+                    var(--bg-header-start) 0%,
+                    var(--bg-header-end) 100%
             );
+
+    transition: background 0.25s ease;
 }
 
 .header-brand {
@@ -67,7 +74,7 @@
 
     overflow: hidden;
 
-    color: #ffffff;
+    color: var(--text-header);
 
     font-size: 1.5rem;
     font-weight: 600;
@@ -80,6 +87,55 @@
 }
 
 /* =====================================================
+   THEME SWITCH
+   ===================================================== */
+
+.theme-toggle {
+    display: flex;
+
+    flex-shrink: 0;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-width: 95px;
+
+    padding: 9px 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    background: var(--bg-nav);
+    color: var(--text-primary);
+
+    cursor: pointer;
+
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            transform 0.1s ease;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-nav-hover);
+    border-color: var(--accent-color);
+}
+
+.theme-toggle:active {
+    transform: scale(0.97);
+}
+
+.theme-icon {
+    font-size: 1.05rem;
+}
+
+/* =====================================================
    NAVIGATION WRAPPER
    ===================================================== */
 
@@ -89,14 +145,14 @@
     overflow-x: auto;
     overflow-y: hidden;
 
-    border-bottom: 1px solid #444444;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #333333;
+    background: var(--bg-nav);
 
     scrollbar-width: thin;
     scrollbar-color:
-            #666666
-            #333333;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
@@ -106,17 +162,17 @@
 }
 
 .main-nav-wrapper::-webkit-scrollbar-track {
-    background: #333333;
+    background: var(--scrollbar-track);
 }
 
 .main-nav-wrapper::-webkit-scrollbar-thumb {
     border-radius: 999px;
 
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .main-nav-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #777777;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -135,7 +191,7 @@
 
     padding: 0 24px;
 
-    background: #333333;
+    background: var(--bg-nav);
 }
 
 .main-nav a {
@@ -149,7 +205,7 @@
 
     border-bottom: 3px solid transparent;
 
-    color: #cccccc;
+    color: var(--text-secondary);
 
     font-size: 0.9rem;
     font-weight: 500;
@@ -165,17 +221,17 @@
 }
 
 .main-nav a:hover {
-    border-bottom-color: #e8792b;
+    border-bottom-color: var(--accent-color);
 
-    background: #3e3e3e;
-    color: #ffffff;
+    background: var(--bg-nav-hover);
+    color: var(--text-primary);
 }
 
 .main-nav a.active {
-    border-bottom-color: #e8792b;
+    border-bottom-color: var(--accent-color);
 
-    background: #3e3e3e;
-    color: #ffffff;
+    background: var(--bg-nav-hover);
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -190,10 +246,6 @@
 
     padding: 24px 32px 48px;
 
-    /*
-     * Breite Tabellen bekommen ihren eigenen
-     * horizontalen Scrollbereich.
-     */
     overflow: visible;
 }
 
@@ -277,6 +329,16 @@
 
     .header-title {
         font-size: 1.15rem;
+    }
+
+    .theme-toggle {
+        min-width: auto;
+
+        padding: 8px 10px;
+    }
+
+    .theme-text {
+        display: none;
     }
 
     .main-nav {

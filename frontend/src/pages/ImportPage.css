@@ -2,7 +2,8 @@
     width: 100%;
     min-width: 0;
     margin: 0 auto;
-    color: #f5f5f5;
+
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -11,8 +12,10 @@
 
 .import-grid {
     display: grid;
+
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
+
     gap: 18px;
 }
 
@@ -23,10 +26,10 @@
 .import-card {
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .import-card-header {
@@ -38,15 +41,15 @@
 
     padding: 19px 22px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .import-card-header h2 {
     margin: 0 0 5px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 20px;
     font-weight: 650;
@@ -55,7 +58,7 @@
 .import-card-header p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 14px;
     line-height: 1.5;
@@ -75,7 +78,7 @@
     background:
             rgba(232, 121, 43, 0.1);
 
-    color: #f29a5b;
+    color: var(--accent);
 
     font-size: 12px;
     font-weight: 600;
@@ -98,7 +101,7 @@
 }
 
 .import-file-label {
-    color: #c7c7c7;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -115,14 +118,27 @@
 
     padding: 10px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #202020;
-
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.88rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.file-input:focus {
+    border-color: var(--accent);
+
+    outline: none;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
 }
 
 .file-input::file-selector-button {
@@ -130,21 +146,29 @@
 
     padding: 8px 12px;
 
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
 
-    background: #3a3a3a;
-
-    color: #ffffff;
+    background: var(--surface-secondary);
+    color: var(--text-primary);
 
     font-size: 0.82rem;
     font-weight: 600;
 
     cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease,
+            color 0.15s ease;
 }
 
 .file-input::file-selector-button:hover {
-    background: #474747;
+    border-color: var(--accent);
+
+    background: var(--surface-hover);
+
+    color: var(--text-heading);
 }
 
 .import-file-info {
@@ -155,18 +179,18 @@
 
     padding: 10px 12px;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #292929;
+    background: var(--surface-secondary);
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 }
 
 .import-file-info strong {
-    color: #ffffff;
+    color: var(--text-heading);
 }
 
 /* =====================================================
@@ -181,8 +205,7 @@
     border: none;
     border-radius: 8px;
 
-    background: #e8792b;
-
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.88rem;
@@ -196,11 +219,12 @@
 }
 
 .import-button:hover:not(:disabled) {
-    background: #d06820;
+    background: var(--accent-hover);
 }
 
 .import-button:disabled {
     cursor: not-allowed;
+
     opacity: 0.5;
 }
 
@@ -220,7 +244,7 @@
     background:
             rgba(90, 158, 62, 0.1);
 
-    color: #99d47e;
+    color: var(--success-text);
 
     font-size: 13px;
     font-weight: 500;
@@ -231,12 +255,14 @@
    ===================================================== */
 
 @media (max-width: 900px) {
+
     .import-grid {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 600px) {
+
     .import-card-header {
         align-items: flex-start;
         flex-direction: column;

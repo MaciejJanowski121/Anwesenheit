@@ -2,7 +2,7 @@
     width: 100%;
     min-width: 0;
     margin: 0 auto;
-    color: #f5f5f5;
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -21,7 +21,7 @@
     border: none;
     border-radius: 8px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.88rem;
@@ -40,7 +40,7 @@
 }
 
 .kurse-add-button:hover:not(:disabled) {
-    background: #d06820;
+    background: var(--accent-hover);
 }
 
 .kurse-add-button:disabled {
@@ -54,12 +54,8 @@
 
 .kurse-stats {
     display: grid;
-
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
-
     margin-bottom: 22px;
 }
 
@@ -69,22 +65,21 @@
     justify-content: space-between;
 
     min-height: 66px;
-
     padding: 16px 18px;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .kurse-stat-card span {
-    color: #9f9f9f;
+    color: var(--text-muted);
     font-size: 13px;
 }
 
 .kurse-stat-card strong {
-    color: #ffffff;
+    color: var(--text-heading);
     font-size: 24px;
     font-weight: 700;
 }
@@ -95,14 +90,13 @@
 
 .kurse-error {
     margin-bottom: 18px;
-
     padding: 12px 14px;
 
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid var(--error-border);
     border-radius: 8px;
 
-    background: rgba(239, 68, 68, 0.1);
-    color: #ffaaaa;
+    background: var(--error-background);
+    color: var(--error-text);
 
     font-size: 14px;
 }
@@ -117,10 +111,10 @@
 
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 /* =====================================================
@@ -133,17 +127,15 @@
     justify-content: space-between;
 
     gap: 18px;
-
     padding: 16px 18px;
 
-    border-bottom: 1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .kurse-search {
     position: relative;
-
     width: min(520px, 100%);
 }
 
@@ -153,12 +145,11 @@
     top: 50%;
     left: 13px;
 
-    color: #8f8f8f;
+    color: var(--text-muted);
 
     font-size: 19px;
 
     transform: translateY(-50%);
-
     pointer-events: none;
 }
 
@@ -166,16 +157,15 @@
     box-sizing: border-box;
 
     width: 100%;
-
     padding: 10px 14px 10px 40px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.88rem;
 
@@ -185,15 +175,12 @@
 }
 
 .kurse-filter-input::placeholder {
-    color: #858585;
+    color: var(--input-placeholder);
 }
 
 .kurse-filter-input:focus {
-    border-color: #e8792b;
-
-    box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
 }
 
 .kurse-result-count {
@@ -204,8 +191,7 @@
     border-radius: 999px;
 
     background: rgba(232, 121, 43, 0.12);
-
-    color: #f29a5b;
+    color: #e8792b;
 
     font-size: 13px;
     font-weight: 600;
@@ -228,8 +214,8 @@
 
     scrollbar-width: thin;
     scrollbar-color:
-            #666666
-            #252525;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
@@ -239,16 +225,16 @@
 }
 
 .kurse-table-scroll::-webkit-scrollbar-track {
-    background: #252525;
+    background: var(--scrollbar-track);
 }
 
 .kurse-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .kurse-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7a7a7a;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -260,10 +246,9 @@
     min-width: 1180px;
 
     table-layout: fixed;
-
     border-collapse: collapse;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 /* feste Spaltenbreiten */
@@ -308,10 +293,10 @@
 .kurse-table th {
     padding: 12px 15px;
 
-    border-bottom: 2px solid #4b4b4b;
+    border-bottom: 2px solid var(--border-strong);
 
-    background: #303030;
-    color: #c0c0c0;
+    background: var(--table-header-background);
+    color: var(--table-header-text);
 
     font-size: 0.78rem;
     font-weight: 700;
@@ -327,14 +312,13 @@
 .kurse-table td {
     padding: 12px 15px;
 
-    border-bottom: 1px solid #3e3e3e;
+    border-bottom: 1px solid var(--table-row-border);
 
-    color: #dddddd;
+    color: var(--text-secondary);
 
     font-size: 0.88rem;
 
     vertical-align: middle;
-
     white-space: nowrap;
 
     overflow: hidden;
@@ -345,8 +329,7 @@
 .kurse-table tbody tr {
     height: 76px;
 
-    transition:
-            background-color 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
 .kurse-table tbody tr:hover {
@@ -358,7 +341,7 @@
 }
 
 .kurs-row-editing {
-    background: rgba(232, 121, 43, 0.08);
+    background: var(--surface-editing);
 }
 
 /* =====================================================
@@ -388,15 +371,13 @@
     border-radius: 9px;
 
     background: rgba(232, 121, 43, 0.14);
-
-    color: #f2914e;
+    color: #e8792b;
 
     font-weight: 800;
 }
 
 .kurs-name-content {
     flex: 1;
-
     min-width: 0;
 }
 
@@ -407,13 +388,12 @@
 
     overflow: hidden;
 
-    color: #f4f4f4;
+    color: var(--text-heading);
 
     font-size: 14px;
     font-weight: 700;
 
     text-overflow: ellipsis;
-
     white-space: nowrap;
 }
 
@@ -424,12 +404,11 @@
 
     overflow: hidden;
 
-    color: #8f8f8f;
+    color: var(--text-muted);
 
     font-size: 12px;
 
     text-overflow: ellipsis;
-
     white-space: nowrap;
 }
 
@@ -457,62 +436,76 @@
 
 .kurs-badge-kurz {
     border-color: rgba(59, 130, 246, 0.3);
-
     background: rgba(59, 130, 246, 0.14);
-
-    color: #8fbcff;
+    color: #5686cf;
 }
 
 .kurs-badge-ogs {
     border-color: rgba(34, 197, 94, 0.3);
-
     background: rgba(34, 197, 94, 0.14);
-
-    color: #7ee2a0;
+    color: #39975a;
 }
 
 .kurs-badge-ogsh {
     border-color: rgba(168, 85, 247, 0.3);
-
     background: rgba(168, 85, 247, 0.14);
-
-    color: #c79bf7;
+    color: #9c5bd4;
 }
 
 .kurs-badge-ogsf {
     border-color: rgba(148, 163, 184, 0.3);
-
     background: rgba(148, 163, 184, 0.13);
-
-    color: #c4cedd;
+    color: var(--text-secondary);
 }
 
 .kurs-badge-m {
     border-color: rgba(234, 179, 8, 0.3);
-
     background: rgba(234, 179, 8, 0.14);
-
-    color: #f0cf61;
+    color: #aa8200;
 }
 
 .kurs-badge-p {
     border-color: rgba(249, 115, 22, 0.3);
-
     background: rgba(249, 115, 22, 0.14);
-
-    color: #f6a56d;
+    color: #d86413;
 }
 
 .kurs-badge-zuschussfrei {
     border-color: rgba(20, 184, 166, 0.3);
-
     background: rgba(20, 184, 166, 0.14);
+    color: #268e84;
+}
 
+[data-theme="dark"] .kurs-badge-kurz {
+    color: #8fbcff;
+}
+
+[data-theme="dark"] .kurs-badge-ogs {
+    color: #7ee2a0;
+}
+
+[data-theme="dark"] .kurs-badge-ogsh {
+    color: #c79bf7;
+}
+
+[data-theme="dark"] .kurs-badge-ogsf {
+    color: #c4cedd;
+}
+
+[data-theme="dark"] .kurs-badge-m {
+    color: #f0cf61;
+}
+
+[data-theme="dark"] .kurs-badge-p {
+    color: #f6a56d;
+}
+
+[data-theme="dark"] .kurs-badge-zuschussfrei {
     color: #72d8cf;
 }
 
 .kurs-fee {
-    color: #f4f4f4;
+    color: var(--text-heading);
     font-weight: 600;
 }
 
@@ -528,28 +521,26 @@
 
     padding: 8px 10px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font: inherit;
 }
 
 .kurs-edit-input:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
-    box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
 }
 
 .kurs-edit-input option {
-    background: #262626;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 /* =====================================================
@@ -560,12 +551,6 @@
     text-align: center !important;
 }
 
-/*
- * WICHTIG:
- * td darf hier NICHT display:flex bekommen,
- * sonst stimmen die horizontalen Tabellenlinien
- * nicht mehr mit den anderen Spalten überein.
- */
 .kurse-action-cell {
     text-align: center;
     vertical-align: middle;
@@ -596,15 +581,12 @@
     cursor: pointer;
 
     white-space: nowrap;
-
     vertical-align: middle;
 
     transition:
             background-color 0.15s ease,
             opacity 0.15s ease;
 }
-
-/* Abstand zwischen den Buttons */
 
 .kurse-edit-button + .kurse-delete-button,
 .kurse-save-button + .kurse-cancel-button {
@@ -658,14 +640,166 @@
 .kurse-empty-row {
     padding: 36px !important;
 
-    color: #8f8f8f !important;
+    color: var(--text-muted) !important;
 
     text-align: center !important;
 }
 
 /* =====================================================
+   FILTER SECTION
+   ===================================================== */
+
+.kurse-filter-section {
+    margin-bottom: 18px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.kurse-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 17px 20px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.kurse-filter-header h2 {
+    margin: 0 0 4px;
+
+    color: var(--text-heading);
+
+    font-size: 18px;
+}
+
+.kurse-filter-header p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.kurse-filter-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(220px, 1.4fr)
+        repeat(4, minmax(150px, 1fr));
+
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.kurse-filter-field {
+    display: flex;
+
+    min-width: 0;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.kurse-filter-field label {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kurse-filter-field input,
+.kurse-filter-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+
+    padding: 9px 11px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-size: 0.86rem;
+}
+
+.kurse-filter-field input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.kurse-filter-field input:focus,
+.kurse-filter-field select:focus {
+    border-color: var(--accent);
+
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.kurse-reset-button {
+    flex-shrink: 0;
+
+    padding: 8px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.kurse-reset-button:hover {
+    border-color: var(--accent);
+    color: var(--text-heading);
+}
+
+.kurse-sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.kurse-sortable-header:hover {
+    background: var(--surface-hover);
+}
+
+.kurs-row-clickable {
+    cursor: pointer;
+}
+
+.kurs-row-clickable:hover {
+    background: rgba(232, 121, 43, 0.07);
+}
+
+/* =====================================================
    RESPONSIVE
    ===================================================== */
+
+@media (max-width: 1200px) {
+    .kurse-filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .kurse-filter-field-wide {
+        grid-column: span 2;
+    }
+}
 
 @media (max-width: 1100px) {
     .kurse-table {
@@ -696,121 +830,7 @@
     .kurse-add-button {
         width: 100%;
     }
-}
 
-
-
-.kurse-filter-section {
-    margin-bottom: 18px;
-    overflow: hidden;
-    border: 1px solid #414141;
-    border-radius: 12px;
-    background: #252525;
-}
-
-.kurse-filter-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 17px 20px;
-    border-bottom: 1px solid #414141;
-    background: #292929;
-}
-
-.kurse-filter-header h2 {
-    margin: 0 0 4px;
-    color: #ffffff;
-    font-size: 18px;
-}
-
-.kurse-filter-header p {
-    margin: 0;
-    color: #999999;
-    font-size: 13px;
-}
-
-.kurse-filter-grid {
-    display: grid;
-    grid-template-columns:
-        minmax(220px, 1.4fr)
-        repeat(4, minmax(150px, 1fr));
-    gap: 14px;
-    padding: 18px 20px;
-}
-
-.kurse-filter-field {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.kurse-filter-field label {
-    color: #c7c7c7;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.kurse-filter-field input,
-.kurse-filter-field select {
-    box-sizing: border-box;
-    width: 100%;
-    padding: 9px 11px;
-    border: 1px solid #505050;
-    border-radius: 7px;
-    outline: none;
-    background: #202020;
-    color: #ffffff;
-    font-size: 0.86rem;
-}
-
-.kurse-filter-field input:focus,
-.kurse-filter-field select:focus {
-    border-color: #e8792b;
-    box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
-}
-
-.kurse-reset-button {
-    flex-shrink: 0;
-    padding: 8px 12px;
-    border: 1px solid #555555;
-    border-radius: 7px;
-    background: #333333;
-    color: #dddddd;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.kurse-reset-button:hover {
-    border-color: #e8792b;
-    color: #ffffff;
-}
-
-.kurse-sortable-header {
-    cursor: pointer;
-    user-select: none;
-}
-
-.kurse-sortable-header:hover {
-    background: #383838;
-}
-
-@media (max-width: 1200px) {
-    .kurse-filter-grid {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-    }
-
-    .kurse-filter-field-wide {
-        grid-column: span 2;
-    }
-}
-
-@media (max-width: 760px) {
     .kurse-filter-header {
         align-items: stretch;
         flex-direction: column;
@@ -827,12 +847,4 @@
     .kurse-reset-button {
         width: 100%;
     }
-}
-
-.kurs-row-clickable {
-    cursor: pointer;
-}
-
-.kurs-row-clickable:hover {
-    background: rgba(232, 121, 43, 0.07);
 }

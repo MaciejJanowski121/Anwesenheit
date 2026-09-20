@@ -1,5 +1,5 @@
 /* =====================================================
-   GLOBAL RESET
+   THEME COLORS - LIGHT MODE (DEFAULT)
    ===================================================== */
 
 :root {
@@ -16,9 +16,161 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background: #1e1e1e;
-  color: #e0e0e0;
+  /* =================================================
+     GLOBAL BACKGROUNDS
+     ================================================= */
+
+  --bg-primary: #f4f5f7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8f8f8;
+
+  /* =================================================
+     SURFACES / CARDS
+     ================================================= */
+
+  --surface-primary: #ffffff;
+  --surface-secondary: #f7f7f7;
+  --surface-hover: #f1f1f1;
+  --surface-editing: rgba(232, 121, 43, 0.08);
+
+  /* =================================================
+     TEXT
+     ================================================= */
+
+  --text-primary: #252525;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --text-heading: #1f1f1f;
+
+  /* =================================================
+     BORDERS
+     ================================================= */
+
+  --border-color: #dddddd;
+  --border-strong: #cccccc;
+
+  /* =================================================
+     INPUTS
+     ================================================= */
+
+  --input-background: #ffffff;
+  --input-text: #252525;
+  --input-placeholder: #999999;
+
+  /* =================================================
+     TABLES
+     ================================================= */
+
+  --table-header-background: #f2f2f2;
+  --table-header-text: #555555;
+  --table-row-border: #e3e3e3;
+
+  /* =================================================
+     SCROLLBAR
+     ================================================= */
+
+  --scrollbar-track: #eeeeee;
+  --scrollbar-thumb: #bbbbbb;
+  --scrollbar-thumb-hover: #999999;
+
+  /* =================================================
+     BRAND
+     ================================================= */
+
+  --accent: #e8792b;
+  --accent-hover: #d06820;
+
+  /* =================================================
+     ERROR
+     ================================================= */
+
+  --error-background: rgba(239, 68, 68, 0.08);
+  --error-border: rgba(239, 68, 68, 0.25);
+  --error-text: #c83c3c;
+
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
+
+
+/* =====================================================
+   DARK MODE
+   ===================================================== */
+
+[data-theme="dark"] {
+  /* =================================================
+     GLOBAL BACKGROUNDS
+     ================================================= */
+
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #252525;
+  --bg-tertiary: #292929;
+
+  /* =================================================
+     SURFACES / CARDS
+     ================================================= */
+
+  --surface-primary: #252525;
+  --surface-secondary: #292929;
+  --surface-hover: #303030;
+  --surface-editing: rgba(232, 121, 43, 0.08);
+
+  /* =================================================
+     TEXT
+     ================================================= */
+
+  --text-primary: #f4f4f4;
+  --text-secondary: #dddddd;
+  --text-muted: #999999;
+  --text-heading: #ffffff;
+
+  /* =================================================
+     BORDERS
+     ================================================= */
+
+  --border-color: #414141;
+  --border-strong: #4b4b4b;
+
+  /* =================================================
+     INPUTS
+     ================================================= */
+
+  --input-background: #202020;
+  --input-text: #ffffff;
+  --input-placeholder: #858585;
+
+  /* =================================================
+     TABLES
+     ================================================= */
+
+  --table-header-background: #303030;
+  --table-header-text: #c0c0c0;
+  --table-row-border: #3e3e3e;
+
+  /* =================================================
+     SCROLLBAR
+     ================================================= */
+
+  --scrollbar-track: #252525;
+  --scrollbar-thumb: #666666;
+  --scrollbar-thumb-hover: #7a7a7a;
+
+  /* =================================================
+     BRAND
+     ================================================= */
+
+  --accent: #e8792b;
+  --accent-hover: #d06820;
+
+  /* =================================================
+     ERROR
+     ================================================= */
+
+  --error-background: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --error-text: #ffaaaa;
+}
+
 
 /* =====================================================
    BOX SIZING
@@ -30,6 +182,7 @@
   box-sizing: border-box;
 }
 
+
 /* =====================================================
    DOCUMENT
    ===================================================== */
@@ -37,12 +190,18 @@
 html {
   width: 100%;
   min-width: 0;
+  min-height: 100%;
 
   margin: 0;
   padding: 0;
 
-  background: #1e1e1e;
+  background: var(--bg-primary);
+
+  transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
 }
+
 
 body {
   width: 100%;
@@ -52,9 +211,14 @@ body {
   margin: 0;
   padding: 0;
 
-  background: #1e1e1e;
-  color: #e0e0e0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+
+  transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
 }
+
 
 /* =====================================================
    REACT ROOT
@@ -68,8 +232,14 @@ body {
   margin: 0;
   padding: 0;
 
-  background: #1e1e1e;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+
+  transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
 }
+
 
 /* =====================================================
    BASIC ELEMENT RESET
@@ -82,7 +252,14 @@ h4,
 h5,
 h6 {
   margin-top: 0;
+  color: var(--text-heading);
 }
+
+
+p {
+  color: var(--text-secondary);
+}
+
 
 button,
 input,
@@ -91,6 +268,109 @@ textarea {
   font: inherit;
 }
 
+
 button {
   font-family: inherit;
+}
+
+
+/* =====================================================
+   FORM ELEMENTS
+   ===================================================== */
+
+input,
+select,
+textarea {
+  background: var(--input-background);
+  color: var(--input-text);
+}
+
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
+
+/* =====================================================
+   LINKS
+   ===================================================== */
+
+a {
+  color: inherit;
+}
+
+
+/* =====================================================
+   GLOBAL THEME TRANSITION
+   ===================================================== */
+
+.app-layout,
+.app-header,
+.main-nav-wrapper,
+.main-nav,
+.app-main,
+.app-content {
+  transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease;
+}
+
+
+/* =====================================================
+   SELECTION
+   ===================================================== */
+
+::selection {
+  background: rgba(232, 121, 43, 0.3);
+}
+
+
+/* =====================================================
+   SCROLLBAR - FIREFOX
+   ===================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color:
+          var(--scrollbar-thumb)
+          var(--scrollbar-track);
+}
+
+
+/* =====================================================
+   SCROLLBAR - CHROME / EDGE / SAFARI
+   ===================================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background: var(--scrollbar-thumb);
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.page-header h1,
+.page-header-content h1 {
+  color: var(--text-heading) !important;
+}
+
+.page-header p,
+.page-header-content p {
+  color: var(--text-muted) !important;
 }

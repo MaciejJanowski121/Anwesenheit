@@ -2,6 +2,8 @@
     width: 100%;
     max-width: 1100px;
     min-width: 0;
+
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -12,11 +14,11 @@
     margin-bottom: 24px;
     padding: 10px 18px;
 
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background-color: #444444;
-    color: #ffffff;
+    background-color: var(--surface-secondary);
+    color: var(--text-primary);
 
     font-size: 0.88rem;
     font-weight: 600;
@@ -25,11 +27,13 @@
 
     transition:
             background-color 0.15s ease,
+            border-color 0.15s ease,
             opacity 0.15s ease;
 }
 
 .back-button:hover {
-    background-color: #555555;
+    border-color: var(--border-strong);
+    background-color: var(--surface-hover);
 }
 
 /* =====================================================
@@ -43,7 +47,7 @@
 .detail-header h2 {
     margin: 0;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 2rem;
     font-weight: 650;
@@ -52,7 +56,7 @@
 .detail-header p {
     margin: 8px 0 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 14px;
 }
@@ -70,16 +74,16 @@
     margin-bottom: 20px;
     padding: 24px;
 
-    border: 1px solid #444444;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #2a2a2a;
+    background: var(--surface-primary);
 }
 
 .detail-section h3 {
     margin: 0 0 18px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 1.1rem;
     font-weight: 650;
@@ -106,10 +110,10 @@
 
     padding: 12px;
 
-    border: 1px solid #3f3f3f;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #333333;
+    background: var(--surface-secondary);
 }
 
 .detail-label {
@@ -117,7 +121,7 @@
 
     margin-bottom: 6px;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 0.8rem;
     font-weight: 500;
@@ -128,7 +132,7 @@
 
     overflow-wrap: anywhere;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 0.95rem;
     font-weight: 500;
@@ -164,7 +168,7 @@
 .detail-item-1530 .detail-label {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 0.8rem;
     font-weight: 500;
@@ -186,10 +190,10 @@
 
     padding: 3px;
 
-    border: 1px solid #4a4a4a;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #252525;
+    background: var(--input-background);
 }
 
 .detail-1530-option {
@@ -202,7 +206,7 @@
     border-radius: 6px;
 
     background: transparent;
-    color: #999999;
+    color: var(--text-muted);
 
     font-family: inherit;
     font-size: 0.8rem;
@@ -217,12 +221,12 @@
 }
 
 .detail-1530-option:hover:not(.active):not(:disabled) {
-    background: #303030;
-    color: #ffffff;
+    background: var(--surface-hover);
+    color: var(--text-heading);
 }
 
 .detail-1530-option.active {
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 }
 
@@ -252,13 +256,16 @@
 
 .assign-kurs-field {
     display: flex;
+
     min-width: 0;
+
     flex-direction: column;
+
     gap: 6px;
 }
 
 .assign-kurs-field label {
-    color: #c7c7c7;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -272,13 +279,13 @@
 
     padding: 10px 12px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
 
     outline: none;
 
-    background-color: #202020;
-    color: #ffffff;
+    background-color: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.88rem;
 
@@ -289,7 +296,7 @@
 }
 
 .assign-kurs-field select:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -302,8 +309,8 @@
 }
 
 .assign-kurs-field select option {
-    background: #262626;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 /* =====================================================
@@ -318,7 +325,7 @@
     border: none;
     border-radius: 7px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.86rem;
@@ -334,7 +341,7 @@
 }
 
 .assign-kurs-button:hover:not(:disabled) {
-    background: #d06820;
+    background: var(--accent-hover);
 }
 
 .assign-kurs-button:disabled {
@@ -369,7 +376,7 @@
 .detail-anwesenheit-header h3 {
     margin: 0 0 6px;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 1.1rem;
     font-weight: 650;
@@ -378,7 +385,7 @@
 .detail-anwesenheit-header p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 0.86rem;
 }
@@ -419,7 +426,7 @@
 }
 
 .detail-filter-field label {
-    color: #b8b8b8;
+    color: var(--text-secondary);
 
     font-size: 0.78rem;
     font-weight: 600;
@@ -435,13 +442,13 @@
 
     padding: 9px 11px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-family: inherit;
     font-size: 0.86rem;
@@ -452,11 +459,13 @@
             background-color 0.15s ease;
 }
 
+.detail-filter-field input::placeholder {
+    color: var(--input-placeholder);
+}
+
 .detail-filter-field input:focus,
 .detail-filter-field select:focus {
-    border-color: #e8792b;
-
-    background: #242424;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -464,13 +473,17 @@
 }
 
 .detail-filter-field select option {
-    background: #262626;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 /* Date input */
 
 .detail-filter-field input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] .detail-filter-field input[type="date"] {
     color-scheme: dark;
 }
 
@@ -483,11 +496,11 @@
 
     padding: 8px 12px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
 
-    background: #333333;
-    color: #d5d5d5;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
 
     font-size: 0.8rem;
     font-weight: 600;
@@ -501,12 +514,12 @@
 }
 
 .detail-filter-reset:hover {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     background:
             rgba(232, 121, 43, 0.1);
 
-    color: #f29a5b;
+    color: var(--accent);
 }
 
 /* =====================================================
@@ -515,7 +528,6 @@
 
 .detail-anwesenheit-count {
     display: inline-flex;
-
     align-items: center;
 
     margin-bottom: 14px;
@@ -527,7 +539,7 @@
     background:
             rgba(232, 121, 43, 0.11);
 
-    color: #d6d6d6;
+    color: var(--text-secondary);
 
     font-size: 0.78rem;
 }
@@ -535,7 +547,7 @@
 .detail-anwesenheit-count strong {
     margin-right: 4px;
 
-    color: #f29a5b;
+    color: var(--accent);
 
     font-weight: 700;
 }
@@ -556,8 +568,8 @@
     scrollbar-width: thin;
 
     scrollbar-color:
-            #666666
-            #2a2a2a;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
@@ -567,17 +579,17 @@
 }
 
 .detail-table-scroll::-webkit-scrollbar-track {
-    background: #2a2a2a;
+    background: var(--scrollbar-track);
 }
 
 .detail-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
 
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .detail-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7a7a7a;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -591,15 +603,17 @@
     margin-top: 10px;
 
     border-collapse: collapse;
+
+    background: var(--surface-primary);
 }
 
 .detail-table th {
     padding: 12px 14px;
 
-    border-bottom: 2px solid #555555;
+    border-bottom: 2px solid var(--border-strong);
 
-    background-color: #333333;
-    color: #ffffff;
+    background-color: var(--table-header-background);
+    color: var(--table-header-text);
 
     font-size: 0.8rem;
     font-weight: 700;
@@ -613,9 +627,9 @@
 .detail-table td {
     padding: 12px 14px;
 
-    border-bottom: 1px solid #444444;
+    border-bottom: 1px solid var(--table-row-border);
 
-    color: #dddddd;
+    color: var(--text-secondary);
 
     font-size: 0.88rem;
 
@@ -676,7 +690,7 @@
 
     padding: 14px 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 0.88rem;
     font-style: italic;
@@ -781,6 +795,10 @@
     }
 
     .detail-filter-reset {
+        position: static;
+
+        transform: none;
+
         align-self: flex-start;
     }
 

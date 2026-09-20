@@ -1,8 +1,9 @@
 .anwesenheit-page {
     width: 100%;
     min-width: 0;
-
     margin: 0 auto;
+
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -11,16 +12,13 @@
 
 .anwesenheit-page .page-header {
     justify-content: center;
-
     text-align: center;
 }
 
 .anwesenheit-page .page-header-content {
     display: flex;
-
     flex-direction: column;
     align-items: center;
-
     text-align: center;
 }
 
@@ -35,11 +33,9 @@
 
 .anwesenheit-tabs {
     display: flex;
-
     gap: 8px;
 
     margin-bottom: 22px;
-
     padding-bottom: 1px;
 
     overflow-x: auto;
@@ -50,17 +46,16 @@
 
     padding: 10px 18px;
 
-    border: 1px solid #4b4b4b;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background: #292929;
-    color: #cfcfcf;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
 
     font-size: 0.88rem;
     font-weight: 600;
 
     cursor: pointer;
-
     white-space: nowrap;
 
     transition:
@@ -70,16 +65,13 @@
 }
 
 .tab-button:hover {
-    background: #333333;
-
-    color: #ffffff;
+    background: var(--surface-hover);
+    color: var(--text-heading);
 }
 
 .tab-button.active {
-    border-color: #e8792b;
-
-    background: #e8792b;
-
+    border-color: var(--accent);
+    background: var(--accent);
     color: #ffffff;
 }
 
@@ -89,57 +81,38 @@
 
 .anwesenheit-message {
     display: flex;
-
     align-items: center;
     justify-content: center;
 
     gap: 10px;
 
     width: 100%;
-
     box-sizing: border-box;
 
     margin-bottom: 18px;
-
     padding: 13px 16px;
 
     border-radius: 8px;
 
     font-size: 14px;
     font-weight: 600;
-
     text-align: center;
 }
 
-/* Erfolg */
-
 .anwesenheit-message.success {
-    border:
-            1px solid
-            rgba(90, 158, 62, 0.4);
-
-    background:
-            rgba(90, 158, 62, 0.12);
-
-    color: #99d47e;
+    border: 1px solid rgba(90, 158, 62, 0.4);
+    background: rgba(90, 158, 62, 0.12);
+    color: var(--success-text);
 }
 
-/* Fehler */
-
 .anwesenheit-message.error {
-    border:
-            1px solid
-            rgba(217, 74, 74, 0.4);
-
-    background:
-            rgba(217, 74, 74, 0.12);
-
-    color: #ff9b9b;
+    border: 1px solid var(--error-border);
+    background: var(--error-background);
+    color: var(--error-text);
 }
 
 .anwesenheit-message-icon {
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
 
@@ -154,20 +127,12 @@
     font-weight: 800;
 }
 
-.anwesenheit-message.success
-.anwesenheit-message-icon {
-    background:
-            rgba(90, 158, 62, 0.25);
-
-    color: #a6e68a;
+.anwesenheit-message.success .anwesenheit-message-icon {
+    background: rgba(90, 158, 62, 0.25);
 }
 
-.anwesenheit-message.error
-.anwesenheit-message-icon {
-    background:
-            rgba(217, 74, 74, 0.25);
-
-    color: #ffaaaa;
+.anwesenheit-message.error .anwesenheit-message-icon {
+    background: rgba(217, 74, 74, 0.25);
 }
 
 /* =====================================================
@@ -180,10 +145,10 @@
 
     overflow: hidden;
 
-    border: 1px solid #444444;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 /* =====================================================
@@ -194,7 +159,6 @@
     position: relative;
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 
@@ -204,15 +168,13 @@
 
     padding: 20px 130px;
 
-    border-bottom:
-            1px solid #404040;
+    border-bottom: 1px solid var(--border-color);
 
     text-align: center;
 }
 
 .anwesenheit-section-header > div {
     display: flex;
-
     flex-direction: column;
     align-items: center;
 
@@ -222,7 +184,7 @@
 .anwesenheit-section-header h2 {
     margin: 0;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 20px;
     font-weight: 650;
@@ -233,7 +195,7 @@
 .anwesenheit-section-header p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 14px;
     line-height: 1.5;
@@ -252,24 +214,17 @@
     right: 22px;
 
     display: inline-flex;
-
     align-items: center;
 
-    transform:
-            translateY(-50%);
+    transform: translateY(-50%);
 
     padding: 7px 12px;
 
-    border:
-            1px solid
-            rgba(232, 121, 43, 0.25);
-
+    border: 1px solid rgba(232, 121, 43, 0.25);
     border-radius: 999px;
 
-    background:
-            rgba(232, 121, 43, 0.1);
-
-    color: #f29a5b;
+    background: rgba(232, 121, 43, 0.1);
+    color: var(--accent);
 
     font-size: 13px;
     font-weight: 600;
@@ -283,15 +238,13 @@
 
 .anwesenheit-toolbar {
     display: flex;
-
     align-items: flex-end;
 
     gap: 16px;
 
     padding: 20px 22px;
 
-    border-bottom:
-            1px solid #404040;
+    border-bottom: 1px solid var(--border-color);
 
     flex-wrap: wrap;
 }
@@ -308,12 +261,11 @@
 
 .anwesenheit-field-large {
     min-width: 280px;
-
     flex: 1;
 }
 
 .anwesenheit-field label {
-    color: #cfcfcf;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -324,18 +276,17 @@
     box-sizing: border-box;
 
     width: 100%;
-
     min-height: 40px;
 
     padding: 10px 12px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.9rem;
 
@@ -344,9 +295,13 @@
             box-shadow 0.15s ease;
 }
 
+.anwesenheit-toolbar input::placeholder {
+    color: var(--input-placeholder);
+}
+
 .anwesenheit-toolbar input:focus,
 .anwesenheit-toolbar select:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -354,14 +309,17 @@
 }
 
 .anwesenheit-toolbar input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] .anwesenheit-toolbar input[type="date"] {
     color-scheme: dark;
 }
 
 .anwesenheit-toolbar select option,
 .anwesenheit-toolbar select optgroup {
-    background: #262626;
-
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 /* =====================================================
@@ -370,7 +328,6 @@
 
 .anwesenheit-toolbar-actions {
     display: flex;
-
     align-items: center;
 
     gap: 10px;
@@ -390,14 +347,13 @@
     border: none;
     border-radius: 7px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.86rem;
     font-weight: 600;
 
     cursor: pointer;
-
     white-space: nowrap;
 
     transition:
@@ -407,15 +363,12 @@
 }
 
 .anwesenheit-load-button:hover:not(:disabled) {
-    background: #cf6820;
-
-    transform:
-            translateY(-1px);
+    background: var(--accent-hover);
+    transform: translateY(-1px);
 }
 
 .anwesenheit-load-button:disabled {
     cursor: not-allowed;
-
     opacity: 0.5;
 }
 
@@ -438,7 +391,6 @@
     font-weight: 600;
 
     cursor: pointer;
-
     white-space: nowrap;
 
     transition:
@@ -450,16 +402,13 @@
 
 .anwesenheit-export-button:hover:not(:disabled) {
     border-color: #5a9e43;
-
     background: #5a9e43;
 
-    transform:
-            translateY(-1px);
+    transform: translateY(-1px);
 }
 
 .anwesenheit-export-button:disabled {
     cursor: not-allowed;
-
     opacity: 0.5;
 }
 
@@ -471,13 +420,12 @@
     display: inline-flex;
 
     margin: 18px 22px 20px;
-
     padding: 4px;
 
-    border: 1px solid #444444;
+    border: 1px solid var(--border-color);
     border-radius: 9px;
 
-    background: #202020;
+    background: var(--input-background);
 }
 
 .anwesenheit-view-switch button {
@@ -489,7 +437,7 @@
     border-radius: 7px;
 
     background: transparent;
-    color: #a9a9a9;
+    color: var(--text-muted);
 
     font-size: 0.84rem;
     font-weight: 600;
@@ -502,14 +450,12 @@
 }
 
 .anwesenheit-view-switch button:hover:not(.active) {
-    background: #303030;
-
-    color: #ffffff;
+    background: var(--surface-hover);
+    color: var(--text-heading);
 }
 
 .anwesenheit-view-switch button.active {
-    background: #e8792b;
-
+    background: var(--accent);
     color: #ffffff;
 }
 
@@ -527,10 +473,9 @@
     padding-bottom: 8px;
 
     scrollbar-width: thin;
-
     scrollbar-color:
-            #666666
-            #252525;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
@@ -540,17 +485,16 @@
 }
 
 .anwesenheit-table-scroll::-webkit-scrollbar-track {
-    background: #252525;
+    background: var(--scrollbar-track);
 }
 
 .anwesenheit-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
-
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .anwesenheit-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7a7a7a;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -559,12 +503,11 @@
 
 .anwesenheit-table {
     width: 100%;
-
     min-width: 950px;
 
     border-collapse: collapse;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .anwesenheit-history-table {
@@ -574,11 +517,10 @@
 .anwesenheit-table th {
     padding: 12px 14px;
 
-    border-bottom:
-            2px solid #4b4b4b;
+    border-bottom: 2px solid var(--border-strong);
 
-    background: #303030;
-    color: #e5e5e5;
+    background: var(--table-header-background);
+    color: var(--table-header-text);
 
     font-size: 0.84rem;
     font-weight: 600;
@@ -591,10 +533,9 @@
 .anwesenheit-table td {
     padding: 11px 14px;
 
-    border-bottom:
-            1px solid #3e3e3e;
+    border-bottom: 1px solid var(--table-row-border);
 
-    color: #dddddd;
+    color: var(--text-secondary);
 
     font-size: 0.9rem;
 
@@ -604,12 +545,11 @@
 }
 
 .anwesenheit-table tbody tr {
-    transition:
-            background-color 0.15s ease;
+    transition: background-color 0.15s ease;
 }
 
 .anwesenheit-table tbody tr:hover {
-    background: #303030;
+    background: var(--surface-hover);
 }
 
 .anwesenheit-table tbody tr:last-child td {
@@ -625,45 +565,47 @@
 
     padding: 7px 9px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 .status-select:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 }
 
 .status-select option {
-    background: #262626;
-
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 .bemerkung-input {
     box-sizing: border-box;
 
     width: 100%;
-
     min-width: 220px;
 
     padding: 8px 10px;
 
-    border: 1px solid #555555;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
+}
+
+.bemerkung-input::placeholder {
+    color: var(--input-placeholder);
 }
 
 .bemerkung-input:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 }
 
 /* =====================================================
@@ -672,13 +614,11 @@
 
 .anwesenheit-actions {
     display: flex;
-
     justify-content: flex-end;
 
     padding: 18px 22px;
 
-    border-top:
-            1px solid #404040;
+    border-top: 1px solid var(--border-color);
 }
 
 .save-button {
@@ -689,7 +629,7 @@
     border: none;
     border-radius: 7px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.88rem;
@@ -703,18 +643,16 @@
 }
 
 .save-button:hover:not(:disabled) {
-    background: #cf6820;
+    background: var(--accent-hover);
 }
 
 .save-button:disabled {
     cursor: not-allowed;
-
     opacity: 0.6;
 }
 
 .anwesenheit-action-cell {
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -750,11 +688,11 @@
 }
 
 .btn-edit {
-    background: #e8792b;
+    background: var(--accent);
 }
 
 .btn-edit:hover {
-    background: #cf6820;
+    background: var(--accent-hover);
 }
 
 .btn-delete {
@@ -787,7 +725,6 @@
 
 .anwesenheit-group-list {
     display: flex;
-
     flex-direction: column;
 
     gap: 18px;
@@ -798,15 +735,14 @@
 .anwesenheit-group {
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .anwesenheit-group-header {
     display: flex;
-
     align-items: center;
     justify-content: space-between;
 
@@ -814,16 +750,15 @@
 
     padding: 14px 16px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #303030;
+    background: var(--table-header-background);
 }
 
 .anwesenheit-group-header h3 {
     margin: 0;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 0.95rem;
     font-weight: 650;
@@ -831,17 +766,14 @@
 
 .anwesenheit-group-header span {
     display: inline-flex;
-
     align-items: center;
 
     padding: 5px 9px;
 
     border-radius: 999px;
 
-    background:
-            rgba(232, 121, 43, 0.12);
-
-    color: #f29a5b;
+    background: rgba(232, 121, 43, 0.12);
+    color: var(--accent);
 
     font-size: 0.76rem;
     font-weight: 600;
@@ -854,7 +786,7 @@
 }
 
 .anwesenheit-group .anwesenheit-table th {
-    background: #2d2d2d;
+    background: var(--table-header-background);
 }
 
 /* =====================================================
@@ -866,11 +798,11 @@
 
     padding: 36px 20px;
 
-    border: 1px dashed #444444;
+    border: 1px dashed var(--border-color);
     border-radius: 8px;
 
-    background: #282828;
-    color: #999999;
+    background: var(--surface-secondary);
+    color: var(--text-muted);
 
     font-size: 0.88rem;
 
@@ -899,15 +831,11 @@
     .anwesenheit-view-switch {
         display: flex;
 
-        width:
-                calc(
-                        100% - 44px
-                );
+        width: calc(100% - 44px);
     }
 
     .anwesenheit-view-switch button {
         min-width: 0;
-
         flex: 1;
     }
 }
@@ -934,7 +862,6 @@
 
     .anwesenheit-section-header > div {
         width: 100%;
-
         align-items: center;
     }
 
@@ -955,20 +882,17 @@
 
     .anwesenheit-toolbar {
         align-items: stretch;
-
         flex-direction: column;
     }
 
     .anwesenheit-field,
     .anwesenheit-field-large {
         width: 100%;
-
         min-width: 0;
     }
 
     .anwesenheit-toolbar-actions {
         width: 100%;
-
         flex-direction: column;
     }
 
@@ -1005,7 +929,6 @@
 
     .anwesenheit-group-header {
         align-items: flex-start;
-
         flex-direction: column;
     }
 
@@ -1015,7 +938,6 @@
 
     .anwesenheit-message {
         align-items: flex-start;
-
         justify-content: flex-start;
 
         text-align: left;

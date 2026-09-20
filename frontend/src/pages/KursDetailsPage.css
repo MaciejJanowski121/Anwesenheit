@@ -1,6 +1,8 @@
 .kurs-details-page {
     width: 100%;
     min-width: 0;
+
+    color: var(--text-primary);
 }
 
 /* =====================================================
@@ -39,16 +41,12 @@
 
     padding: 7px 12px;
 
-    border:
-            1px solid
-            rgba(232, 121, 43, 0.25);
-
+    border: 1px solid rgba(232, 121, 43, 0.25);
     border-radius: 999px;
 
-    background:
-            rgba(232, 121, 43, 0.1);
+    background: rgba(232, 121, 43, 0.1);
 
-    color: #f29a5b;
+    color: var(--accent);
 
     font-size: 13px;
     font-weight: 600;
@@ -65,16 +63,11 @@
 
     padding: 11px 14px;
 
-    border:
-            1px solid
-            rgba(217, 74, 74, 0.35);
-
+    border: 1px solid var(--error-border);
     border-radius: 8px;
 
-    background:
-            rgba(217, 74, 74, 0.1);
-
-    color: #ff9999;
+    background: var(--error-background);
+    color: var(--error-text);
 
     font-size: 13px;
 }
@@ -87,10 +80,7 @@
     display: grid;
 
     grid-template-columns:
-            repeat(
-                    4,
-                    minmax(0, 1fr)
-            );
+        repeat(4, minmax(0, 1fr));
 
     gap: 14px;
 
@@ -100,10 +90,10 @@
 .kurs-details-info > div {
     padding: 16px 18px;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .kurs-details-info span {
@@ -111,13 +101,13 @@
 
     margin-bottom: 7px;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 12px;
 }
 
 .kurs-details-info strong {
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 15px;
 }
@@ -135,10 +125,10 @@
 
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .kurs-jahrgang-header {
@@ -149,10 +139,9 @@
 
     padding: 18px 22px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 
     text-align: center;
 }
@@ -169,7 +158,7 @@
 .kurs-jahrgang-header h2 {
     margin: 0;
 
-    color: #ffffff;
+    color: var(--text-heading);
 
     font-size: 18px;
     font-weight: 650;
@@ -178,7 +167,7 @@
 .kurs-jahrgang-header p {
     margin: 0;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 }
@@ -204,7 +193,7 @@
 }
 
 .kurs-jahrgang-field label {
-    color: #c7c7c7;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -214,24 +203,27 @@
     box-sizing: border-box;
 
     width: 100%;
-
     min-height: 40px;
 
     padding: 10px 12px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.88rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
 }
 
 .kurs-jahrgang-field select:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -239,9 +231,8 @@
 }
 
 .kurs-jahrgang-field select option {
-    background: #262626;
-
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 .kurs-jahrgang-button {
@@ -252,7 +243,7 @@
     border: none;
     border-radius: 8px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.86rem;
@@ -261,10 +252,14 @@
     cursor: pointer;
 
     white-space: nowrap;
+
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
 }
 
 .kurs-jahrgang-button:hover:not(:disabled) {
-    background: #d06820;
+    background: var(--accent-hover);
 }
 
 .kurs-jahrgang-button:disabled {
@@ -278,16 +273,12 @@
 
     padding: 10px 12px;
 
-    border:
-            1px solid
-            rgba(90, 158, 62, 0.3);
-
+    border: 1px solid rgba(90, 158, 62, 0.3);
     border-radius: 8px;
 
-    background:
-            rgba(90, 158, 62, 0.1);
+    background: rgba(90, 158, 62, 0.1);
 
-    color: #99d47e;
+    color: var(--success-text);
 
     font-size: 13px;
     font-weight: 500;
@@ -306,10 +297,10 @@
 
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 .kurs-add-students-toggle {
@@ -326,8 +317,8 @@
 
     border: none;
 
-    background: #292929;
-    color: #ffffff;
+    background: var(--surface-secondary);
+    color: var(--text-heading);
 
     font-size: 16px;
     font-weight: 650;
@@ -335,14 +326,17 @@
     cursor: pointer;
 
     text-align: left;
+
+    transition:
+            background-color 0.15s ease;
 }
 
 .kurs-add-students-toggle:hover {
-    background: #303030;
+    background: var(--surface-hover);
 }
 
 .kurs-add-students-toggle span:last-child {
-    color: #e8792b;
+    color: var(--accent);
 
     font-size: 22px;
     line-height: 1;
@@ -353,8 +347,7 @@
    ===================================================== */
 
 .kurs-add-students-content {
-    border-top:
-            1px solid #414141;
+    border-top: 1px solid var(--border-color);
 }
 
 /* =====================================================
@@ -365,15 +358,14 @@
     display: grid;
 
     grid-template-columns:
-            minmax(250px, 1fr)
-            minmax(180px, 280px);
+        minmax(250px, 1fr)
+        minmax(180px, 280px);
 
     gap: 14px;
 
     padding: 18px 22px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .kurs-add-students-field {
@@ -387,7 +379,7 @@
 }
 
 .kurs-add-students-field label {
-    color: #c7c7c7;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -399,25 +391,32 @@
 
     width: 100%;
     min-width: 0;
-
     min-height: 40px;
 
     padding: 10px 12px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.88rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.kurs-add-students-field input::placeholder {
+    color: var(--input-placeholder);
 }
 
 .kurs-add-students-field input:focus,
 .kurs-add-students-field select:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -425,9 +424,8 @@
 }
 
 .kurs-add-students-field select option {
-    background: #262626;
-
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 }
 
 /* =====================================================
@@ -444,10 +442,9 @@
 
     padding: 12px 22px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #2b2b2b;
+    background: var(--surface-secondary);
 }
 
 .kurs-add-students-list-header label {
@@ -457,7 +454,7 @@
 
     gap: 9px;
 
-    color: #dddddd;
+    color: var(--text-secondary);
 
     font-size: 13px;
     font-weight: 600;
@@ -466,7 +463,7 @@
 }
 
 .kurs-add-students-list-header span {
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 12px;
 }
@@ -481,7 +478,7 @@
 
     flex-shrink: 0;
 
-    accent-color: #e8792b;
+    accent-color: var(--accent);
 
     cursor: pointer;
 }
@@ -498,8 +495,26 @@
     scrollbar-width: thin;
 
     scrollbar-color:
-            #666666
-            #252525;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
+}
+
+.kurs-add-students-list::-webkit-scrollbar {
+    width: 9px;
+}
+
+.kurs-add-students-list::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+.kurs-add-students-list::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background: var(--scrollbar-thumb);
+}
+
+.kurs-add-students-list::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
 .kurs-add-student-row {
@@ -511,8 +526,7 @@
 
     padding: 11px 22px;
 
-    border-bottom:
-            1px solid #3e3e3e;
+    border-bottom: 1px solid var(--table-row-border);
 
     cursor: pointer;
 
@@ -521,8 +535,7 @@
 }
 
 .kurs-add-student-row:hover {
-    background:
-            rgba(232, 121, 43, 0.06);
+    background: rgba(232, 121, 43, 0.06);
 }
 
 .kurs-add-student-row:last-child {
@@ -540,14 +553,14 @@
 }
 
 .kurs-add-student-name strong {
-    color: #eeeeee;
+    color: var(--text-heading);
 
     font-size: 13px;
     font-weight: 600;
 }
 
 .kurs-add-student-name span {
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 12px;
 }
@@ -559,7 +572,7 @@
 .kurs-add-students-empty {
     padding: 28px 22px;
 
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 
@@ -580,14 +593,13 @@
 
     padding: 16px 22px;
 
-    border-top:
-            1px solid #414141;
+    border-top: 1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .kurs-add-students-actions > span {
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 }
@@ -600,17 +612,21 @@
     border: none;
     border-radius: 8px;
 
-    background: #e8792b;
+    background: var(--accent);
     color: #ffffff;
 
     font-size: 0.86rem;
     font-weight: 600;
 
     cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
 }
 
 .kurs-add-students-button:hover:not(:disabled) {
-    background: #d06820;
+    background: var(--accent-hover);
 }
 
 .kurs-add-students-button:disabled {
@@ -624,16 +640,12 @@
 
     padding: 10px 12px;
 
-    border:
-            1px solid
-            rgba(90, 158, 62, 0.3);
-
+    border: 1px solid rgba(90, 158, 62, 0.3);
     border-radius: 8px;
 
-    background:
-            rgba(90, 158, 62, 0.1);
+    background: rgba(90, 158, 62, 0.1);
 
-    color: #99d47e;
+    color: var(--success-text);
 
     font-size: 13px;
     font-weight: 500;
@@ -649,10 +661,10 @@
 
     overflow: hidden;
 
-    border: 1px solid #414141;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: #252525;
+    background: var(--surface-primary);
 }
 
 /* =====================================================
@@ -669,10 +681,9 @@
 
     padding: 16px 18px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--border-color);
 
-    background: #292929;
+    background: var(--surface-secondary);
 }
 
 .kurs-details-toolbar input {
@@ -682,17 +693,25 @@
 
     padding: 10px 12px;
 
-    border: 1px solid #505050;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.kurs-details-toolbar input::placeholder {
+    color: var(--input-placeholder);
 }
 
 .kurs-details-toolbar input:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 3px
@@ -700,7 +719,7 @@
 }
 
 .kurs-details-toolbar span {
-    color: #999999;
+    color: var(--text-muted);
 
     font-size: 13px;
 
@@ -723,8 +742,8 @@
     scrollbar-width: thin;
 
     scrollbar-color:
-            #666666
-            #252525;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
@@ -734,17 +753,17 @@
 }
 
 .kurs-details-table-scroll::-webkit-scrollbar-track {
-    background: #252525;
+    background: var(--scrollbar-track);
 }
 
 .kurs-details-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
 
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .kurs-details-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7a7a7a;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -757,14 +776,15 @@
     min-width: 1900px;
 
     border-collapse: collapse;
+
+    background: var(--surface-primary);
 }
 
 .kurs-details-table th,
 .kurs-details-table td {
     padding: 11px 13px;
 
-    border-bottom:
-            1px solid #414141;
+    border-bottom: 1px solid var(--table-row-border);
 
     text-align: left;
 
@@ -772,9 +792,9 @@
 }
 
 .kurs-details-table th {
-    background: #303030;
+    background: var(--table-header-background);
 
-    color: #bdbdbd;
+    color: var(--table-header-text);
 
     font-size: 12px;
     font-weight: 700;
@@ -782,10 +802,17 @@
     cursor: pointer;
 
     user-select: none;
+
+    transition:
+            background-color 0.15s ease;
+}
+
+.kurs-details-table th:hover {
+    background: var(--surface-hover);
 }
 
 .kurs-details-table td {
-    color: #dddddd;
+    color: var(--text-secondary);
 
     font-size: 13px;
 }
@@ -798,8 +825,7 @@
 }
 
 .kurs-details-table tbody tr:hover {
-    background:
-            rgba(232, 121, 43, 0.07);
+    background: rgba(232, 121, 43, 0.07);
 }
 
 .kurs-details-table tbody tr:last-child td {
@@ -811,7 +837,7 @@
    ===================================================== */
 
 .kurs-1530-cell {
-    color: #f29a5b !important;
+    color: var(--accent) !important;
 
     font-weight: 700;
 }
@@ -823,7 +849,7 @@
 .kurs-details-empty {
     padding: 35px !important;
 
-    color: #999999 !important;
+    color: var(--text-muted) !important;
 
     text-align: center !important;
 }
@@ -831,13 +857,13 @@
 .kurs-details-message {
     padding: 30px;
 
-    color: #999999;
+    color: var(--text-muted);
 
     text-align: center;
 }
 
 .kurs-details-error {
-    color: #ff9999;
+    color: var(--error-text);
 }
 
 /* =====================================================
@@ -848,10 +874,7 @@
 
     .kurs-details-info {
         grid-template-columns:
-                repeat(
-                        2,
-                        minmax(0, 1fr)
-                );
+            repeat(2, minmax(0, 1fr));
     }
 
     .kurs-jahrgang-content {
@@ -869,8 +892,7 @@
     }
 
     .kurs-add-students-filter {
-        grid-template-columns:
-                1fr;
+        grid-template-columns: 1fr;
     }
 }
 
@@ -881,8 +903,7 @@
 @media (max-width: 600px) {
 
     .kurs-details-info {
-        grid-template-columns:
-                1fr;
+        grid-template-columns: 1fr;
     }
 
     .kurs-details-page .page-header {
@@ -906,9 +927,7 @@
     }
 
     .kurs-jahrgang-message {
-        margin:
-                0 18px
-                16px;
+        margin: 0 18px 16px;
     }
 
     .kurs-add-students-toggle {
@@ -944,9 +963,7 @@
     }
 
     .kurs-add-students-message {
-        margin:
-                0 18px
-                16px;
+        margin: 0 18px 16px;
     }
 
     .kurs-details-toolbar {

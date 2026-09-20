@@ -14,15 +14,6 @@
    TOP HORIZONTAL SCROLLBAR
    ===================================================== */
 
-/*
- * Eigener horizontaler Scrollbereich oberhalb
- * der Tabelle.
- *
- * Dadurch ist der Scrollbalken immer erreichbar,
- * ohne zuerst bis zum Ende von mehreren hundert
- * Schülern scrollen zu müssen.
- */
-
 .student-table-top-scroll {
     width: 100%;
     max-width: 100%;
@@ -35,20 +26,16 @@
     overflow-x: scroll;
     overflow-y: hidden;
 
-    background: #252525;
+    background: var(--surface-primary);
 
     scrollbar-width: auto;
     scrollbar-color:
-            #777777
-            #2a2a2a;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 
     -webkit-overflow-scrolling: touch;
 }
 
-/*
- * Unsichtbarer Inhalt erzeugt genau dieselbe
- * horizontale Breite wie die Tabelle.
- */
 .student-table-top-scroll-content {
     height: 1px;
 }
@@ -62,20 +49,20 @@
 .student-table-top-scroll::-webkit-scrollbar-track {
     border-radius: 999px;
 
-    background: #2a2a2a;
+    background: var(--scrollbar-track);
 }
 
 .student-table-top-scroll::-webkit-scrollbar-thumb {
     min-width: 50px;
 
-    border: 2px solid #2a2a2a;
+    border: 2px solid var(--scrollbar-track);
     border-radius: 999px;
 
-    background: #777777;
+    background: var(--scrollbar-thumb);
 }
 
 .student-table-top-scroll::-webkit-scrollbar-thumb:hover {
-    background: #999999;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -100,32 +87,26 @@
 
     scrollbar-width: thin;
     scrollbar-color:
-            #666666
-            #252525;
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
 }
-
-/*
- * Unterer nativer Scrollbalken bleibt ebenfalls
- * vorhanden. Der obere Balken ist aber der
- * primäre Scrollbalken für normale Mäuse.
- */
 
 .student-table-scroll::-webkit-scrollbar {
     height: 9px;
 }
 
 .student-table-scroll::-webkit-scrollbar-track {
-    background: #252525;
+    background: var(--scrollbar-track);
 }
 
 .student-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
 
-    background: #666666;
+    background: var(--scrollbar-thumb);
 }
 
 .student-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7a7a7a;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* =====================================================
@@ -148,9 +129,9 @@
 
     border-collapse: collapse;
 
-    border: 1px solid #444444;
+    border: 1px solid var(--border-color);
 
-    background: #252525;
+    background: var(--surface-primary);
 
     font-size: 0.9rem;
 }
@@ -162,10 +143,10 @@
 .student-table th {
     padding: 11px 14px;
 
-    border-bottom: 2px solid #555555;
+    border-bottom: 2px solid var(--border-strong);
 
-    background: #2f2f2f;
-    color: #e5e5e5;
+    background: var(--table-header-background);
+    color: var(--table-header-text);
 
     font-size: 0.82rem;
     font-weight: 600;
@@ -182,9 +163,9 @@
 .student-table td {
     padding: 10px 14px;
 
-    border-bottom: 1px solid #3e3e3e;
+    border-bottom: 1px solid var(--table-row-border);
 
-    color: #dddddd;
+    color: var(--text-secondary);
 
     vertical-align: middle;
 
@@ -192,14 +173,14 @@
 }
 
 .student-table tbody tr {
-    background: #252525;
+    background: var(--surface-primary);
 
     transition:
             background-color 0.15s ease;
 }
 
 .student-table tbody tr:hover {
-    background: #303030;
+    background: var(--surface-hover);
 }
 
 .student-table tbody tr:last-child td {
@@ -220,7 +201,7 @@
 }
 
 .sortable-header:hover {
-    background: #3a3a3a;
+    background: var(--surface-hover);
 }
 
 .header-content {
@@ -238,7 +219,7 @@
 .empty-row {
     padding: 30px 14px !important;
 
-    color: #999999 !important;
+    color: var(--text-muted) !important;
 
     text-align: center !important;
 }
@@ -255,13 +236,13 @@
 
     padding: 7px 9px;
 
-    border: 1px solid #666666;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
 
     outline: none;
 
-    background: #202020;
-    color: #ffffff;
+    background: var(--input-background);
+    color: var(--input-text);
 
     font-size: 0.85rem;
 
@@ -270,8 +251,12 @@
             box-shadow 0.15s ease;
 }
 
+.edit-input::placeholder {
+    color: var(--input-placeholder);
+}
+
 .edit-input:focus {
-    border-color: #e8792b;
+    border-color: var(--accent);
 
     box-shadow:
             0 0 0 2px
@@ -321,44 +306,62 @@
             opacity 0.15s ease;
 }
 
+/* Details */
+
 .btn-details {
     display: inline-block;
 
-    background: #444444;
+    border: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+    color: var(--text-primary);
 
     text-decoration: none;
 }
 
 .btn-details:hover {
-    background: #555555;
+    background: var(--surface-hover);
+    color: var(--text-heading);
 }
 
+/* Bearbeiten */
+
 .btn-edit {
-    background: #e8792b;
+    background: var(--accent);
+    color: #ffffff;
 }
 
 .btn-edit:hover {
-    background: #d06820;
+    background: var(--accent-hover);
 }
+
+/* Löschen */
 
 .btn-delete {
     background: #d94a4a;
+    color: #ffffff;
 }
 
 .btn-delete:hover {
     background: #bd3535;
 }
 
+/* Speichern */
+
 .btn-save {
     background: #5a9e3e;
+    color: #ffffff;
 }
 
 .btn-save:hover {
     background: #4a8a30;
 }
 
+/* Abbrechen */
+
 .btn-cancel {
     background: #777777;
+    color: #ffffff;
 }
 
 .btn-cancel:hover {
@@ -374,7 +377,7 @@
 }
 
 .student-row:hover {
-    background: #303030;
+    background: var(--surface-hover);
 }
 
 .student-row-editing {
