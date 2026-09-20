@@ -31,38 +31,40 @@ function AnwesenheitPage() {
        GRUNDDATEN
        ===================================================== */
 
-    const [kurse, setKurse] =
-        useState([]);
+    const [kurse, setKurse] = useState([]);
 
-    const [selectedKurs, setSelectedKurs] =
-        useState('');
+    const [selectedKurs, setSelectedKurs] = useState('');
 
-    const [students, setStudents] =
-        useState([]);
+    const [students, setStudents] = useState([]);
 
-    const [statuses, setStatuses] =
-        useState({});
+    const [statuses, setStatuses] = useState({});
 
-    const [bemerkungen, setBemerkungen] =
-        useState({});
+    const [bemerkungen, setBemerkungen] = useState({});
 
-    const [savedAnwesenheiten, setSavedAnwesenheiten] =
-        useState([]);
+    const [savedAnwesenheiten, setSavedAnwesenheiten] = useState([]);
+
+    /* =====================================================
+       SCHÜLER FILTER / SORTIERUNG
+       ===================================================== */
+
+    const [studentSearch, setStudentSearch] = useState('');
+
+    const [studentJahrgangFilter, setStudentJahrgangFilter] = useState('');
+
+    const [studentKlasseFilter, setStudentKlasseFilter] = useState('');
+
+    const [studentSort, setStudentSort] = useState({
+        key: 'name',
+        direction: 'asc'
+    });
 
     /* =====================================================
        MELDUNGEN
        ===================================================== */
 
-    const [message, setMessage] =
-        useState('');
+    const [message, setMessage] = useState('');
 
-    /*
-     * success
-     * error
-     * info
-     */
-    const [messageType, setMessageType] =
-        useState('success');
+    const [messageType, setMessageType] = useState('success');
 
     const showSuccess = (text) => {
         setMessageType('success');
@@ -82,53 +84,43 @@ function AnwesenheitPage() {
        TABS
        ===================================================== */
 
-    const [activeTab, setActiveTab] =
-        useState('erfassen');
+    const [activeTab, setActiveTab] = useState('erfassen');
 
     /* =====================================================
        ANWESENHEIT ERFASSEN
        ===================================================== */
 
-    const [datum, setDatum] =
-        useState(getToday());
+    const [datum, setDatum] = useState(getToday());
 
-    const [saveLoading, setSaveLoading] =
-        useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
+
+    const [studentsLoading, setStudentsLoading] = useState(false);
 
     /* =====================================================
        VERLAUF
        ===================================================== */
 
-    const [filterVon, setFilterVon] =
-        useState(getToday());
+    const [filterVon, setFilterVon] = useState(getToday());
 
-    const [filterBis, setFilterBis] =
-        useState(getToday());
+    const [filterBis, setFilterBis] = useState(getToday());
 
-    const [filterKurs, setFilterKurs] =
-        useState('');
+    const [filterKurs, setFilterKurs] = useState('');
 
-    const [anzeigeModus, setAnzeigeModus] =
-        useState('gesamt');
+    const [anzeigeModus, setAnzeigeModus] = useState('gesamt');
 
-    const [historyLoading, setHistoryLoading] =
-        useState(false);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
-    const [exportLoading, setExportLoading] =
-        useState(false);
+    const [exportLoading, setExportLoading] = useState(false);
 
     /* =====================================================
        BEARBEITUNG
        ===================================================== */
 
-    const [editingId, setEditingId] =
-        useState(null);
+    const [editingId, setEditingId] = useState(null);
 
-    const [editStatus, setEditStatus] =
-        useState('');
+    const [editStatus, setEditStatus] = useState('');
 
-    const [editBemerkung, setEditBemerkung] =
-        useState('');
+    const [editBemerkung, setEditBemerkung] = useState('');
 
     /* =====================================================
        INITIALISIERUNG
@@ -156,11 +148,8 @@ function AnwesenheitPage() {
             return '–';
         }
 
-        const nachname =
-            student.nachname || '';
-
-        const vorname =
-            student.vorname || '';
+        const nachname = student.nachname || '';
+        const vorname = student.vorname || '';
 
         if (!nachname && !vorname) {
             return '–';
@@ -195,8 +184,7 @@ function AnwesenheitPage() {
 
         try {
 
-            const data =
-                await getKurse();
+            const data = await getKurse();
 
             setKurse(
                 Array.isArray(data)
@@ -246,14 +234,6 @@ function AnwesenheitPage() {
 
             setHistoryLoading(true);
 
-            /*
-             * Beim manuellen Laden darf die alte
-             * Meldung verschwinden.
-             *
-             * Nach dem Speichern setzen wir
-             * resetMessage = false, damit die
-             * Erfolgsmeldung sichtbar bleibt.
-             */
             if (resetMessage) {
                 clearMessage();
             }
@@ -294,195 +274,34 @@ function AnwesenheitPage() {
        KURSE NACH WOCHENTAG
        ===================================================== */
 
-    const getKurseByWochentag = (
-        wochentag
-    ) => {
+    const getKurseByWochentag = (wochentag) => {
 
         return kurse.filter(
             (kurs) =>
-                kurs.wochentag ===
-                wochentag
+                kurs.wochentag === wochentag
         );
     };
 
     /* =====================================================
-       VERLAUF FILTERN
+       SCHÜLER + GESPEICHERTE ANWESENHEIT LADEN
+
+       Wichtig:
+       Wenn für Datum + Kurs bereits Anwesenheiten existieren,
+       werden diese Statuswerte wieder geladen.
+
+       Wenn nichts gespeichert wurde:
+       Standard = ANWESEND
        ===================================================== */
 
-    const filteredAnwesenheiten =
-        useMemo(() => {
-
-            return savedAnwesenheiten
-                .filter(
-                    (anwesenheit) => {
-
-                        const matchesKurs =
-                            !filterKurs ||
-                            anwesenheit
-                                .kurs
-                                ?.id ===
-                            Number(filterKurs);
-
-                        return matchesKurs;
-                    }
-                )
-                .sort(
-                    (a, b) => {
-
-                        const datumA =
-                            String(
-                                a.datum ?? ''
-                            );
-
-                        const datumB =
-                            String(
-                                b.datum ?? ''
-                            );
-
-                        return datumB
-                            .localeCompare(
-                                datumA
-                            );
-                    }
-                );
-
-        }, [
-            savedAnwesenheiten,
-            filterKurs
-        ]);
-
-    /* =====================================================
-       NACH KURS GRUPPIEREN
-       ===================================================== */
-
-    const gruppiertNachKurs =
-        useMemo(() => {
-
-            const gruppen = {};
-
-            filteredAnwesenheiten.forEach(
-                (anwesenheit) => {
-
-                    const kursId =
-                        anwesenheit
-                            .kurs
-                            ?.id ??
-                        'ohne-kurs';
-
-                    if (!gruppen[kursId]) {
-
-                        gruppen[kursId] = {
-                            kurs:
-                            anwesenheit.kurs,
-
-                            eintraege: []
-                        };
-                    }
-
-                    gruppen[
-                        kursId
-                        ].eintraege.push(
-                        anwesenheit
-                    );
-                }
-            );
-
-            return Object
-                .values(gruppen)
-                .sort(
-                    (a, b) =>
-                        String(
-                            a.kurs
-                                ?.name ??
-                            ''
-                        ).localeCompare(
-                            String(
-                                b.kurs
-                                    ?.name ??
-                                ''
-                            ),
-                            'de'
-                        )
-                );
-
-        }, [
-            filteredAnwesenheiten
-        ]);
-
-    /* =====================================================
-       NACH KIND GRUPPIEREN
-       ===================================================== */
-
-    const gruppiertNachKind =
-        useMemo(() => {
-
-            const gruppen = {};
-
-            filteredAnwesenheiten.forEach(
-                (anwesenheit) => {
-
-                    const studentId =
-                        anwesenheit
-                            .student
-                            ?.id ??
-                        'ohne-student';
-
-                    if (!gruppen[studentId]) {
-
-                        gruppen[studentId] = {
-                            student:
-                            anwesenheit.student,
-
-                            eintraege: []
-                        };
-                    }
-
-                    gruppen[
-                        studentId
-                        ].eintraege.push(
-                        anwesenheit
-                    );
-                }
-            );
-
-            return Object
-                .values(gruppen)
-                .sort(
-                    (a, b) =>
-                        formatStudentName(
-                            a.student
-                        ).localeCompare(
-                            formatStudentName(
-                                b.student
-                            ),
-                            'de'
-                        )
-                );
-
-        }, [
-            filteredAnwesenheiten
-        ]);
-
-    /* =====================================================
-       KURS AUSWÄHLEN
-       ===================================================== */
-
-    const handleKursChange = async (
-        kursId
+    const loadStudentsForKurs = async (
+        kursId,
+        selectedDatum
     ) => {
-
-        setSelectedKurs(
-            kursId
-        );
-
-        clearMessage();
 
         if (!kursId) {
 
             setStudents([]);
-
             setStatuses({});
-
             setBemerkungen({});
 
             return;
@@ -490,6 +309,11 @@ function AnwesenheitPage() {
 
         try {
 
+            setStudentsLoading(true);
+
+            /*
+             * Buchungen / Schüler des Kurses laden
+             */
             const response =
                 await fetch(
                     `/api/buchungen/kurs/${kursId}`
@@ -513,9 +337,31 @@ function AnwesenheitPage() {
                     )
                     .filter(Boolean);
 
-            setStudents(
-                studentList
-            );
+            /*
+             * Anwesenheiten für genau diesen Tag laden.
+             */
+            const anwesenheitenData =
+                await getAnwesenheitenByZeitraum(
+                    selectedDatum,
+                    selectedDatum
+                );
+
+            const anwesenheiten =
+                Array.isArray(anwesenheitenData)
+                    ? anwesenheitenData
+                    : [];
+
+            /*
+             * Nur Anwesenheiten des aktuell
+             * ausgewählten Kurses verwenden.
+             */
+            const kursAnwesenheiten =
+                anwesenheiten.filter(
+                    (anwesenheit) =>
+                        Number(
+                            anwesenheit.kurs?.id
+                        ) === Number(kursId)
+                );
 
             const initialStatuses = {};
             const initialBemerkungen = {};
@@ -523,36 +369,122 @@ function AnwesenheitPage() {
             studentList.forEach(
                 (student) => {
 
-                    initialStatuses[
-                        student.id
-                        ] = 'ANWESEND';
+                    /*
+                     * Prüfen, ob für diesen Schüler,
+                     * diesen Kurs und dieses Datum
+                     * bereits ein Eintrag existiert.
+                     */
+                    const existing =
+                        kursAnwesenheiten.find(
+                            (anwesenheit) =>
+                                Number(
+                                    anwesenheit.student?.id
+                                ) === Number(student.id)
+                        );
 
-                    initialBemerkungen[
-                        student.id
-                        ] = '';
+                    if (existing) {
+
+                        /*
+                         * Gespeicherten Status übernehmen.
+                         */
+                        initialStatuses[
+                            student.id
+                            ] =
+                            existing.status ||
+                            'ANWESEND';
+
+                        /*
+                         * Gespeicherte Bemerkung übernehmen.
+                         */
+                        initialBemerkungen[
+                            student.id
+                            ] =
+                            existing.bemerkung ||
+                            '';
+
+                    } else {
+
+                        /*
+                         * Noch kein Eintrag vorhanden.
+                         *
+                         * Standardmäßig ANWESEND.
+                         */
+                        initialStatuses[
+                            student.id
+                            ] = 'ANWESEND';
+
+                        initialBemerkungen[
+                            student.id
+                            ] = '';
+                    }
                 }
             );
 
-            setStatuses(
-                initialStatuses
-            );
+            setStudents(studentList);
 
-            setBemerkungen(
-                initialBemerkungen
-            );
+            setStatuses(initialStatuses);
+
+            setBemerkungen(initialBemerkungen);
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                'Fehler beim Laden der Schüler/Anwesenheiten:',
+                error
+            );
 
             setStudents([]);
-
             setStatuses({});
-
             setBemerkungen({});
 
             showError(
-                'Schüler konnten nicht geladen werden.'
+                'Schüler oder gespeicherte Anwesenheiten konnten nicht geladen werden.'
+            );
+
+        } finally {
+
+            setStudentsLoading(false);
+        }
+    };
+
+    /* =====================================================
+       KURS AUSWÄHLEN
+       ===================================================== */
+
+    const handleKursChange = async (kursId) => {
+
+        setSelectedKurs(kursId);
+
+        clearMessage();
+
+        setStudentSearch('');
+        setStudentJahrgangFilter('');
+        setStudentKlasseFilter('');
+
+        await loadStudentsForKurs(
+            kursId,
+            datum
+        );
+    };
+
+    /* =====================================================
+       DATUM ÄNDERN
+
+       Wenn bereits ein Kurs ausgewählt wurde,
+       werden die Daten des neuen Tages geladen.
+       ===================================================== */
+
+    const handleDatumChange = async (newDatum) => {
+
+        setDatum(newDatum);
+
+        clearMessage();
+
+        if (selectedKurs) {
+
+            await loadStudentsForKurs(
+                selectedKurs,
+                newDatum
             );
         }
     };
@@ -569,9 +501,7 @@ function AnwesenheitPage() {
         setStatuses(
             (previous) => ({
                 ...previous,
-
-                [studentId]:
-                status
+                [studentId]: status
             })
         );
     };
@@ -588,11 +518,244 @@ function AnwesenheitPage() {
         setBemerkungen(
             (previous) => ({
                 ...previous,
-
-                [studentId]:
-                bemerkung
+                [studentId]: bemerkung
             })
         );
+    };
+
+    /* =====================================================
+       JAHRGÄNGE FÜR FILTER
+       ===================================================== */
+
+    const studentJahrgaenge =
+        useMemo(() => {
+
+            return [
+                ...new Set(
+                    students
+                        .map(
+                            (student) =>
+                                student.jahrgang
+                        )
+                        .filter(
+                            (jahrgang) =>
+                                jahrgang !== null &&
+                                jahrgang !== undefined &&
+                                jahrgang !== ''
+                        )
+                )
+            ].sort(
+                (a, b) =>
+                    Number(a) - Number(b)
+            );
+
+        }, [students]);
+
+    /* =====================================================
+       KLASSEN FÜR FILTER
+       ===================================================== */
+
+    const studentKlassen =
+        useMemo(() => {
+
+            return [
+                ...new Set(
+                    students
+                        .map(
+                            (student) =>
+                                student.klasse
+                        )
+                        .filter(Boolean)
+                )
+            ].sort(
+                (a, b) =>
+                    String(a).localeCompare(
+                        String(b),
+                        'de'
+                    )
+            );
+
+        }, [students]);
+
+    /* =====================================================
+       SCHÜLER FILTERN / SORTIEREN
+       ===================================================== */
+
+    const filteredStudents =
+        useMemo(() => {
+
+            const search =
+                studentSearch
+                    .trim()
+                    .toLowerCase();
+
+            const result =
+                students.filter(
+                    (student) => {
+
+                        const name =
+                            formatStudentName(
+                                student
+                            ).toLowerCase();
+
+                        const matchesSearch =
+                            !search ||
+                            name.includes(search);
+
+                        const matchesJahrgang =
+                            !studentJahrgangFilter ||
+                            String(
+                                student.jahrgang ?? ''
+                            ) ===
+                            String(
+                                studentJahrgangFilter
+                            );
+
+                        const matchesKlasse =
+                            !studentKlasseFilter ||
+                            String(
+                                student.klasse ?? ''
+                            ) ===
+                            String(
+                                studentKlasseFilter
+                            );
+
+                        return (
+                            matchesSearch &&
+                            matchesJahrgang &&
+                            matchesKlasse
+                        );
+                    }
+                );
+
+            result.sort(
+                (a, b) => {
+
+                    let valueA = '';
+                    let valueB = '';
+
+                    switch (studentSort.key) {
+
+                        case 'jahrgang':
+
+                            valueA =
+                                Number(
+                                    a.jahrgang ?? 0
+                                );
+
+                            valueB =
+                                Number(
+                                    b.jahrgang ?? 0
+                                );
+
+                            break;
+
+                        case 'klasse':
+
+                            valueA =
+                                String(
+                                    a.klasse ?? ''
+                                );
+
+                            valueB =
+                                String(
+                                    b.klasse ?? ''
+                                );
+
+                            break;
+
+                        case 'name':
+                        default:
+
+                            valueA =
+                                formatStudentName(a);
+
+                            valueB =
+                                formatStudentName(b);
+
+                            break;
+                    }
+
+                    let comparison = 0;
+
+                    if (
+                        typeof valueA === 'number' &&
+                        typeof valueB === 'number'
+                    ) {
+
+                        comparison =
+                            valueA - valueB;
+
+                    } else {
+
+                        comparison =
+                            String(valueA)
+                                .localeCompare(
+                                    String(valueB),
+                                    'de'
+                                );
+                    }
+
+                    return studentSort.direction ===
+                    'asc'
+                        ? comparison
+                        : -comparison;
+                }
+            );
+
+            return result;
+
+        }, [
+            students,
+            studentSearch,
+            studentJahrgangFilter,
+            studentKlasseFilter,
+            studentSort
+        ]);
+
+    /* =====================================================
+       SORTIERUNG ÄNDERN
+       ===================================================== */
+
+    const handleStudentSort = (key) => {
+
+        setStudentSort(
+            (previous) => {
+
+                if (previous.key === key) {
+
+                    return {
+                        key,
+                        direction:
+                            previous.direction ===
+                            'asc'
+                                ? 'desc'
+                                : 'asc'
+                    };
+                }
+
+                return {
+                    key,
+                    direction: 'asc'
+                };
+            }
+        );
+    };
+
+    /* =====================================================
+       SORTIERUNG SYMBOL
+       ===================================================== */
+
+    const getSortSymbol = (key) => {
+
+        if (studentSort.key !== key) {
+            return '';
+        }
+
+        return studentSort.direction ===
+        'asc'
+            ? ' ↑'
+            : ' ↓';
     };
 
     /* =====================================================
@@ -625,9 +788,12 @@ function AnwesenheitPage() {
 
             clearMessage();
 
-            for (
-                const student of students
-                ) {
+            /*
+             * Wichtig:
+             * Wir speichern ALLE Schüler des Kurses,
+             * nicht nur die aktuell gefilterten.
+             */
+            for (const student of students) {
 
                 const anwesenheit = {
 
@@ -653,20 +819,21 @@ function AnwesenheitPage() {
                 );
             }
 
-            /*
-             * Erfolgsmeldung setzen.
-             */
             showSuccess(
                 'Anwesenheit wurde erfolgreich gespeichert.'
             );
 
             /*
-             * Verlauf aktualisieren, wenn das Datum
-             * innerhalb des ausgewählten Zeitraums liegt.
+             * Direkt danach erneut aus der DB laden.
              *
-             * false verhindert, dass loadZeitraum()
-             * unsere Erfolgsmeldung wieder löscht.
+             * Dadurch entspricht die Anzeige exakt
+             * dem gespeicherten Zustand.
              */
+            await loadStudentsForKurs(
+                selectedKurs,
+                datum
+            );
+
             if (
                 datum >= filterVon &&
                 datum <= filterBis
@@ -692,6 +859,147 @@ function AnwesenheitPage() {
             setSaveLoading(false);
         }
     };
+
+    /* =====================================================
+       VERLAUF FILTERN
+       ===================================================== */
+
+    const filteredAnwesenheiten =
+        useMemo(() => {
+
+            return savedAnwesenheiten
+                .filter(
+                    (anwesenheit) => {
+
+                        return (
+                            !filterKurs ||
+                            Number(
+                                anwesenheit.kurs?.id
+                            ) ===
+                            Number(filterKurs)
+                        );
+                    }
+                )
+                .sort(
+                    (a, b) => {
+
+                        const datumA =
+                            String(
+                                a.datum ?? ''
+                            );
+
+                        const datumB =
+                            String(
+                                b.datum ?? ''
+                            );
+
+                        return datumB.localeCompare(
+                            datumA
+                        );
+                    }
+                );
+
+        }, [
+            savedAnwesenheiten,
+            filterKurs
+        ]);
+
+    /* =====================================================
+       NACH KURS GRUPPIEREN
+       ===================================================== */
+
+    const gruppiertNachKurs =
+        useMemo(() => {
+
+            const gruppen = {};
+
+            filteredAnwesenheiten.forEach(
+                (anwesenheit) => {
+
+                    const kursId =
+                        anwesenheit.kurs?.id ??
+                        'ohne-kurs';
+
+                    if (!gruppen[kursId]) {
+
+                        gruppen[kursId] = {
+                            kurs: anwesenheit.kurs,
+                            eintraege: []
+                        };
+                    }
+
+                    gruppen[
+                        kursId
+                        ].eintraege.push(
+                        anwesenheit
+                    );
+                }
+            );
+
+            return Object
+                .values(gruppen)
+                .sort(
+                    (a, b) =>
+                        String(
+                            a.kurs?.name ?? ''
+                        ).localeCompare(
+                            String(
+                                b.kurs?.name ?? ''
+                            ),
+                            'de'
+                        )
+                );
+
+        }, [filteredAnwesenheiten]);
+
+    /* =====================================================
+       NACH KIND GRUPPIEREN
+       ===================================================== */
+
+    const gruppiertNachKind =
+        useMemo(() => {
+
+            const gruppen = {};
+
+            filteredAnwesenheiten.forEach(
+                (anwesenheit) => {
+
+                    const studentId =
+                        anwesenheit.student?.id ??
+                        'ohne-student';
+
+                    if (!gruppen[studentId]) {
+
+                        gruppen[studentId] = {
+                            student:
+                            anwesenheit.student,
+                            eintraege: []
+                        };
+                    }
+
+                    gruppen[
+                        studentId
+                        ].eintraege.push(
+                        anwesenheit
+                    );
+                }
+            );
+
+            return Object
+                .values(gruppen)
+                .sort(
+                    (a, b) =>
+                        formatStudentName(
+                            a.student
+                        ).localeCompare(
+                            formatStudentName(
+                                b.student
+                            ),
+                            'de'
+                        )
+                );
+
+        }, [filteredAnwesenheiten]);
 
     /* =====================================================
        BEARBEITUNG STARTEN
@@ -770,6 +1078,26 @@ function AnwesenheitPage() {
                 false
             );
 
+            /*
+             * Jeżeli edytowany wpis dotyczy aktualnie
+             * otwartego dnia i kursu, odświeżamy również
+             * zakładkę "Anwesenheit erfassen".
+             */
+            if (
+                String(anwesenheit.datum) ===
+                String(datum) &&
+                Number(
+                    anwesenheit.kurs?.id
+                ) ===
+                Number(selectedKurs)
+            ) {
+
+                await loadStudentsForKurs(
+                    selectedKurs,
+                    datum
+                );
+            }
+
         } catch (error) {
 
             console.error(error);
@@ -784,9 +1112,7 @@ function AnwesenheitPage() {
        LÖSCHEN
        ===================================================== */
 
-    const handleDelete = async (
-        id
-    ) => {
+    const handleDelete = async (id) => {
 
         const confirmed =
             window.confirm(
@@ -799,9 +1125,7 @@ function AnwesenheitPage() {
 
         try {
 
-            await deleteAnwesenheit(
-                id
-            );
+            await deleteAnwesenheit(id);
 
             showSuccess(
                 'Anwesenheit wurde erfolgreich gelöscht.'
@@ -812,6 +1136,14 @@ function AnwesenheitPage() {
                 filterBis,
                 false
             );
+
+            if (selectedKurs) {
+
+                await loadStudentsForKurs(
+                    selectedKurs,
+                    datum
+                );
+            }
 
         } catch (error) {
 
@@ -829,10 +1161,7 @@ function AnwesenheitPage() {
 
     const handleExport = async () => {
 
-        if (
-            !filterVon ||
-            !filterBis
-        ) {
+        if (!filterVon || !filterBis) {
 
             showError(
                 'Bitte einen Zeitraum für den Export auswählen.'
@@ -841,10 +1170,7 @@ function AnwesenheitPage() {
             return;
         }
 
-        if (
-            filterVon >
-            filterBis
-        ) {
+        if (filterVon > filterBis) {
 
             showError(
                 'Das Von-Datum darf nicht nach dem Bis-Datum liegen.'
@@ -868,34 +1194,27 @@ function AnwesenheitPage() {
 
             const url =
                 window.URL
-                    .createObjectURL(
-                        blob
-                    );
+                    .createObjectURL(blob);
 
             const link =
-                document
-                    .createElement(
-                        'a'
-                    );
+                document.createElement('a');
 
             link.href = url;
 
             link.download =
                 `Anwesenheit_${filterVon}_bis_${filterBis}.xlsx`;
 
-            document.body
-                .appendChild(
-                    link
-                );
+            document.body.appendChild(
+                link
+            );
 
             link.click();
 
             link.remove();
 
-            window.URL
-                .revokeObjectURL(
-                    url
-                );
+            window.URL.revokeObjectURL(
+                url
+            );
 
             showSuccess(
                 'Excel-Export wurde erfolgreich erstellt.'
@@ -956,16 +1275,13 @@ function AnwesenheitPage() {
                 <button
                     type="button"
                     className={
-                        activeTab ===
-                        'erfassen'
+                        activeTab === 'erfassen'
                             ? 'tab-button active'
                             : 'tab-button'
                     }
                     onClick={() => {
 
-                        setActiveTab(
-                            'erfassen'
-                        );
+                        setActiveTab('erfassen');
 
                         clearMessage();
                     }}
@@ -976,16 +1292,13 @@ function AnwesenheitPage() {
                 <button
                     type="button"
                     className={
-                        activeTab ===
-                        'verlauf'
+                        activeTab === 'verlauf'
                             ? 'tab-button active'
                             : 'tab-button'
                     }
                     onClick={() => {
 
-                        setActiveTab(
-                            'verlauf'
-                        );
+                        setActiveTab('verlauf');
 
                         clearMessage();
                     }}
@@ -1006,16 +1319,19 @@ function AnwesenheitPage() {
                         `anwesenheit-message ${messageType}`
                     }
                 >
+
                     <span className="anwesenheit-message-icon">
-                        {messageType ===
-                        'success'
+
+                        {messageType === 'success'
                             ? '✓'
                             : '!'}
+
                     </span>
 
                     <span>
                         {message}
                     </span>
+
                 </div>
 
             )}
@@ -1024,47 +1340,142 @@ function AnwesenheitPage() {
                 ANWESENHEIT ERFASSEN
                ================================================= */}
 
-            {activeTab ===
-                'erfassen' && (
+            {activeTab === 'erfassen' && (
 
-                    <section className="anwesenheit-section">
+                <section className="anwesenheit-section">
 
-                        <div className="anwesenheit-section-header">
+                    <div className="anwesenheit-section-header">
 
-                            <div>
+                        <div>
 
-                                <h2>
-                                    Anwesenheit erfassen
-                                </h2>
+                            <h2>
+                                Anwesenheit erfassen
+                            </h2>
 
-                                <p>
-                                    Datum und Kurs auswählen und
-                                    anschließend den Status der Schüler
-                                    erfassen.
-                                </p>
-
-                            </div>
+                            <p>
+                                Datum und Kurs auswählen und
+                                anschließend den Status der Schüler
+                                erfassen.
+                            </p>
 
                         </div>
 
-                        {/* =================================================
-                        DATUM / KURS
+                    </div>
+
+                    {/* DATUM / KURS */}
+
+                    <div className="anwesenheit-toolbar">
+
+                        <div className="anwesenheit-field">
+
+                            <label htmlFor="anwesenheit-datum">
+                                Datum
+                            </label>
+
+                            <input
+                                id="anwesenheit-datum"
+                                type="date"
+                                value={datum}
+                                onChange={(event) =>
+                                    handleDatumChange(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                        </div>
+
+                        <div className="anwesenheit-field anwesenheit-field-large">
+
+                            <label htmlFor="anwesenheit-kurs">
+                                Kurs
+                            </label>
+
+                            <select
+                                id="anwesenheit-kurs"
+                                value={selectedKurs}
+                                onChange={(event) =>
+                                    handleKursChange(
+                                        event.target.value
+                                    )
+                                }
+                            >
+
+                                <option value="">
+                                    Kurs auswählen...
+                                </option>
+
+                                {wochentage.map(
+                                    (tag) => {
+
+                                        const kurseAmTag =
+                                            getKurseByWochentag(
+                                                tag
+                                            );
+
+                                        if (
+                                            kurseAmTag.length ===
+                                            0
+                                        ) {
+                                            return null;
+                                        }
+
+                                        return (
+
+                                            <optgroup
+                                                key={tag}
+                                                label={tag}
+                                            >
+
+                                                {kurseAmTag.map(
+                                                    (kurs) => (
+
+                                                        <option
+                                                            key={kurs.id}
+                                                            value={kurs.id}
+                                                        >
+                                                            {kurs.name}
+
+                                                            {kurs.uhrzeit
+                                                                ? ` | ${kurs.uhrzeit}`
+                                                                : ''}
+                                                        </option>
+
+                                                    )
+                                                )}
+
+                                            </optgroup>
+
+                                        );
+                                    }
+                                )}
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    {/* =================================================
+                        SCHÜLER FILTER
                        ================================================= */}
 
-                        <div className="anwesenheit-toolbar">
+                    {students.length > 0 && (
 
-                            <div className="anwesenheit-field">
+                        <div className="anwesenheit-student-filters">
 
-                                <label htmlFor="anwesenheit-datum">
-                                    Datum
+                            <div className="anwesenheit-field anwesenheit-student-search">
+
+                                <label>
+                                    Schüler
                                 </label>
 
                                 <input
-                                    id="anwesenheit-datum"
-                                    type="date"
-                                    value={datum}
+                                    type="text"
+                                    placeholder="Name suchen..."
+                                    value={studentSearch}
                                     onChange={(event) =>
-                                        setDatum(
+                                        setStudentSearch(
                                             event.target.value
                                         )
                                     }
@@ -1072,78 +1483,72 @@ function AnwesenheitPage() {
 
                             </div>
 
-                            <div className="anwesenheit-field anwesenheit-field-large">
+                            <div className="anwesenheit-field">
 
-                                <label htmlFor="anwesenheit-kurs">
-                                    Kurs
+                                <label>
+                                    Jahrgang
                                 </label>
 
                                 <select
-                                    id="anwesenheit-kurs"
-                                    value={selectedKurs}
+                                    value={studentJahrgangFilter}
                                     onChange={(event) =>
-                                        handleKursChange(
+                                        setStudentJahrgangFilter(
                                             event.target.value
                                         )
                                     }
                                 >
 
                                     <option value="">
-                                        Kurs auswählen...
+                                        Alle Jahrgänge
                                     </option>
 
-                                    {wochentage.map(
-                                        (tag) => {
+                                    {studentJahrgaenge.map(
+                                        (jahrgang) => (
 
-                                            const kurseAmTag =
-                                                getKurseByWochentag(
-                                                    tag
-                                                );
+                                            <option
+                                                key={jahrgang}
+                                                value={jahrgang}
+                                            >
+                                                {jahrgang}
+                                            </option>
 
-                                            if (
-                                                kurseAmTag
-                                                    .length ===
-                                                0
-                                            ) {
-                                                return null;
-                                            }
+                                        )
+                                    )}
 
-                                            return (
+                                </select>
 
-                                                <optgroup
-                                                    key={tag}
-                                                    label={tag}
-                                                >
+                            </div>
 
-                                                    {kurseAmTag.map(
-                                                        (kurs) => (
+                            <div className="anwesenheit-field">
 
-                                                            <option
-                                                                key={
-                                                                    kurs.id
-                                                                }
-                                                                value={
-                                                                    kurs.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    kurs.name
-                                                                }
+                                <label>
+                                    Klasse
+                                </label>
 
-                                                                {
-                                                                    kurs.uhrzeit
-                                                                        ? ` | ${kurs.uhrzeit}`
-                                                                        : ''
-                                                                }
-                                                            </option>
+                                <select
+                                    value={studentKlasseFilter}
+                                    onChange={(event) =>
+                                        setStudentKlasseFilter(
+                                            event.target.value
+                                        )
+                                    }
+                                >
 
-                                                        )
-                                                    )}
+                                    <option value="">
+                                        Alle Klassen
+                                    </option>
 
-                                                </optgroup>
+                                    {studentKlassen.map(
+                                        (klasse) => (
 
-                                            );
-                                        }
+                                            <option
+                                                key={klasse}
+                                                value={klasse}
+                                            >
+                                                {klasse}
+                                            </option>
+
+                                        )
                                     )}
 
                                 </select>
@@ -1152,123 +1557,661 @@ function AnwesenheitPage() {
 
                         </div>
 
-                        {/* =================================================
+                    )}
+
+                    {/* =================================================
                         SCHÜLER
                        ================================================= */}
 
-                        {students.length ===
-                        0 ? (
+                    {studentsLoading ? (
 
-                            <div className="anwesenheit-empty">
+                        <div className="anwesenheit-empty">
+                            Schüler und Anwesenheiten werden geladen...
+                        </div>
 
-                                Kein Kurs ausgewählt oder keine Schüler vorhanden.
+                    ) : students.length === 0 ? (
+
+                        <div className="anwesenheit-empty">
+
+                            Kein Kurs ausgewählt oder keine Schüler vorhanden.
+
+                        </div>
+
+                    ) : filteredStudents.length === 0 ? (
+
+                        <div className="anwesenheit-empty">
+
+                            Keine Schüler entsprechen dem Filter.
+
+                        </div>
+
+                    ) : (
+
+                        <>
+
+                            <div className="anwesenheit-table-scroll">
+
+                                <table className="anwesenheit-table">
+
+                                    <thead>
+
+                                    <tr>
+
+                                        <th
+                                            className="sortable-header"
+                                            onClick={() =>
+                                                handleStudentSort(
+                                                    'name'
+                                                )
+                                            }
+                                        >
+                                            Name
+                                            {getSortSymbol('name')}
+                                        </th>
+
+                                        <th
+                                            className="sortable-header"
+                                            onClick={() =>
+                                                handleStudentSort(
+                                                    'jahrgang'
+                                                )
+                                            }
+                                        >
+                                            Jahrgang
+                                            {getSortSymbol(
+                                                'jahrgang'
+                                            )}
+                                        </th>
+
+                                        <th
+                                            className="sortable-header"
+                                            onClick={() =>
+                                                handleStudentSort(
+                                                    'klasse'
+                                                )
+                                            }
+                                        >
+                                            Klasse
+                                            {getSortSymbol(
+                                                'klasse'
+                                            )}
+                                        </th>
+
+                                        <th className="status-column">
+                                            Anwesend
+                                        </th>
+
+                                        <th className="status-column">
+                                            Entschuldigt
+                                        </th>
+
+                                        <th className="status-column">
+                                            Fehlt
+                                        </th>
+
+                                        <th>
+                                            Bemerkung
+                                        </th>
+
+                                    </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                    {filteredStudents.map(
+                                        (student) => (
+
+                                            <tr key={student.id}>
+
+                                                <td>
+                                                    {formatStudentName(
+                                                        student
+                                                    )}
+                                                </td>
+
+                                                <td>
+                                                    {student.jahrgang ??
+                                                        '–'}
+                                                </td>
+
+                                                <td className="klasse-cell">
+                                                    {student.klasse ||
+                                                        '–'}
+                                                </td>
+
+                                                <td className="attendance-checkbox-cell">
+
+                                                    <input
+                                                        type="checkbox"
+                                                        className="attendance-checkbox"
+                                                        checked={
+                                                            statuses[
+                                                                student.id
+                                                                ] ===
+                                                            'ANWESEND'
+                                                        }
+                                                        onChange={() =>
+                                                            handleStatusChange(
+                                                                student.id,
+                                                                'ANWESEND'
+                                                            )
+                                                        }
+                                                    />
+
+                                                </td>
+
+                                                <td className="attendance-checkbox-cell">
+
+                                                    <input
+                                                        type="checkbox"
+                                                        className="attendance-checkbox"
+                                                        checked={
+                                                            statuses[
+                                                                student.id
+                                                                ] ===
+                                                            'ENTSCHULDIGT'
+                                                        }
+                                                        onChange={() =>
+                                                            handleStatusChange(
+                                                                student.id,
+                                                                'ENTSCHULDIGT'
+                                                            )
+                                                        }
+                                                    />
+
+                                                </td>
+
+                                                <td className="attendance-checkbox-cell">
+
+                                                    <input
+                                                        type="checkbox"
+                                                        className="attendance-checkbox"
+                                                        checked={
+                                                            statuses[
+                                                                student.id
+                                                                ] ===
+                                                            'FEHLT'
+                                                        }
+                                                        onChange={() =>
+                                                            handleStatusChange(
+                                                                student.id,
+                                                                'FEHLT'
+                                                            )
+                                                        }
+                                                    />
+
+                                                </td>
+
+                                                <td>
+
+                                                    <input
+                                                        type="text"
+                                                        className="bemerkung-input"
+                                                        placeholder="Bemerkung..."
+                                                        value={
+                                                            bemerkungen[
+                                                                student.id
+                                                                ] || ''
+                                                        }
+                                                        onChange={(event) =>
+                                                            handleBemerkungChange(
+                                                                student.id,
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                    />
+
+                                                </td>
+
+                                            </tr>
+
+                                        )
+                                    )}
+
+                                    </tbody>
+
+                                </table>
 
                             </div>
 
-                        ) : (
+                            <div className="anwesenheit-actions">
 
-                            <>
+                                <button
+                                    type="button"
+                                    className="save-button"
+                                    onClick={handleSave}
+                                    disabled={saveLoading}
+                                >
+
+                                    {saveLoading
+                                        ? 'Wird gespeichert...'
+                                        : 'Anwesenheit speichern'}
+
+                                </button>
+
+                            </div>
+
+                        </>
+
+                    )}
+
+                </section>
+
+            )}
+
+            {/* =================================================
+                VERLAUF
+               ================================================= */}
+
+            {activeTab === 'verlauf' && (
+
+                <section className="anwesenheit-section">
+
+                    <div className="anwesenheit-section-header">
+
+                        <div>
+
+                            <h2>
+                                Verlauf
+                            </h2>
+
+                            <p>
+                                Anwesenheiten nach Zeitraum anzeigen,
+                                filtern und auswerten.
+                            </p>
+
+                        </div>
+
+                        <span className="anwesenheit-count">
+
+                            {filteredAnwesenheiten.length}{' '}
+                            Einträge
+
+                        </span>
+
+                    </div>
+
+                    {/* FILTER */}
+
+                    <div className="anwesenheit-toolbar">
+
+                        <div className="anwesenheit-field">
+
+                            <label htmlFor="filter-von">
+                                Von
+                            </label>
+
+                            <input
+                                id="filter-von"
+                                type="date"
+                                value={filterVon}
+                                onChange={(event) =>
+                                    setFilterVon(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                        </div>
+
+                        <div className="anwesenheit-field">
+
+                            <label htmlFor="filter-bis">
+                                Bis
+                            </label>
+
+                            <input
+                                id="filter-bis"
+                                type="date"
+                                value={filterBis}
+                                onChange={(event) =>
+                                    setFilterBis(
+                                        event.target.value
+                                    )
+                                }
+                            />
+
+                        </div>
+
+                        <div className="anwesenheit-field anwesenheit-field-large">
+
+                            <label htmlFor="filter-kurs">
+                                Kurs
+                            </label>
+
+                            <select
+                                id="filter-kurs"
+                                value={filterKurs}
+                                onChange={(event) =>
+                                    setFilterKurs(
+                                        event.target.value
+                                    )
+                                }
+                            >
+
+                                <option value="">
+                                    Alle Kurse
+                                </option>
+
+                                {wochentage.map(
+                                    (tag) => {
+
+                                        const kurseAmTag =
+                                            getKurseByWochentag(
+                                                tag
+                                            );
+
+                                        if (
+                                            kurseAmTag.length ===
+                                            0
+                                        ) {
+                                            return null;
+                                        }
+
+                                        return (
+
+                                            <optgroup
+                                                key={tag}
+                                                label={tag}
+                                            >
+
+                                                {kurseAmTag.map(
+                                                    (kurs) => (
+
+                                                        <option
+                                                            key={kurs.id}
+                                                            value={kurs.id}
+                                                        >
+                                                            {kurs.name}
+                                                        </option>
+
+                                                    )
+                                                )}
+
+                                            </optgroup>
+
+                                        );
+                                    }
+                                )}
+
+                            </select>
+
+                        </div>
+
+                        <div className="anwesenheit-toolbar-actions">
+
+                            <button
+                                type="button"
+                                className="anwesenheit-load-button"
+                                onClick={() =>
+                                    loadZeitraum()
+                                }
+                                disabled={historyLoading}
+                            >
+
+                                {historyLoading
+                                    ? 'Wird geladen...'
+                                    : 'Zeitraum anzeigen'}
+
+                            </button>
+
+                            <button
+                                type="button"
+                                className="anwesenheit-export-button"
+                                onClick={handleExport}
+                                disabled={exportLoading}
+                            >
+
+                                {exportLoading
+                                    ? 'Export läuft...'
+                                    : 'Excel exportieren'}
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    {/* ANZEIGEMODUS */}
+
+                    <div className="anwesenheit-view-switch">
+
+                        <button
+                            type="button"
+                            className={
+                                anzeigeModus === 'gesamt'
+                                    ? 'active'
+                                    : ''
+                            }
+                            onClick={() =>
+                                setAnzeigeModus(
+                                    'gesamt'
+                                )
+                            }
+                        >
+                            Gesamt
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                anzeigeModus === 'kurse'
+                                    ? 'active'
+                                    : ''
+                            }
+                            onClick={() =>
+                                setAnzeigeModus(
+                                    'kurse'
+                                )
+                            }
+                        >
+                            Nach Kursen
+                        </button>
+
+                        <button
+                            type="button"
+                            className={
+                                anzeigeModus === 'kinder'
+                                    ? 'active'
+                                    : ''
+                            }
+                            onClick={() =>
+                                setAnzeigeModus(
+                                    'kinder'
+                                )
+                            }
+                        >
+                            Nach Kindern
+                        </button>
+
+                    </div>
+
+                    {filteredAnwesenheiten.length === 0 ? (
+
+                        <div className="anwesenheit-empty">
+
+                            Keine Anwesenheiten für den ausgewählten Zeitraum gefunden.
+
+                        </div>
+
+                    ) : (
+
+                        <>
+
+                            {/* GESAMT */}
+
+                            {anzeigeModus === 'gesamt' && (
 
                                 <div className="anwesenheit-table-scroll">
 
-                                    <table className="anwesenheit-table">
+                                    <table className="anwesenheit-table anwesenheit-history-table">
 
                                         <thead>
 
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Klasse</th>
+                                            <th>Datum</th>
+                                            <th>Schüler</th>
+                                            <th>Kurs</th>
                                             <th>Status</th>
                                             <th>Bemerkung</th>
+                                            <th>Aktionen</th>
                                         </tr>
 
                                         </thead>
 
                                         <tbody>
 
-                                        {students.map(
-                                            (student) => (
+                                        {filteredAnwesenheiten.map(
+                                            (anwesenheit) => (
 
                                                 <tr
                                                     key={
-                                                        student.id
+                                                        anwesenheit.id
                                                     }
                                                 >
 
                                                     <td>
-                                                        {
-                                                            formatStudentName(
-                                                                student
-                                                            )
-                                                        }
+                                                        {anwesenheit.datum}
                                                     </td>
 
                                                     <td>
-                                                        {
-                                                            student.klasse ||
-                                                            '–'
-                                                        }
+                                                        {formatStudentName(
+                                                            anwesenheit.student
+                                                        )}
                                                     </td>
 
                                                     <td>
-
-                                                        <select
-                                                            className="status-select"
-                                                            value={
-                                                                statuses[
-                                                                    student.id
-                                                                    ] ||
-                                                                'ANWESEND'
-                                                            }
-                                                            onChange={(
-                                                                event
-                                                            ) =>
-                                                                handleStatusChange(
-                                                                    student.id,
-                                                                    event.target.value
-                                                                )
-                                                            }
-                                                        >
-
-                                                            <option value="ANWESEND">
-                                                                Anwesend
-                                                            </option>
-
-                                                            <option value="FEHLT">
-                                                                Fehlt
-                                                            </option>
-
-                                                            <option value="ENTSCHULDIGT">
-                                                                Entschuldigt
-                                                            </option>
-
-                                                        </select>
-
+                                                        {anwesenheit.kurs
+                                                                ?.name ||
+                                                            '–'}
                                                     </td>
 
-                                                    <td>
+                                                    {editingId ===
+                                                    anwesenheit.id ? (
 
-                                                        <input
-                                                            type="text"
-                                                            className="bemerkung-input"
-                                                            placeholder="Bemerkung..."
-                                                            value={
-                                                                bemerkungen[
-                                                                    student.id
-                                                                    ] ||
-                                                                ''
-                                                            }
-                                                            onChange={(
-                                                                event
-                                                            ) =>
-                                                                handleBemerkungChange(
-                                                                    student.id,
-                                                                    event.target.value
-                                                                )
-                                                            }
-                                                        />
+                                                        <>
 
-                                                    </td>
+                                                            <td>
+
+                                                                <select
+                                                                    className="status-select"
+                                                                    value={
+                                                                        editStatus
+                                                                    }
+                                                                    onChange={(event) =>
+                                                                        setEditStatus(
+                                                                            event.target.value
+                                                                        )
+                                                                    }
+                                                                >
+
+                                                                    <option value="ANWESEND">
+                                                                        Anwesend
+                                                                    </option>
+
+                                                                    <option value="FEHLT">
+                                                                        Fehlt
+                                                                    </option>
+
+                                                                    <option value="ENTSCHULDIGT">
+                                                                        Entschuldigt
+                                                                    </option>
+
+                                                                </select>
+
+                                                            </td>
+
+                                                            <td>
+
+                                                                <input
+                                                                    className="bemerkung-input"
+                                                                    value={
+                                                                        editBemerkung
+                                                                    }
+                                                                    onChange={(event) =>
+                                                                        setEditBemerkung(
+                                                                            event.target.value
+                                                                        )
+                                                                    }
+                                                                />
+
+                                                            </td>
+
+                                                            <td className="anwesenheit-action-cell">
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn-save"
+                                                                    onClick={() =>
+                                                                        handleEditSave(
+                                                                            anwesenheit
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Speichern
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn-cancel"
+                                                                    onClick={
+                                                                        handleEditCancel
+                                                                    }
+                                                                >
+                                                                    Abbrechen
+                                                                </button>
+
+                                                            </td>
+
+                                                        </>
+
+                                                    ) : (
+
+                                                        <>
+
+                                                            <td>
+                                                                {formatStatus(
+                                                                    anwesenheit.status
+                                                                )}
+                                                            </td>
+
+                                                            <td>
+                                                                {anwesenheit.bemerkung ||
+                                                                    '–'}
+                                                            </td>
+
+                                                            <td className="anwesenheit-action-cell">
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn-edit"
+                                                                    onClick={() =>
+                                                                        handleEditStart(
+                                                                            anwesenheit
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Bearbeiten
+                                                                </button>
+
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn-delete"
+                                                                    onClick={() =>
+                                                                        handleDelete(
+                                                                            anwesenheit.id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Löschen
+                                                                </button>
+
+                                                            </td>
+
+                                                        </>
+
+                                                    )}
 
                                                 </tr>
 
@@ -1281,764 +2224,212 @@ function AnwesenheitPage() {
 
                                 </div>
 
-                                <div className="anwesenheit-actions">
+                            )}
 
-                                    <button
-                                        type="button"
-                                        className="save-button"
-                                        onClick={
-                                            handleSave
-                                        }
-                                        disabled={
-                                            saveLoading
-                                        }
-                                    >
+                            {/* NACH KURSEN */}
 
-                                        {saveLoading
-                                            ? 'Wird gespeichert...'
-                                            : 'Anwesenheit speichern'}
+                            {anzeigeModus === 'kurse' && (
 
-                                    </button>
+                                <div className="anwesenheit-group-list">
+
+                                    {gruppiertNachKurs.map(
+                                        (gruppe) => (
+
+                                            <div
+                                                key={
+                                                    gruppe.kurs?.id ??
+                                                    'ohne-kurs'
+                                                }
+                                                className="anwesenheit-group"
+                                            >
+
+                                                <div className="anwesenheit-group-header">
+
+                                                    <h3>
+                                                        {gruppe.kurs?.name ||
+                                                            'Ohne Kurs'}
+                                                    </h3>
+
+                                                    <span>
+                                                        {gruppe.eintraege.length}{' '}
+                                                        Einträge
+                                                    </span>
+
+                                                </div>
+
+                                                <div className="anwesenheit-table-scroll">
+
+                                                    <table className="anwesenheit-table">
+
+                                                        <thead>
+
+                                                        <tr>
+                                                            <th>Datum</th>
+                                                            <th>Schüler</th>
+                                                            <th>Status</th>
+                                                            <th>Bemerkung</th>
+                                                        </tr>
+
+                                                        </thead>
+
+                                                        <tbody>
+
+                                                        {gruppe.eintraege.map(
+                                                            (anwesenheit) => (
+
+                                                                <tr
+                                                                    key={
+                                                                        anwesenheit.id
+                                                                    }
+                                                                >
+
+                                                                    <td>
+                                                                        {anwesenheit.datum}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {formatStudentName(
+                                                                            anwesenheit.student
+                                                                        )}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {formatStatus(
+                                                                            anwesenheit.status
+                                                                        )}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {anwesenheit.bemerkung ||
+                                                                            '–'}
+                                                                    </td>
+
+                                                                </tr>
+
+                                                            )
+                                                        )}
+
+                                                        </tbody>
+
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+
+                                        )
+                                    )}
 
                                 </div>
 
-                            </>
+                            )}
 
-                        )}
+                            {/* NACH KINDERN */}
 
-                    </section>
+                            {anzeigeModus === 'kinder' && (
 
-                )}
+                                <div className="anwesenheit-group-list">
 
-            {/* =================================================
-                VERLAUF
-               ================================================= */}
+                                    {gruppiertNachKind.map(
+                                        (gruppe) => (
 
-            {activeTab ===
-                'verlauf' && (
+                                            <div
+                                                key={
+                                                    gruppe.student?.id ??
+                                                    'ohne-student'
+                                                }
+                                                className="anwesenheit-group"
+                                            >
 
-                    <section className="anwesenheit-section">
+                                                <div className="anwesenheit-group-header">
 
-                        <div className="anwesenheit-section-header">
+                                                    <h3>
+                                                        {formatStudentName(
+                                                            gruppe.student
+                                                        )}
+                                                    </h3>
 
-                            <div>
+                                                    <span>
+                                                        {gruppe.eintraege.length}{' '}
+                                                        Einträge
+                                                    </span>
 
-                                <h2>
-                                    Verlauf
-                                </h2>
+                                                </div>
 
-                                <p>
-                                    Anwesenheiten nach Zeitraum anzeigen,
-                                    filtern und auswerten.
-                                </p>
+                                                <div className="anwesenheit-table-scroll">
 
-                            </div>
+                                                    <table className="anwesenheit-table">
 
-                            <span className="anwesenheit-count">
+                                                        <thead>
 
-                            {
-                                filteredAnwesenheiten
-                                    .length
-                            }{' '}
-                                Einträge
-
-                        </span>
-
-                        </div>
-
-                        {/* =================================================
-                        FILTER
-                       ================================================= */}
-
-                        <div className="anwesenheit-toolbar">
-
-                            <div className="anwesenheit-field">
-
-                                <label htmlFor="filter-von">
-                                    Von
-                                </label>
-
-                                <input
-                                    id="filter-von"
-                                    type="date"
-                                    value={filterVon}
-                                    onChange={(event) =>
-                                        setFilterVon(
-                                            event.target.value
-                                        )
-                                    }
-                                />
-
-                            </div>
-
-                            <div className="anwesenheit-field">
-
-                                <label htmlFor="filter-bis">
-                                    Bis
-                                </label>
-
-                                <input
-                                    id="filter-bis"
-                                    type="date"
-                                    value={filterBis}
-                                    onChange={(event) =>
-                                        setFilterBis(
-                                            event.target.value
-                                        )
-                                    }
-                                />
-
-                            </div>
-
-                            <div className="anwesenheit-field anwesenheit-field-large">
-
-                                <label htmlFor="filter-kurs">
-                                    Kurs
-                                </label>
-
-                                <select
-                                    id="filter-kurs"
-                                    value={filterKurs}
-                                    onChange={(event) =>
-                                        setFilterKurs(
-                                            event.target.value
-                                        )
-                                    }
-                                >
-
-                                    <option value="">
-                                        Alle Kurse
-                                    </option>
-
-                                    {wochentage.map(
-                                        (tag) => {
-
-                                            const kurseAmTag =
-                                                getKurseByWochentag(
-                                                    tag
-                                                );
-
-                                            if (
-                                                kurseAmTag
-                                                    .length ===
-                                                0
-                                            ) {
-                                                return null;
-                                            }
-
-                                            return (
-
-                                                <optgroup
-                                                    key={tag}
-                                                    label={tag}
-                                                >
-
-                                                    {kurseAmTag.map(
-                                                        (kurs) => (
-
-                                                            <option
-                                                                key={
-                                                                    kurs.id
-                                                                }
-                                                                value={
-                                                                    kurs.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    kurs.name
-                                                                }
-                                                            </option>
-
-                                                        )
-                                                    )}
-
-                                                </optgroup>
-
-                                            );
-                                        }
-                                    )}
-
-                                </select>
-
-                            </div>
-
-                            <div className="anwesenheit-toolbar-actions">
-
-                                <button
-                                    type="button"
-                                    className="anwesenheit-load-button"
-                                    onClick={() =>
-                                        loadZeitraum()
-                                    }
-                                    disabled={
-                                        historyLoading
-                                    }
-                                >
-
-                                    {historyLoading
-                                        ? 'Wird geladen...'
-                                        : 'Zeitraum anzeigen'}
-
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="anwesenheit-export-button"
-                                    onClick={
-                                        handleExport
-                                    }
-                                    disabled={
-                                        exportLoading
-                                    }
-                                >
-
-                                    {exportLoading
-                                        ? 'Export läuft...'
-                                        : 'Excel exportieren'}
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        {/* =================================================
-                        ANZEIGEMODUS
-                       ================================================= */}
-
-                        <div className="anwesenheit-view-switch">
-
-                            <button
-                                type="button"
-                                className={
-                                    anzeigeModus ===
-                                    'gesamt'
-                                        ? 'active'
-                                        : ''
-                                }
-                                onClick={() =>
-                                    setAnzeigeModus(
-                                        'gesamt'
-                                    )
-                                }
-                            >
-                                Gesamt
-                            </button>
-
-                            <button
-                                type="button"
-                                className={
-                                    anzeigeModus ===
-                                    'kurse'
-                                        ? 'active'
-                                        : ''
-                                }
-                                onClick={() =>
-                                    setAnzeigeModus(
-                                        'kurse'
-                                    )
-                                }
-                            >
-                                Nach Kursen
-                            </button>
-
-                            <button
-                                type="button"
-                                className={
-                                    anzeigeModus ===
-                                    'kinder'
-                                        ? 'active'
-                                        : ''
-                                }
-                                onClick={() =>
-                                    setAnzeigeModus(
-                                        'kinder'
-                                    )
-                                }
-                            >
-                                Nach Kindern
-                            </button>
-
-                        </div>
-
-                        {/* =================================================
-                        KEINE DATEN
-                       ================================================= */}
-
-                        {filteredAnwesenheiten
-                            .length ===
-                        0 ? (
-
-                            <div className="anwesenheit-empty">
-
-                                Keine Anwesenheiten für den ausgewählten Zeitraum gefunden.
-
-                            </div>
-
-                        ) : (
-
-                            <>
-
-                                {/* =================================================
-                                GESAMT
-                               ================================================= */}
-
-                                {anzeigeModus ===
-                                    'gesamt' && (
-
-                                        <div className="anwesenheit-table-scroll">
-
-                                            <table className="anwesenheit-table anwesenheit-history-table">
-
-                                                <thead>
-
-                                                <tr>
-                                                    <th>Datum</th>
-                                                    <th>Schüler</th>
-                                                    <th>Kurs</th>
-                                                    <th>Status</th>
-                                                    <th>Bemerkung</th>
-                                                    <th>Aktionen</th>
-                                                </tr>
-
-                                                </thead>
-
-                                                <tbody>
-
-                                                {filteredAnwesenheiten.map(
-                                                    (
-                                                        anwesenheit
-                                                    ) => (
-
-                                                        <tr
-                                                            key={
-                                                                anwesenheit.id
-                                                            }
-                                                        >
-
-                                                            <td>
-                                                                {
-                                                                    anwesenheit.datum
-                                                                }
-                                                            </td>
-
-                                                            <td>
-                                                                {
-                                                                    formatStudentName(
-                                                                        anwesenheit.student
-                                                                    )
-                                                                }
-                                                            </td>
-
-                                                            <td>
-                                                                {
-                                                                    anwesenheit
-                                                                        .kurs
-                                                                        ?.name ||
-                                                                    '–'
-                                                                }
-                                                            </td>
-
-                                                            {editingId ===
-                                                            anwesenheit.id ? (
-
-                                                                <>
-
-                                                                    <td>
-
-                                                                        <select
-                                                                            className="status-select"
-                                                                            value={
-                                                                                editStatus
-                                                                            }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                setEditStatus(
-                                                                                    event.target.value
-                                                                                )
-                                                                            }
-                                                                        >
-
-                                                                            <option value="ANWESEND">
-                                                                                Anwesend
-                                                                            </option>
-
-                                                                            <option value="FEHLT">
-                                                                                Fehlt
-                                                                            </option>
-
-                                                                            <option value="ENTSCHULDIGT">
-                                                                                Entschuldigt
-                                                                            </option>
-
-                                                                        </select>
-
-                                                                    </td>
-
-                                                                    <td>
-
-                                                                        <input
-                                                                            className="bemerkung-input"
-                                                                            value={
-                                                                                editBemerkung
-                                                                            }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                setEditBemerkung(
-                                                                                    event.target.value
-                                                                                )
-                                                                            }
-                                                                        />
-
-                                                                    </td>
-
-                                                                    <td className="anwesenheit-action-cell">
-
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-save"
-                                                                            onClick={() =>
-                                                                                handleEditSave(
-                                                                                    anwesenheit
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Speichern
-                                                                        </button>
-
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-cancel"
-                                                                            onClick={
-                                                                                handleEditCancel
-                                                                            }
-                                                                        >
-                                                                            Abbrechen
-                                                                        </button>
-
-                                                                    </td>
-
-                                                                </>
-
-                                                            ) : (
-
-                                                                <>
-
-                                                                    <td>
-                                                                        {
-                                                                            formatStatus(
-                                                                                anwesenheit.status
-                                                                            )
-                                                                        }
-                                                                    </td>
-
-                                                                    <td>
-                                                                        {
-                                                                            anwesenheit.bemerkung ||
-                                                                            '–'
-                                                                        }
-                                                                    </td>
-
-                                                                    <td className="anwesenheit-action-cell">
-
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-edit"
-                                                                            onClick={() =>
-                                                                                handleEditStart(
-                                                                                    anwesenheit
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Bearbeiten
-                                                                        </button>
-
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-delete"
-                                                                            onClick={() =>
-                                                                                handleDelete(
-                                                                                    anwesenheit.id
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            Löschen
-                                                                        </button>
-
-                                                                    </td>
-
-                                                                </>
-
-                                                            )}
-
+                                                        <tr>
+                                                            <th>Datum</th>
+                                                            <th>Kurs</th>
+                                                            <th>Status</th>
+                                                            <th>Bemerkung</th>
                                                         </tr>
 
-                                                    )
-                                                )}
+                                                        </thead>
 
-                                                </tbody>
+                                                        <tbody>
 
-                                            </table>
+                                                        {gruppe.eintraege.map(
+                                                            (anwesenheit) => (
 
-                                        </div>
+                                                                <tr
+                                                                    key={
+                                                                        anwesenheit.id
+                                                                    }
+                                                                >
 
-                                    )}
+                                                                    <td>
+                                                                        {anwesenheit.datum}
+                                                                    </td>
 
-                                {/* =================================================
-                                NACH KURSEN
-                               ================================================= */}
+                                                                    <td>
+                                                                        {anwesenheit.kurs
+                                                                                ?.name ||
+                                                                            '–'}
+                                                                    </td>
 
-                                {anzeigeModus ===
-                                    'kurse' && (
+                                                                    <td>
+                                                                        {formatStatus(
+                                                                            anwesenheit.status
+                                                                        )}
+                                                                    </td>
 
-                                        <div className="anwesenheit-group-list">
+                                                                    <td>
+                                                                        {anwesenheit.bemerkung ||
+                                                                            '–'}
+                                                                    </td>
 
-                                            {gruppiertNachKurs.map(
-                                                (
-                                                    gruppe
-                                                ) => (
-
-                                                    <div
-                                                        key={
-                                                            gruppe
-                                                                .kurs
-                                                                ?.id ??
-                                                            'ohne-kurs'
-                                                        }
-                                                        className="anwesenheit-group"
-                                                    >
-
-                                                        <div className="anwesenheit-group-header">
-
-                                                            <h3>
-                                                                {
-                                                                    gruppe
-                                                                        .kurs
-                                                                        ?.name ||
-                                                                    'Ohne Kurs'
-                                                                }
-                                                            </h3>
-
-                                                            <span>
-                                                        {
-                                                            gruppe
-                                                                .eintraege
-                                                                .length
-                                                        }{' '}
-                                                                Einträge
-                                                    </span>
-
-                                                        </div>
-
-                                                        <div className="anwesenheit-table-scroll">
-
-                                                            <table className="anwesenheit-table">
-
-                                                                <thead>
-
-                                                                <tr>
-                                                                    <th>Datum</th>
-                                                                    <th>Schüler</th>
-                                                                    <th>Status</th>
-                                                                    <th>Bemerkung</th>
                                                                 </tr>
 
-                                                                </thead>
+                                                            )
+                                                        )}
 
-                                                                <tbody>
+                                                        </tbody>
 
-                                                                {gruppe.eintraege.map(
-                                                                    (
-                                                                        anwesenheit
-                                                                    ) => (
+                                                    </table>
 
-                                                                        <tr
-                                                                            key={
-                                                                                anwesenheit.id
-                                                                            }
-                                                                        >
+                                                </div>
 
-                                                                            <td>
-                                                                                {
-                                                                                    anwesenheit.datum
-                                                                                }
-                                                                            </td>
+                                            </div>
 
-                                                                            <td>
-                                                                                {
-                                                                                    formatStudentName(
-                                                                                        anwesenheit.student
-                                                                                    )
-                                                                                }
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    formatStatus(
-                                                                                        anwesenheit.status
-                                                                                    )
-                                                                                }
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    anwesenheit.bemerkung ||
-                                                                                    '–'
-                                                                                }
-                                                                            </td>
-
-                                                                        </tr>
-
-                                                                    )
-                                                                )}
-
-                                                                </tbody>
-
-                                                            </table>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                )
-                                            )}
-
-                                        </div>
-
+                                        )
                                     )}
 
-                                {/* =================================================
-                                NACH KINDERN
-                               ================================================= */}
+                                </div>
 
-                                {anzeigeModus ===
-                                    'kinder' && (
+                            )}
 
-                                        <div className="anwesenheit-group-list">
+                        </>
 
-                                            {gruppiertNachKind.map(
-                                                (
-                                                    gruppe
-                                                ) => (
+                    )}
 
-                                                    <div
-                                                        key={
-                                                            gruppe
-                                                                .student
-                                                                ?.id ??
-                                                            'ohne-student'
-                                                        }
-                                                        className="anwesenheit-group"
-                                                    >
+                </section>
 
-                                                        <div className="anwesenheit-group-header">
-
-                                                            <h3>
-                                                                {
-                                                                    formatStudentName(
-                                                                        gruppe.student
-                                                                    )
-                                                                }
-                                                            </h3>
-
-                                                            <span>
-                                                        {
-                                                            gruppe
-                                                                .eintraege
-                                                                .length
-                                                        }{' '}
-                                                                Einträge
-                                                    </span>
-
-                                                        </div>
-
-                                                        <div className="anwesenheit-table-scroll">
-
-                                                            <table className="anwesenheit-table">
-
-                                                                <thead>
-
-                                                                <tr>
-                                                                    <th>Datum</th>
-                                                                    <th>Kurs</th>
-                                                                    <th>Status</th>
-                                                                    <th>Bemerkung</th>
-                                                                </tr>
-
-                                                                </thead>
-
-                                                                <tbody>
-
-                                                                {gruppe.eintraege.map(
-                                                                    (
-                                                                        anwesenheit
-                                                                    ) => (
-
-                                                                        <tr
-                                                                            key={
-                                                                                anwesenheit.id
-                                                                            }
-                                                                        >
-
-                                                                            <td>
-                                                                                {
-                                                                                    anwesenheit.datum
-                                                                                }
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    anwesenheit
-                                                                                        .kurs
-                                                                                        ?.name ||
-                                                                                    '–'
-                                                                                }
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    formatStatus(
-                                                                                        anwesenheit.status
-                                                                                    )
-                                                                                }
-                                                                            </td>
-
-                                                                            <td>
-                                                                                {
-                                                                                    anwesenheit.bemerkung ||
-                                                                                    '–'
-                                                                                }
-                                                                            </td>
-
-                                                                        </tr>
-
-                                                                    )
-                                                                )}
-
-                                                                </tbody>
-
-                                                            </table>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                )
-                                            )}
-
-                                        </div>
-
-                                    )}
-
-                            </>
-
-                        )}
-
-                    </section>
-
-                )}
+            )}
 
         </div>
     );

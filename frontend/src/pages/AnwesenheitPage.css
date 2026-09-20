@@ -943,3 +943,182 @@
         text-align: left;
     }
 }
+
+/* =====================================================
+   SCHÜLER FILTER
+   ===================================================== */
+
+.anwesenheit-student-filters {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+
+    gap: 14px;
+
+    padding: 16px 22px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.anwesenheit-student-filters .anwesenheit-field {
+    min-width: 180px;
+}
+
+.anwesenheit-student-search {
+    flex: 1;
+    min-width: 260px !important;
+}
+
+.anwesenheit-student-filters input,
+.anwesenheit-student-filters select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-height: 40px;
+
+    padding: 9px 11px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-size: 0.88rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.anwesenheit-student-filters input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.anwesenheit-student-filters input:focus,
+.anwesenheit-student-filters select:focus {
+    border-color: var(--accent);
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.anwesenheit-student-filters select option {
+    background: var(--input-background);
+    color: var(--input-text);
+}
+
+
+/* =====================================================
+   SORTIERBARE SPALTEN
+   ===================================================== */
+
+.sortable-header {
+    cursor: pointer;
+
+    user-select: none;
+
+    transition:
+            background-color 0.15s ease,
+            color 0.15s ease;
+}
+
+.sortable-header:hover {
+    background: var(--surface-hover) !important;
+    color: var(--text-heading);
+}
+
+
+/* =====================================================
+   STATUS SPALTEN
+   ===================================================== */
+
+.status-column {
+    width: 115px;
+
+    text-align: center !important;
+}
+
+.attendance-checkbox-cell {
+    width: 115px;
+
+    text-align: center;
+}
+
+
+/* =====================================================
+   STATUS CHECKBOX
+   ===================================================== */
+
+.attendance-checkbox {
+    width: 20px;
+    height: 20px;
+
+    margin: 0;
+
+    accent-color: var(--accent);
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   KLASSEN SPALTE
+   ===================================================== */
+
+.klasse-cell {
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLET
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .anwesenheit-student-filters {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 2fr)
+            minmax(160px, 1fr)
+            minmax(160px, 1fr);
+    }
+
+    .anwesenheit-student-search {
+        min-width: 0 !important;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
+@media (max-width: 760px) {
+
+    .anwesenheit-student-filters {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+
+        padding: 16px 18px;
+    }
+
+    .anwesenheit-student-filters .anwesenheit-field,
+    .anwesenheit-student-search {
+        width: 100%;
+        min-width: 0 !important;
+    }
+
+    .status-column,
+    .attendance-checkbox-cell {
+        width: 100px;
+    }
+}
