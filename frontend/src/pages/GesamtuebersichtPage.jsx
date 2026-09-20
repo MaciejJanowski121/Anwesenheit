@@ -241,7 +241,7 @@ function GesamtuebersichtPage() {
 
             /*
              * Zahlen sortieren:
-             * Jahrgang sowie spätere Anwesenheitszähler.
+             * Jahrgang sowie Anwesenheitszähler.
              */
             if (
                 typeof valA === 'number' &&
@@ -317,27 +317,74 @@ function GesamtuebersichtPage() {
         }));
     };
 
+    /*
+     * Schüler speichern.
+     *
+     * Bei bestehenden Schülern wird ein UPDATE ausgeführt.
+     *
+     * Bei neuen Schülern wird die temporäre Frontend-ID
+     * NICHT an das Backend geschickt.
+     *
+     * PostgreSQL / Hibernate erzeugt anschließend die echte ID.
+     */
     const handleEditSave = async () => {
         try {
             let savedStudent;
 
             if (typeof editingId === 'number') {
+
+                // Bestehenden Schüler aktualisieren
                 savedStudent =
                     await updateStudent(
                         editingId,
                         editData
                     );
+
             } else {
+
+                /*
+                 * Neuen Schüler erstellen.
+                 *
+                 * Folgende Felder gehören nur zum Frontend
+                 * und werden deshalb nicht an das Backend gesendet:
+                 *
+                 * id
+                 * anzahlAnwesend
+                 * anzahlEntschuldigt
+                 * anzahlFehlend
+                 */
+                const {
+                    id,
+                    anzahlAnwesend,
+                    anzahlEntschuldigt,
+                    anzahlFehlend,
+                    ...studentToCreate
+                } = editData;
+
                 savedStudent =
                     await createStudent(
-                        editData
+                        studentToCreate
                     );
             }
 
+            /*
+             * Temporären Datensatz durch den vom Backend
+             * zurückgegebenen Schüler ersetzen.
+             *
+             * savedStudent enthält jetzt die echte Datenbank-ID.
+             */
             setStudents((previous) =>
                 previous.map((student) =>
                     student.id === editingId
-                        ? savedStudent
+                        ? {
+                            ...savedStudent,
+                            anzahlAnwesend:
+                                savedStudent.anzahlAnwesend ?? 0,
+                            anzahlEntschuldigt:
+                                savedStudent.anzahlEntschuldigt ?? 0,
+                            anzahlFehlend:
+                                savedStudent.anzahlFehlend ?? 0
+                        }
                         : student
                 )
             );
@@ -345,6 +392,7 @@ function GesamtuebersichtPage() {
             setEditingId(null);
             setEditData({});
             setError('');
+
         } catch (error) {
             console.error(
                 'Fehler beim Speichern:',
@@ -376,6 +424,11 @@ function GesamtuebersichtPage() {
             return;
         }
 
+        /*
+         * Temporäre ID nur für React / Frontend.
+         * Diese ID wird beim Speichern NICHT
+         * an das Backend geschickt.
+         */
         const tempId =
             `new-${Date.now()}`;
 
