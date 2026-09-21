@@ -32,15 +32,10 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [kurse, setKurse] = useState([]);
-
     const [selectedKurs, setSelectedKurs] = useState('');
-
     const [students, setStudents] = useState([]);
-
     const [statuses, setStatuses] = useState({});
-
     const [bemerkungen, setBemerkungen] = useState({});
-
     const [savedAnwesenheiten, setSavedAnwesenheiten] = useState([]);
 
     /* =====================================================
@@ -48,9 +43,7 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [studentSearch, setStudentSearch] = useState('');
-
     const [studentJahrgangFilter, setStudentJahrgangFilter] = useState('');
-
     const [studentKlasseFilter, setStudentKlasseFilter] = useState('');
 
     const [studentSort, setStudentSort] = useState({
@@ -63,7 +56,6 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [message, setMessage] = useState('');
-
     const [messageType, setMessageType] = useState('success');
 
     const showSuccess = (text) => {
@@ -91,9 +83,7 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [datum, setDatum] = useState(getToday());
-
     const [saveLoading, setSaveLoading] = useState(false);
-
     const [studentsLoading, setStudentsLoading] = useState(false);
 
     /* =====================================================
@@ -101,15 +91,10 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [filterVon, setFilterVon] = useState(getToday());
-
     const [filterBis, setFilterBis] = useState(getToday());
-
     const [filterKurs, setFilterKurs] = useState('');
-
     const [anzeigeModus, setAnzeigeModus] = useState('gesamt');
-
     const [historyLoading, setHistoryLoading] = useState(false);
-
     const [exportLoading, setExportLoading] = useState(false);
 
     /* =====================================================
@@ -117,9 +102,7 @@ function AnwesenheitPage() {
        ===================================================== */
 
     const [editingId, setEditingId] = useState(null);
-
     const [editStatus, setEditStatus] = useState('');
-
     const [editBemerkung, setEditBemerkung] = useState('');
 
     /* =====================================================
@@ -173,6 +156,58 @@ function AnwesenheitPage() {
 
             default:
                 return status || '–';
+        }
+    };
+
+    /* =====================================================
+       FARBE NACH KLASSE
+
+       Erde    = Braun
+       Feuer   = Rot
+       Luft    = Blau
+       Wasser  = Grün
+       Mars    = Orange
+       Merkur  = Gelb
+       Saturn  = Violett
+
+       Andere Klassen werden nicht markiert.
+       ===================================================== */
+
+    const getKlasseColorClass = (klasse) => {
+
+        if (!klasse) {
+            return '';
+        }
+
+        switch (
+            String(klasse)
+                .trim()
+                .toLowerCase()
+            ) {
+
+            case 'erde':
+                return 'klasse-erde';
+
+            case 'feuer':
+                return 'klasse-feuer';
+
+            case 'luft':
+                return 'klasse-luft';
+
+            case 'wasser':
+                return 'klasse-wasser';
+
+            case 'mars':
+                return 'klasse-mars';
+
+            case 'merkur':
+                return 'klasse-merkur';
+
+            case 'saturn':
+                return 'klasse-saturn';
+
+            default:
+                return '';
         }
     };
 
@@ -284,13 +319,6 @@ function AnwesenheitPage() {
 
     /* =====================================================
        SCHÜLER + GESPEICHERTE ANWESENHEIT LADEN
-
-       Wichtig:
-       Wenn für Datum + Kurs bereits Anwesenheiten existieren,
-       werden diese Statuswerte wieder geladen.
-
-       Wenn nichts gespeichert wurde:
-       Standard = ANWESEND
        ===================================================== */
 
     const loadStudentsForKurs = async (
@@ -312,7 +340,7 @@ function AnwesenheitPage() {
             setStudentsLoading(true);
 
             /*
-             * Buchungen / Schüler des Kurses laden
+             * Schüler des ausgewählten Kurses laden.
              */
             const response =
                 await fetch(
@@ -338,7 +366,8 @@ function AnwesenheitPage() {
                     .filter(Boolean);
 
             /*
-             * Anwesenheiten für genau diesen Tag laden.
+             * Bereits gespeicherte Anwesenheiten
+             * für das ausgewählte Datum laden.
              */
             const anwesenheitenData =
                 await getAnwesenheitenByZeitraum(
@@ -352,15 +381,15 @@ function AnwesenheitPage() {
                     : [];
 
             /*
-             * Nur Anwesenheiten des aktuell
-             * ausgewählten Kurses verwenden.
+             * Nur Einträge des ausgewählten Kurses.
              */
             const kursAnwesenheiten =
                 anwesenheiten.filter(
                     (anwesenheit) =>
                         Number(
                             anwesenheit.kurs?.id
-                        ) === Number(kursId)
+                        ) ===
+                        Number(kursId)
                 );
 
             const initialStatuses = {};
@@ -369,23 +398,20 @@ function AnwesenheitPage() {
             studentList.forEach(
                 (student) => {
 
-                    /*
-                     * Prüfen, ob für diesen Schüler,
-                     * diesen Kurs und dieses Datum
-                     * bereits ein Eintrag existiert.
-                     */
                     const existing =
                         kursAnwesenheiten.find(
                             (anwesenheit) =>
                                 Number(
                                     anwesenheit.student?.id
-                                ) === Number(student.id)
+                                ) ===
+                                Number(student.id)
                         );
 
                     if (existing) {
 
                         /*
-                         * Gespeicherten Status übernehmen.
+                         * Bereits gespeicherten Status
+                         * und Bemerkung übernehmen.
                          */
                         initialStatuses[
                             student.id
@@ -393,9 +419,6 @@ function AnwesenheitPage() {
                             existing.status ||
                             'ANWESEND';
 
-                        /*
-                         * Gespeicherte Bemerkung übernehmen.
-                         */
                         initialBemerkungen[
                             student.id
                             ] =
@@ -405,9 +428,8 @@ function AnwesenheitPage() {
                     } else {
 
                         /*
-                         * Noch kein Eintrag vorhanden.
-                         *
-                         * Standardmäßig ANWESEND.
+                         * Noch kein Eintrag:
+                         * Standard = ANWESEND.
                          */
                         initialStatuses[
                             student.id
@@ -421,9 +443,7 @@ function AnwesenheitPage() {
             );
 
             setStudents(studentList);
-
             setStatuses(initialStatuses);
-
             setBemerkungen(initialBemerkungen);
 
         } catch (error) {
@@ -469,9 +489,6 @@ function AnwesenheitPage() {
 
     /* =====================================================
        DATUM ÄNDERN
-
-       Wenn bereits ein Kurs ausgewählt wurde,
-       werden die Daten des neuen Tages geladen.
        ===================================================== */
 
     const handleDatumChange = async (newDatum) => {
@@ -789,8 +806,7 @@ function AnwesenheitPage() {
             clearMessage();
 
             /*
-             * Wichtig:
-             * Wir speichern ALLE Schüler des Kurses,
+             * Alle Schüler speichern,
              * nicht nur die aktuell gefilterten.
              */
             for (const student of students) {
@@ -824,10 +840,9 @@ function AnwesenheitPage() {
             );
 
             /*
-             * Direkt danach erneut aus der DB laden.
-             *
-             * Dadurch entspricht die Anzeige exakt
-             * dem gespeicherten Zustand.
+             * Nach dem Speichern Daten erneut laden,
+             * damit die gespeicherten Checkboxen
+             * weiterhin korrekt angezeigt werden.
              */
             await loadStudentsForKurs(
                 selectedKurs,
@@ -1031,9 +1046,7 @@ function AnwesenheitPage() {
     const handleEditCancel = () => {
 
         setEditingId(null);
-
         setEditStatus('');
-
         setEditBemerkung('');
     };
 
@@ -1063,9 +1076,7 @@ function AnwesenheitPage() {
             );
 
             setEditingId(null);
-
             setEditStatus('');
-
             setEditBemerkung('');
 
             showSuccess(
@@ -1078,11 +1089,6 @@ function AnwesenheitPage() {
                 false
             );
 
-            /*
-             * Jeżeli edytowany wpis dotyczy aktualnie
-             * otwartego dnia i kursu, odświeżamy również
-             * zakładkę "Anwesenheit erfassen".
-             */
             if (
                 String(anwesenheit.datum) ===
                 String(datum) &&
@@ -1362,7 +1368,9 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* DATUM / KURS */}
+                    {/* =================================================
+                        DATUM / KURS
+                       ================================================= */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -1414,8 +1422,7 @@ function AnwesenheitPage() {
                                             );
 
                                         if (
-                                            kurseAmTag.length ===
-                                            0
+                                            kurseAmTag.length === 0
                                         ) {
                                             return null;
                                         }
@@ -1662,7 +1669,14 @@ function AnwesenheitPage() {
                                     {filteredStudents.map(
                                         (student) => (
 
-                                            <tr key={student.id}>
+                                            <tr
+                                                key={student.id}
+                                                className={
+                                                    getKlasseColorClass(
+                                                        student.klasse
+                                                    )
+                                                }
+                                            >
 
                                                 <td>
                                                     {formatStudentName(
@@ -1832,7 +1846,9 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* FILTER */}
+                    {/* =================================================
+                        FILTER
+                       ================================================= */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -1903,8 +1919,7 @@ function AnwesenheitPage() {
                                             );
 
                                         if (
-                                            kurseAmTag.length ===
-                                            0
+                                            kurseAmTag.length === 0
                                         ) {
                                             return null;
                                         }
@@ -1973,7 +1988,9 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* ANZEIGEMODUS */}
+                    {/* =================================================
+                        ANZEIGEMODUS
+                       ================================================= */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -2027,6 +2044,10 @@ function AnwesenheitPage() {
 
                     </div>
 
+                    {/* =================================================
+                        KEINE DATEN
+                       ================================================= */}
+
                     {filteredAnwesenheiten.length === 0 ? (
 
                         <div className="anwesenheit-empty">
@@ -2039,7 +2060,9 @@ function AnwesenheitPage() {
 
                         <>
 
-                            {/* GESAMT */}
+                            {/* =================================================
+                                GESAMT
+                               ================================================= */}
 
                             {anzeigeModus === 'gesamt' && (
 
@@ -2226,7 +2249,9 @@ function AnwesenheitPage() {
 
                             )}
 
-                            {/* NACH KURSEN */}
+                            {/* =================================================
+                                NACH KURSEN
+                               ================================================= */}
 
                             {anzeigeModus === 'kurse' && (
 
@@ -2324,7 +2349,9 @@ function AnwesenheitPage() {
 
                             )}
 
-                            {/* NACH KINDERN */}
+                            {/* =================================================
+                                NACH KINDERN
+                               ================================================= */}
 
                             {anzeigeModus === 'kinder' && (
 

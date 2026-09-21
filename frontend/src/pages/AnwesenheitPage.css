@@ -1122,3 +1122,115 @@
         width: 100px;
     }
 }
+
+/* =====================================================
+   KLASSENFARBEN
+   ===================================================== */
+
+/* Erde = Braun */
+.anwesenheit-table tbody tr.klasse-erde > td {
+    background-color: rgba(121, 85, 72, 0.20);
+}
+
+.anwesenheit-table tbody tr.klasse-erde > td:first-child {
+    box-shadow: inset 5px 0 0 #795548;
+}
+
+
+/* Feuer = Rot */
+.anwesenheit-table tbody tr.klasse-feuer > td {
+    background-color: rgba(211, 47, 47, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-feuer > td:first-child {
+    box-shadow: inset 5px 0 0 #d32f2f;
+}
+
+
+/* Luft = Blau */
+.anwesenheit-table tbody tr.klasse-luft > td {
+    background-color: rgba(30, 136, 229, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-luft > td:first-child {
+    box-shadow: inset 5px 0 0 #1e88e5;
+}
+
+
+/* Wasser = Grün */
+.anwesenheit-table tbody tr.klasse-wasser > td {
+    background-color: rgba(67, 160, 71, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-wasser > td:first-child {
+    box-shadow: inset 5px 0 0 #43a047;
+}
+
+
+/* Mars = Orange */
+.anwesenheit-table tbody tr.klasse-mars > td {
+    background-color: rgba(239, 108, 0, 0.18);
+}
+
+.anwesenheit-table tbody tr.klasse-mars > td:first-child {
+    box-shadow: inset 5px 0 0 #ef6c00;
+}
+
+
+/* Merkur = Gelb */
+.anwesenheit-table tbody tr.klasse-merkur > td {
+    background-color: rgba(253, 216, 53, 0.18);
+}
+
+.anwesenheit-table tbody tr.klasse-merkur > td:first-child {
+    box-shadow: inset 5px 0 0 #fdd835;
+}
+
+
+/* Saturn = Violett */
+.anwesenheit-table tbody tr.klasse-saturn > td {
+    background-color: rgba(142, 36, 170, 0.17);
+}
+
+.anwesenheit-table tbody tr.klasse-saturn > td:first-child {
+    box-shadow: inset 5px 0 0 #8e24aa;
+}
+
+
+/* =====================================================
+   KLASSENFARBEN - HOVER
+   ===================================================== */
+
+.anwesenheit-table tbody tr.klasse-erde:hover > td {
+    background-color: rgba(121, 85, 72, 0.30);
+}
+
+.anwesenheit-table tbody tr.klasse-feuer:hover > td {
+    background-color: rgba(211, 47, 47, 0.26);
+}
+
+.anwesenheit-table tbody tr.klasse-luft:hover > td {
+    background-color: rgba(30, 136, 229, 0.26);
+}
+
+.anwesenheit-table tbody tr.klasse-wasser:hover > td {
+    background-color: rgba(67, 160, 71, 0.26);
+}
+
+.anwesenheit-table tbody tr.klasse-mars:hover > td {
+    background-color: rgba(239, 108, 0, 0.28);
+}
+
+.anwesenheit-table tbody tr.klasse-merkur:hover > td {
+    background-color: rgba(253, 216, 53, 0.28);
+}
+
+.anwesenheit-table tbody tr.klasse-saturn:hover > td {
+    background-color: rgba(142, 36, 170, 0.27);
+}
+
+
+/* Płynna zmiana koloru przy hover */
+.anwesenheit-table tbody tr > td {
+    transition: background-color 0.15s ease;
+}
