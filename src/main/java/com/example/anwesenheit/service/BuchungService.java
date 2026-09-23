@@ -17,6 +17,8 @@ import java.util.List;
 @Service
 public class BuchungService {
 
+    private static final int MAX_BESONDERHEITEN_LENGTH = 50;
+
     private final BuchungRepository buchungRepository;
     private final StudentRepository studentRepository;
     private final KursRepository kursRepository;
@@ -223,6 +225,64 @@ public class BuchungService {
                 .findByKursId(
                         kursId
                 );
+    }
+
+    /* =====================================================
+       BESONDERHEITEN AKTUALISIEREN
+       ===================================================== */
+
+    @Transactional
+    public Buchung updateBesonderheiten(
+            Long buchungId,
+            String besonderheiten
+    ) {
+
+        Buchung buchung =
+                buchungRepository
+                        .findById(buchungId)
+                        .orElseThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Buchung nicht gefunden"
+                                        )
+                        );
+
+        /*
+         * Leere Eingaben werden als null gespeichert.
+         */
+        if (besonderheiten != null) {
+
+            besonderheiten =
+                    besonderheiten.trim();
+
+            if (besonderheiten.isEmpty()) {
+                besonderheiten = null;
+            }
+        }
+
+        /*
+         * Maximale Länge prüfen.
+         */
+        if (
+                besonderheiten != null &&
+                        besonderheiten.length() >
+                                MAX_BESONDERHEITEN_LENGTH
+        ) {
+
+            throw new IllegalArgumentException(
+                    "Besonderheiten dürfen maximal "
+                            + MAX_BESONDERHEITEN_LENGTH
+                            + " Zeichen enthalten."
+            );
+        }
+
+        buchung.setBesonderheiten(
+                besonderheiten
+        );
+
+        return buchungRepository.save(
+                buchung
+        );
     }
 
     /* =====================================================

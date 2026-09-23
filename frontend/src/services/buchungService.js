@@ -49,6 +49,25 @@ export const addStudentsToKurs = async (
 
 
 /* =====================================================
+   BESONDERHEITEN AKTUALISIEREN
+   ===================================================== */
+
+export const updateBesonderheiten = async (
+    buchungId,
+    besonderheiten
+) => {
+    const response = await axios.patch(
+        `${API_URL}/${buchungId}/besonderheiten`,
+        {
+            besonderheiten
+        }
+    );
+
+    return response.data;
+};
+
+
+/* =====================================================
    BUCHUNG LÖSCHEN
    ===================================================== */
 

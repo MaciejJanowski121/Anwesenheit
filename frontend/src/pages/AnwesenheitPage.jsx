@@ -3,6 +3,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { getKurse } from '../services/kursService';
 
 import {
+    updateBesonderheiten
+} from '../services/buchungService';
+
+import {
     createAnwesenheit,
     getAnwesenheitenByZeitraum,
     deleteAnwesenheit,
@@ -37,6 +41,14 @@ function AnwesenheitPage() {
     const [statuses, setStatuses] = useState({});
     const [bemerkungen, setBemerkungen] = useState({});
     const [savedAnwesenheiten, setSavedAnwesenheiten] = useState([]);
+
+    /* =====================================================
+       BESONDERHEITEN
+       ===================================================== */
+
+    const [besonderheiten, setBesonderheiten] = useState({});
+    const [savingBesonderheitenId, setSavingBesonderheitenId] =
+        useState(null);
 
     /* =====================================================
        SCHÜLER FILTER / SORTIERUNG
@@ -161,16 +173,6 @@ function AnwesenheitPage() {
 
     /* =====================================================
        FARBE NACH KLASSE
-
-       Erde    = Braun
-       Feuer   = Rot
-       Luft    = Blau
-       Wasser  = Grün
-       Mars    = Orange
-       Merkur  = Gelb
-       Saturn  = Violett
-
-       Andere Klassen werden nicht markiert.
        ===================================================== */
 
     const getKlasseColorClass = (klasse) => {
@@ -318,7 +320,7 @@ function AnwesenheitPage() {
     };
 
     /* =====================================================
-       SCHÜLER + GESPEICHERTE ANWESENHEIT LADEN
+       SCHÜLER + BESONDERHEITEN + ANWESENHEIT LADEN
        ===================================================== */
 
     const loadStudentsForKurs = async (
@@ -331,6 +333,7 @@ function AnwesenheitPage() {
             setStudents([]);
             setStatuses({});
             setBemerkungen({});
+            setBesonderheiten({});
 
             return;
         }
@@ -339,9 +342,6 @@ function AnwesenheitPage() {
 
             setStudentsLoading(true);
 
-            /*
-             * Schüler des ausgewählten Kurses laden.
-             */
             const response =
                 await fetch(
                     `/api/buchungen/kurs/${kursId}`
@@ -357,18 +357,35 @@ function AnwesenheitPage() {
             const buchungen =
                 await response.json();
 
-            const studentList =
-                buchungen
-                    .map(
-                        (buchung) =>
-                            buchung.student
-                    )
-                    .filter(Boolean);
-
             /*
-             * Bereits gespeicherte Anwesenheiten
-             * für das ausgewählte Datum laden.
+             * Wichtig:
+             * buchungId speichern, weil Besonderheiten
+             * zur Buchung und nicht zum Student gehören.
              */
+            const studentList =
+                (Array.isArray(buchungen)
+                        ? buchungen
+                        : []
+                )
+                    .filter(
+                        (buchung) =>
+                            Boolean(
+                                buchung.student
+                            )
+                    )
+                    .map(
+                        (buchung) => ({
+                            ...buchung.student,
+
+                            buchungId:
+                            buchung.id,
+
+                            besonderheiten:
+                                buchung.besonderheiten ??
+                                ''
+                        })
+                    );
+
             const anwesenheitenData =
                 await getAnwesenheitenByZeitraum(
                     selectedDatum,
@@ -380,9 +397,6 @@ function AnwesenheitPage() {
                     ? anwesenheitenData
                     : [];
 
-            /*
-             * Nur Einträge des ausgewählten Kurses.
-             */
             const kursAnwesenheiten =
                 anwesenheiten.filter(
                     (anwesenheit) =>
@@ -394,6 +408,7 @@ function AnwesenheitPage() {
 
             const initialStatuses = {};
             const initialBemerkungen = {};
+            const initialBesonderheiten = {};
 
             studentList.forEach(
                 (student) => {
@@ -409,10 +424,6 @@ function AnwesenheitPage() {
 
                     if (existing) {
 
-                        /*
-                         * Bereits gespeicherten Status
-                         * und Bemerkung übernehmen.
-                         */
                         initialStatuses[
                             student.id
                             ] =
@@ -427,24 +438,29 @@ function AnwesenheitPage() {
 
                     } else {
 
-                        /*
-                         * Noch kein Eintrag:
-                         * Standard = ANWESEND.
-                         */
                         initialStatuses[
                             student.id
-                            ] = 'ANWESEND';
+                            ] =
+                            'ANWESEND';
 
                         initialBemerkungen[
                             student.id
-                            ] = '';
+                            ] =
+                            '';
                     }
+
+                    initialBesonderheiten[
+                        student.id
+                        ] =
+                        student.besonderheiten ||
+                        '';
                 }
             );
 
             setStudents(studentList);
             setStatuses(initialStatuses);
             setBemerkungen(initialBemerkungen);
+            setBesonderheiten(initialBesonderheiten);
 
         } catch (error) {
 
@@ -456,6 +472,7 @@ function AnwesenheitPage() {
             setStudents([]);
             setStatuses({});
             setBemerkungen({});
+            setBesonderheiten({});
 
             showError(
                 'Schüler oder gespeicherte Anwesenheiten konnten nicht geladen werden.'
@@ -538,6 +555,99 @@ function AnwesenheitPage() {
                 [studentId]: bemerkung
             })
         );
+    };
+
+    /* =====================================================
+       BESONDERHEITEN ÄNDERN
+       ===================================================== */
+
+    const handleBesonderheitenChange = (
+        studentId,
+        value
+    ) => {
+
+        setBesonderheiten(
+            (previous) => ({
+                ...previous,
+                [studentId]: value
+            })
+        );
+    };
+
+    /* =====================================================
+       BESONDERHEITEN SPEICHERN
+       ===================================================== */
+
+    const handleBesonderheitenSave = async (
+        student
+    ) => {
+
+        if (!student.buchungId) {
+
+            showError(
+                'Die Kursbuchung konnte nicht gefunden werden.'
+            );
+
+            return;
+        }
+
+        try {
+
+            setSavingBesonderheitenId(
+                student.id
+            );
+
+            clearMessage();
+
+            await updateBesonderheiten(
+                student.buchungId,
+                besonderheiten[
+                    student.id
+                    ] || ''
+            );
+
+            /*
+             * Lokalen Student ebenfalls aktualisieren,
+             * damit die Anzeige sofort synchron ist.
+             */
+            setStudents(
+                (previous) =>
+                    previous.map(
+                        (currentStudent) =>
+                            currentStudent.id ===
+                            student.id
+                                ? {
+                                    ...currentStudent,
+                                    besonderheiten:
+                                        besonderheiten[
+                                            student.id
+                                            ] || ''
+                                }
+                                : currentStudent
+                    )
+            );
+
+            showSuccess(
+                'Besonderheiten wurden erfolgreich gespeichert.'
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Besonderheiten konnten nicht gespeichert werden:',
+                error
+            );
+
+            showError(
+                'Besonderheiten konnten nicht gespeichert werden.'
+            );
+
+        } finally {
+
+            setSavingBesonderheitenId(
+                null
+            );
+        }
     };
 
     /* =====================================================
@@ -805,10 +915,6 @@ function AnwesenheitPage() {
 
             clearMessage();
 
-            /*
-             * Alle Schüler speichern,
-             * nicht nur die aktuell gefilterten.
-             */
             for (const student of students) {
 
                 const anwesenheit = {
@@ -839,11 +945,6 @@ function AnwesenheitPage() {
                 'Anwesenheit wurde erfolgreich gespeichert.'
             );
 
-            /*
-             * Nach dem Speichern Daten erneut laden,
-             * damit die gespeicherten Checkboxen
-             * weiterhin korrekt angezeigt werden.
-             */
             await loadStudentsForKurs(
                 selectedKurs,
                 datum
@@ -1251,10 +1352,6 @@ function AnwesenheitPage() {
 
         <div className="anwesenheit-page">
 
-            {/* =================================================
-                PAGE HEADER
-               ================================================= */}
-
             <header className="page-header">
 
                 <div className="page-header-content">
@@ -1288,7 +1385,6 @@ function AnwesenheitPage() {
                     onClick={() => {
 
                         setActiveTab('erfassen');
-
                         clearMessage();
                     }}
                 >
@@ -1305,7 +1401,6 @@ function AnwesenheitPage() {
                     onClick={() => {
 
                         setActiveTab('verlauf');
-
                         clearMessage();
                     }}
                 >
@@ -1368,9 +1463,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        DATUM / KURS
-                       ================================================= */}
+                    {/* DATUM / KURS */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -1463,9 +1556,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        SCHÜLER FILTER
-                       ================================================= */}
+                    {/* SCHÜLER FILTER */}
 
                     {students.length > 0 && (
 
@@ -1566,9 +1657,7 @@ function AnwesenheitPage() {
 
                     )}
 
-                    {/* =================================================
-                        SCHÜLER
-                       ================================================= */}
+                    {/* SCHÜLER */}
 
                     {studentsLoading ? (
 
@@ -1579,17 +1668,13 @@ function AnwesenheitPage() {
                     ) : students.length === 0 ? (
 
                         <div className="anwesenheit-empty">
-
                             Kein Kurs ausgewählt oder keine Schüler vorhanden.
-
                         </div>
 
                     ) : filteredStudents.length === 0 ? (
 
                         <div className="anwesenheit-empty">
-
                             Keine Schüler entsprechen dem Filter.
-
                         </div>
 
                     ) : (
@@ -1644,6 +1729,10 @@ function AnwesenheitPage() {
                                             )}
                                         </th>
 
+                                        <th className="besonderheiten-column">
+                                            Besonderheiten
+                                        </th>
+
                                         <th className="status-column">
                                             Anwesend
                                         </th>
@@ -1692,6 +1781,69 @@ function AnwesenheitPage() {
                                                 <td className="klasse-cell">
                                                     {student.klasse ||
                                                         '–'}
+                                                </td>
+
+                                                {/* =========================
+                                                    BESONDERHEITEN EDITIEREN
+                                                   ========================= */}
+
+                                                <td className="besonderheiten-cell">
+
+                                                    <div className="besonderheiten-edit">
+
+                                                        <input
+                                                            type="text"
+                                                            className="besonderheiten-input"
+                                                            maxLength={50}
+                                                            placeholder="Hinweis..."
+                                                            value={
+                                                                besonderheiten[
+                                                                    student.id
+                                                                    ] || ''
+                                                            }
+                                                            onChange={(event) =>
+                                                                handleBesonderheitenChange(
+                                                                    student.id,
+                                                                    event.target.value
+                                                                )
+                                                            }
+                                                        />
+
+                                                        <button
+                                                            type="button"
+                                                            className="besonderheiten-save-button"
+                                                            disabled={
+                                                                savingBesonderheitenId ===
+                                                                student.id
+                                                            }
+                                                            onClick={() =>
+                                                                handleBesonderheitenSave(
+                                                                    student
+                                                                )
+                                                            }
+                                                        >
+
+                                                            {savingBesonderheitenId ===
+                                                            student.id
+                                                                ? '...'
+                                                                : 'Speichern'}
+
+                                                        </button>
+
+                                                    </div>
+
+                                                    <span className="besonderheiten-counter">
+
+                                                        {
+                                                            (
+                                                                besonderheiten[
+                                                                    student.id
+                                                                    ] || ''
+                                                            ).length
+                                                        } / 50
+
+                                                    </span>
+
                                                 </td>
 
                                                 <td className="attendance-checkbox-cell">
@@ -1846,9 +1998,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        FILTER
-                       ================================================= */}
+                    {/* FILTER */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -1988,9 +2138,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        ANZEIGEMODUS
-                       ================================================= */}
+                    {/* ANZEIGEMODUS */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -2044,10 +2192,6 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        KEINE DATEN
-                       ================================================= */}
-
                     {filteredAnwesenheiten.length === 0 ? (
 
                         <div className="anwesenheit-empty">
@@ -2060,9 +2204,7 @@ function AnwesenheitPage() {
 
                         <>
 
-                            {/* =================================================
-                                GESAMT
-                               ================================================= */}
+                            {/* GESAMT */}
 
                             {anzeigeModus === 'gesamt' && (
 
@@ -2249,9 +2391,7 @@ function AnwesenheitPage() {
 
                             )}
 
-                            {/* =================================================
-                                NACH KURSEN
-                               ================================================= */}
+                            {/* NACH KURSEN */}
 
                             {anzeigeModus === 'kurse' && (
 
@@ -2349,9 +2489,7 @@ function AnwesenheitPage() {
 
                             )}
 
-                            {/* =================================================
-                                NACH KINDERN
-                               ================================================= */}
+                            {/* NACH KINDERN */}
 
                             {anzeigeModus === 'kinder' && (
 

@@ -29,4 +29,17 @@ public class Buchung {
 
     private LocalDate buchungsdatum;
 
+    /*
+     * Zusätzlicher Hinweis für diese konkrete Kursbuchung.
+     *
+     * Beispiele:
+     * - "Geht um 13:30 Uhr"
+     * - "Kommt ca. 20 Min. später"
+     * - "Wird von Oma abgeholt"
+     *
+     * Der Hinweis wird später auch bei der
+     * Anwesenheitserfassung angezeigt.
+     */
+    @Column(length = 50)
+    private String besonderheiten;
 }

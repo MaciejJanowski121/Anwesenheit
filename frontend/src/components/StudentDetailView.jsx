@@ -1,4 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, {
+    useEffect,
+    useMemo,
+    useState
+} from 'react';
+
 import './StudentDetailView.css';
 
 const WOCHENTAGE = [
@@ -16,6 +21,7 @@ function StudentDetailView({
                                anwesenheiten,
                                onAssignKurs,
                                onDeleteBuchung,
+                               onUpdateBesonderheiten,
                                onUpdateGehtUm1530,
                                onClose
                            }) {
@@ -29,6 +35,42 @@ function StudentDetailView({
 
     const [selectedKursId, setSelectedKursId] =
         useState('');
+
+    /* =====================================================
+       BESONDERHEITEN
+       ===================================================== */
+
+    const [
+        besonderheitenValues,
+        setBesonderheitenValues
+    ] = useState({});
+
+    const [
+        savingBesonderheitenId,
+        setSavingBesonderheitenId
+    ] = useState(null);
+
+    /*
+     * Die Eingabefelder mit den gespeicherten
+     * Besonderheiten der Buchungen synchronisieren.
+     */
+    useEffect(() => {
+
+        const values = {};
+
+        (buchungen || []).forEach(
+            (buchung) => {
+
+                values[buchung.id] =
+                    buchung.besonderheiten ?? '';
+            }
+        );
+
+        setBesonderheitenValues(
+            values
+        );
+
+    }, [buchungen]);
 
     /* =====================================================
        15:30
@@ -65,6 +107,7 @@ function StudentDetailView({
        ===================================================== */
 
     const filteredKurse = useMemo(() => {
+
         if (!selectedWochentag) {
             return [];
         }
@@ -73,20 +116,28 @@ function StudentDetailView({
             (kurs) =>
                 kurs.wochentag === selectedWochentag
         );
-    }, [kurse, selectedWochentag]);
+
+    }, [
+        kurse,
+        selectedWochentag
+    ]);
 
     /* =====================================================
        KURSE AUS ANWESENHEITEN
        ===================================================== */
 
     const anwesenheitKurse = useMemo(() => {
+
         const kursMap = new Map();
 
         (anwesenheiten || []).forEach(
             (anwesenheit) => {
-                const kurs = anwesenheit.kurs;
+
+                const kurs =
+                    anwesenheit.kurs;
 
                 if (kurs?.id) {
+
                     kursMap.set(
                         String(kurs.id),
                         kurs
@@ -103,21 +154,15 @@ function StudentDetailView({
                         'de'
                     )
         );
+
     }, [anwesenheiten]);
 
     /* =====================================================
        VERFÜGBARE STATUS
        ===================================================== */
 
-    /*
-     * Die Statuswerte werden direkt aus den vorhandenen
-     * Anwesenheitsdaten erzeugt.
-     *
-     * Dadurch funktioniert der Filter unabhängig davon,
-     * ob der Backend-Status z.B. "ANWESEND",
-     * "Anwesend", "FEHLT" usw. lautet.
-     */
     const anwesenheitStatus = useMemo(() => {
+
         return [
             ...new Set(
                 (anwesenheiten || [])
@@ -127,12 +172,15 @@ function StudentDetailView({
                     )
                     .filter(Boolean)
             )
-        ].sort((a, b) =>
-            String(a).localeCompare(
-                String(b),
-                'de'
-            )
+        ].sort(
+            (a, b) =>
+                String(a)
+                    .localeCompare(
+                        String(b),
+                        'de'
+                    )
         );
+
     }, [anwesenheiten]);
 
     /* =====================================================
@@ -140,21 +188,26 @@ function StudentDetailView({
        ===================================================== */
 
     const filteredAnwesenheiten = useMemo(() => {
+
         return [...(anwesenheiten || [])]
+
             .filter((anwesenheit) => {
 
                 const matchesDatum =
                     !anwesenheitDatumFilter ||
                     String(
                         anwesenheit.datum ?? ''
-                    ) === anwesenheitDatumFilter;
+                    ) ===
+                    anwesenheitDatumFilter;
 
                 const matchesKurs =
                     !anwesenheitKursFilter ||
                     String(
                         anwesenheit.kurs?.id ?? ''
                     ) ===
-                    String(anwesenheitKursFilter);
+                    String(
+                        anwesenheitKursFilter
+                    );
 
                 const matchesStatus =
                     !anwesenheitStatusFilter ||
@@ -169,12 +222,18 @@ function StudentDetailView({
                     matchesStatus
                 );
             })
-            .sort((a, b) =>
-                String(b.datum ?? '')
-                    .localeCompare(
-                        String(a.datum ?? '')
+
+            .sort(
+                (a, b) =>
+                    String(
+                        b.datum ?? ''
+                    ).localeCompare(
+                        String(
+                            a.datum ?? ''
+                        )
                     )
             );
+
     }, [
         anwesenheiten,
         anwesenheitDatumFilter,
@@ -193,7 +252,10 @@ function StudentDetailView({
        KURSZUWEISUNG HANDLER
        ===================================================== */
 
-    const handleWochentagChange = (event) => {
+    const handleWochentagChange = (
+        event
+    ) => {
+
         setSelectedWochentag(
             event.target.value
         );
@@ -201,13 +263,17 @@ function StudentDetailView({
         setSelectedKursId('');
     };
 
-    const handleKursChange = (event) => {
+    const handleKursChange = (
+        event
+    ) => {
+
         setSelectedKursId(
             event.target.value
         );
     };
 
     const handleAssign = async () => {
+
         if (!selectedKursId) {
             return;
         }
@@ -220,6 +286,65 @@ function StudentDetailView({
     };
 
     /* =====================================================
+       BESONDERHEITEN HANDLER
+       ===================================================== */
+
+    const handleBesonderheitenChange = (
+        buchungId,
+        value
+    ) => {
+
+        /*
+         * Maximal 50 Zeichen.
+         */
+        const limitedValue =
+            value.slice(
+                0,
+                50
+            );
+
+        setBesonderheitenValues(
+            (previous) => ({
+                ...previous,
+                [buchungId]:
+                limitedValue
+            })
+        );
+    };
+
+    const handleBesonderheitenSave = async (
+        buchungId
+    ) => {
+
+        try {
+
+            setSavingBesonderheitenId(
+                buchungId
+            );
+
+            await onUpdateBesonderheiten(
+                buchungId,
+                besonderheitenValues[
+                    buchungId
+                    ] ?? ''
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Besonderheiten konnten nicht gespeichert werden:',
+                error
+            );
+
+        } finally {
+
+            setSavingBesonderheitenId(
+                null
+            );
+        }
+    };
+
+    /* =====================================================
        15:30 HANDLER
        ===================================================== */
 
@@ -227,34 +352,34 @@ function StudentDetailView({
         newValue
     ) => {
 
-        if (newValue === gehtUm1530) {
+        if (
+            newValue ===
+            gehtUm1530
+        ) {
             return;
         }
 
         try {
+
             setSaving1530(true);
 
-            /*
-             * Zuerst im Backend speichern.
-             */
             await onUpdateGehtUm1530(
                 newValue
             );
 
-            /*
-             * Lokalen Zustand erst nach
-             * erfolgreichem Speichern ändern.
-             */
             setGehtUm1530(
                 newValue
             );
 
         } catch (error) {
+
             console.error(
                 '15:30-Einstellung konnte nicht gespeichert werden:',
                 error
             );
+
         } finally {
+
             setSaving1530(false);
         }
     };
@@ -264,12 +389,14 @@ function StudentDetailView({
        ===================================================== */
 
     const resetAnwesenheitFilter = () => {
+
         setAnwesenheitDatumFilter('');
         setAnwesenheitKursFilter('');
         setAnwesenheitStatusFilter('');
     };
 
     return (
+
         <div className="student-detail-view">
 
             {/* =================================================
@@ -289,12 +416,16 @@ function StudentDetailView({
                ================================================= */}
 
             <div className="detail-header">
+
                 <h2>
                     {student.nachname},{' '}
                     {student.vorname}
                 </h2>
 
-                <p>Schülerdetails</p>
+                <p>
+                    Schülerdetails
+                </p>
+
             </div>
 
             {/* =================================================
@@ -310,6 +441,7 @@ function StudentDetailView({
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Vorname
                         </span>
@@ -317,9 +449,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.vorname || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Nachname
                         </span>
@@ -327,9 +461,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.nachname || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Jahrgang
                         </span>
@@ -337,9 +473,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.jahrgang ?? '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Klasse
                         </span>
@@ -347,9 +485,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.klasse || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Foto- und Bildfreigabe
                         </span>
@@ -357,6 +497,7 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.fotoFreigabe || '–'}
                         </span>
+
                     </div>
 
                     {/* =============================================
@@ -369,6 +510,7 @@ function StudentDetailView({
                             detail-item-1530
                         "
                     >
+
                         <div className="detail-1530-header">
 
                             <span className="detail-label">
@@ -416,10 +558,13 @@ function StudentDetailView({
                                 </button>
 
                             </div>
+
                         </div>
+
                     </div>
 
                 </div>
+
             </section>
 
             {/* =================================================
@@ -428,11 +573,14 @@ function StudentDetailView({
 
             <section className="detail-section">
 
-                <h3>Kontakt 1</h3>
+                <h3>
+                    Kontakt 1
+                </h3>
 
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Email 1
                         </span>
@@ -440,9 +588,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.email1 || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Telefon 1
                         </span>
@@ -450,9 +600,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.telefon1 || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Mobil 1
                         </span>
@@ -460,9 +612,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.mobil1 || '–'}
                         </span>
+
                     </div>
 
                 </div>
+
             </section>
 
             {/* =================================================
@@ -471,11 +625,14 @@ function StudentDetailView({
 
             <section className="detail-section">
 
-                <h3>Kontakt 2</h3>
+                <h3>
+                    Kontakt 2
+                </h3>
 
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Email 2
                         </span>
@@ -483,9 +640,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.email2 || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Telefon 2
                         </span>
@@ -493,9 +652,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.telefon2 || '–'}
                         </span>
+
                     </div>
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Mobil 2
                         </span>
@@ -503,9 +664,11 @@ function StudentDetailView({
                         <span className="detail-value">
                             {student.mobil2 || '–'}
                         </span>
+
                     </div>
 
                 </div>
+
             </section>
 
             {/* =================================================
@@ -514,7 +677,9 @@ function StudentDetailView({
 
             <section className="detail-section">
 
-                <h3>Kursbuchungen</h3>
+                <h3>
+                    Kursbuchungen
+                </h3>
 
                 <div className="assign-kurs-box">
 
@@ -535,12 +700,14 @@ function StudentDetailView({
                                 handleWochentagChange
                             }
                         >
+
                             <option value="">
                                 Wochentag auswählen...
                             </option>
 
                             {WOCHENTAGE.map(
                                 (tag) => (
+
                                     <option
                                         key={tag}
                                         value={tag}
@@ -551,6 +718,7 @@ function StudentDetailView({
                             )}
 
                         </select>
+
                     </div>
 
                     {/* Kurs */}
@@ -575,27 +743,33 @@ function StudentDetailView({
                         >
 
                             <option value="">
+
                                 {!selectedWochentag
                                     ? 'Zuerst Wochentag auswählen...'
                                     : 'Kurs auswählen...'}
+
                             </option>
 
                             {filteredKurse.map(
                                 (kurs) => (
+
                                     <option
                                         key={kurs.id}
                                         value={kurs.id}
                                     >
+
                                         {kurs.name}
 
                                         {kurs.uhrzeit
                                             ? ` | ${kurs.uhrzeit}`
                                             : ''}
+
                                     </option>
                                 )
                             )}
 
                         </select>
+
                     </div>
 
                     <button
@@ -615,11 +789,13 @@ function StudentDetailView({
 
                 {selectedWochentag &&
                     filteredKurse.length === 0 && (
+
                         <p className="empty-text">
+
                             Für{' '}
                             {selectedWochentag}{' '}
-                            sind keine Kurse
-                            vorhanden.
+                            sind keine Kurse vorhanden.
+
                         </p>
                     )}
 
@@ -628,9 +804,10 @@ function StudentDetailView({
 
                     <div className="detail-table-scroll">
 
-                        <table className="detail-table">
+                        <table className="detail-table kursbuchungen-table">
 
                             <thead>
+
                             <tr>
                                 <th>Kurs</th>
                                 <th>Kursleitung</th>
@@ -638,19 +815,23 @@ function StudentDetailView({
                                 <th>Uhrzeit</th>
                                 <th>Buchungsart</th>
                                 <th>Gebühr</th>
+                                <th>Besonderheiten</th>
                                 <th>Aktionen</th>
                             </tr>
+
                             </thead>
 
                             <tbody>
 
                             {buchungen.map(
                                 (buchung) => (
+
                                     <tr
                                         key={
                                             buchung.id
                                         }
                                     >
+
                                         <td>
                                             {buchung.kurs
                                                     ?.name ||
@@ -682,13 +863,90 @@ function StudentDetailView({
                                         </td>
 
                                         <td>
+
                                             {buchung.kurs
                                                 ?.kursgebuehr != null
                                                 ? `${buchung.kurs.kursgebuehr} €`
                                                 : '–'}
+
                                         </td>
 
+                                        {/* =================================
+                                            BESONDERHEITEN
+                                           ================================= */}
+
                                         <td>
+
+                                            <div className="besonderheiten-editor">
+
+                                                <input
+                                                    type="text"
+                                                    className="besonderheiten-input"
+                                                    value={
+                                                        besonderheitenValues[
+                                                            buchung.id
+                                                            ] ?? ''
+                                                    }
+                                                    maxLength={
+                                                        50
+                                                    }
+                                                    placeholder="Hinweis..."
+                                                    onChange={
+                                                        (event) =>
+                                                            handleBesonderheitenChange(
+                                                                buchung.id,
+                                                                event.target.value
+                                                            )
+                                                    }
+                                                />
+
+                                                <div className="besonderheiten-footer">
+
+                                                    <span className="besonderheiten-counter">
+
+                                                        {
+                                                            (
+                                                                besonderheitenValues[
+                                                                    buchung.id
+                                                                    ] ?? ''
+                                                            ).length
+                                                        } / 50
+
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        className="btn-save-besonderheiten"
+                                                        disabled={
+                                                            savingBesonderheitenId ===
+                                                            buchung.id
+                                                        }
+                                                        onClick={() =>
+                                                            handleBesonderheitenSave(
+                                                                buchung.id
+                                                            )
+                                                        }
+                                                    >
+
+                                                        {savingBesonderheitenId ===
+                                                        buchung.id
+                                                            ? 'Speichert...'
+                                                            : 'Speichern'}
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+                                        </td>
+
+                                        {/* =================================
+                                            AKTIONEN
+                                           ================================= */}
+
+                                        <td>
+
                                             <button
                                                 type="button"
                                                 className="btn-remove-kurs"
@@ -700,19 +958,23 @@ function StudentDetailView({
                                             >
                                                 Entfernen
                                             </button>
+
                                         </td>
+
                                     </tr>
                                 )
                             )}
 
                             </tbody>
+
                         </table>
+
                     </div>
 
                 ) : (
+
                     <p className="empty-text">
-                        Noch keine Kursbuchungen
-                        vorhanden.
+                        Noch keine Kursbuchungen vorhanden.
                     </p>
                 )}
 
@@ -727,15 +989,20 @@ function StudentDetailView({
                 <div className="detail-anwesenheit-header">
 
                     <div>
-                        <h3>Anwesenheit</h3>
+
+                        <h3>
+                            Anwesenheit
+                        </h3>
 
                         <p>
                             Anwesenheiten nach Datum,
                             Kurs oder Status filtern
                         </p>
+
                     </div>
 
                     {hasAnwesenheitFilter && (
+
                         <button
                             type="button"
                             className="detail-filter-reset"
@@ -797,12 +1064,14 @@ function StudentDetailView({
                                 )
                             }
                         >
+
                             <option value="">
                                 Alle Kurse
                             </option>
 
                             {anwesenheitKurse.map(
                                 (kurs) => (
+
                                     <option
                                         key={kurs.id}
                                         value={kurs.id}
@@ -813,6 +1082,7 @@ function StudentDetailView({
                             )}
 
                         </select>
+
                     </div>
 
                     {/* Status */}
@@ -834,12 +1104,14 @@ function StudentDetailView({
                                 )
                             }
                         >
+
                             <option value="">
                                 Alle Status
                             </option>
 
                             {anwesenheitStatus.map(
                                 (status) => (
+
                                     <option
                                         key={status}
                                         value={status}
@@ -850,6 +1122,7 @@ function StudentDetailView({
                             )}
 
                         </select>
+
                     </div>
 
                 </div>
@@ -883,12 +1156,14 @@ function StudentDetailView({
                         <table className="detail-table">
 
                             <thead>
+
                             <tr>
                                 <th>Datum</th>
                                 <th>Kurs</th>
                                 <th>Status</th>
                                 <th>Bemerkung</th>
                             </tr>
+
                             </thead>
 
                             <tbody>
@@ -928,6 +1203,7 @@ function StudentDetailView({
                             )}
 
                             </tbody>
+
                         </table>
 
                     </div>
@@ -941,7 +1217,6 @@ function StudentDetailView({
                             : 'Noch keine Anwesenheitsdaten vorhanden.'}
 
                     </p>
-
                 )}
 
             </section>

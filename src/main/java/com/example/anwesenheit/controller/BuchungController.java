@@ -125,6 +125,28 @@ public class BuchungController {
     }
 
     /* =====================================================
+       BESONDERHEITEN AKTUALISIEREN
+       ===================================================== */
+
+    @PatchMapping(
+            "/{id}/besonderheiten"
+    )
+    public Buchung updateBesonderheiten(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
+
+        String besonderheiten =
+                body.get("besonderheiten");
+
+        return buchungService
+                .updateBesonderheiten(
+                        id,
+                        besonderheiten
+                );
+    }
+
+    /* =====================================================
        BUCHUNG LÖSCHEN
        ===================================================== */
 

@@ -13,7 +13,8 @@ import { getKurse } from '../services/kursService';
 import {
     getBuchungenByStudent,
     createBuchung,
-    deleteBuchung
+    deleteBuchung,
+    updateBesonderheiten
 } from '../services/buchungService';
 
 import {
@@ -68,6 +69,10 @@ function StudentDetailsPage() {
 
     }, [id]);
 
+    /* =====================================================
+       KURS ZUWEISEN
+       ===================================================== */
+
     const handleAssignKurs = async (kursId) => {
         try {
             const newBuchung =
@@ -89,6 +94,10 @@ function StudentDetailsPage() {
             );
         }
     };
+
+    /* =====================================================
+       BUCHUNG LÖSCHEN
+       ===================================================== */
 
     const handleDeleteBuchung = async (
         buchungId
@@ -113,6 +122,57 @@ function StudentDetailsPage() {
             );
         }
     };
+
+    /* =====================================================
+       BESONDERHEITEN AKTUALISIEREN
+       ===================================================== */
+
+    const handleUpdateBesonderheiten = async (
+        buchungId,
+        besonderheiten
+    ) => {
+        try {
+            setError('');
+
+            const updatedBuchung =
+                await updateBesonderheiten(
+                    buchungId,
+                    besonderheiten
+                );
+
+            /*
+             * Die aktualisierte Buchung direkt im lokalen
+             * Zustand ersetzen. Dadurch muss die Seite
+             * nicht neu geladen werden.
+             */
+            setBuchungen((previous) =>
+                previous.map(
+                    (buchung) =>
+                        buchung.id === buchungId
+                            ? updatedBuchung
+                            : buchung
+                )
+            );
+
+            return updatedBuchung;
+
+        } catch (error) {
+            console.error(
+                'Besonderheiten konnten nicht gespeichert werden:',
+                error
+            );
+
+            setError(
+                'Besonderheiten konnten nicht gespeichert werden.'
+            );
+
+            throw error;
+        }
+    };
+
+    /* =====================================================
+       15:30 AKTUALISIEREN
+       ===================================================== */
 
     const handleUpdateGehtUm1530 = async (
         value
@@ -185,6 +245,10 @@ function StudentDetailsPage() {
 
                 onDeleteBuchung={
                     handleDeleteBuchung
+                }
+
+                onUpdateBesonderheiten={
+                    handleUpdateBesonderheiten
                 }
 
                 onUpdateGehtUm1530={

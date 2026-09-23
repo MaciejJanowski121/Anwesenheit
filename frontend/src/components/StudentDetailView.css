@@ -350,6 +350,101 @@
 }
 
 /* =====================================================
+   BESONDERHEITEN
+   ===================================================== */
+
+.besonderheiten-editor {
+    min-width: 220px;
+}
+
+.besonderheiten-input {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 200px;
+
+    padding: 8px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-family: inherit;
+    font-size: 0.84rem;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease,
+            background-color 0.15s ease;
+}
+
+.besonderheiten-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.besonderheiten-input:focus {
+    border-color: var(--accent);
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.besonderheiten-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-top: 6px;
+}
+
+.besonderheiten-counter {
+    color: var(--text-muted);
+
+    font-size: 0.72rem;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.btn-save-besonderheiten {
+    padding: 6px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: var(--accent);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+            background-color 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.btn-save-besonderheiten:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.btn-save-besonderheiten:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+/* =====================================================
    ANWESENHEIT HEADER
    ===================================================== */
 
@@ -559,11 +654,12 @@
 .detail-table-scroll {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
 
     overflow-x: auto;
     overflow-y: hidden;
 
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 
     scrollbar-width: thin;
 
@@ -579,6 +675,8 @@
 }
 
 .detail-table-scroll::-webkit-scrollbar-track {
+    border-radius: 999px;
+
     background: var(--scrollbar-track);
 }
 
@@ -598,13 +696,21 @@
 
 .detail-table {
     width: 100%;
-    min-width: 900px;
+    min-width: 700px;
 
     margin-top: 10px;
 
     border-collapse: collapse;
 
     background: var(--surface-primary);
+}
+
+/* =====================================================
+   KURSBUCHUNGEN TABLE
+   ===================================================== */
+
+.kursbuchungen-table {
+    min-width: 1250px;
 }
 
 .detail-table th {
@@ -810,9 +916,23 @@
         grid-column: auto;
     }
 
+    /* Besonderheiten */
+
+    .besonderheiten-editor {
+        min-width: 200px;
+    }
+
+    .besonderheiten-input {
+        min-width: 180px;
+    }
+
     /* Tabellen */
 
     .detail-table {
-        min-width: 800px;
+        min-width: 700px;
+    }
+
+    .kursbuchungen-table {
+        min-width: 1250px;
     }
 }
