@@ -478,11 +478,6 @@ function AnwesenheitPage() {
 
             setStudentsLoading(true);
 
-            /*
-             * Buchungen des Kurses laden.
-             *
-             * Besonderheiten kommen direkt aus der Buchung.
-             */
             const response =
                 await fetch(
                     `/api/buchungen/kurs/${kursId}`
@@ -540,19 +535,12 @@ function AnwesenheitPage() {
                                 buchungId:
                                 buchung.id,
 
-                                /*
-                                 * Besonderheiten gehören zur
-                                 * Buchung und sind hier nur lesbar.
-                                 */
                                 besonderheiten:
                                     buchung.besonderheiten ?? ''
                             };
                         }
                     );
 
-            /*
-             * Anwesenheiten für das konkrete Datum laden.
-             */
             const anwesenheitenData =
                 await getAnwesenheitenByZeitraum(
                     selectedDatum,
@@ -592,11 +580,18 @@ function AnwesenheitPage() {
                                 )
                         );
 
+                    /*
+                     * WICHTIG:
+                     * Kein Standardwert "ANWESEND".
+                     *
+                     * Wenn noch kein Eintrag existiert,
+                     * bleibt der Status leer.
+                     */
                     initialStatuses[
                         student.entryKey
                         ] =
                         existing?.status ||
-                        'ANWESEND';
+                        '';
 
                     initialBemerkungen[
                         student.entryKey
@@ -735,10 +730,6 @@ function AnwesenheitPage() {
                                 buchungId:
                                 buchung.id,
 
-                                /*
-                                 * Auch im Tagesmodus kommen
-                                 * Besonderheiten aus der Buchung.
-                                 */
                                 besonderheiten:
                                     buchung.besonderheiten ?? ''
                             });
@@ -783,11 +774,15 @@ function AnwesenheitPage() {
                                 )
                         );
 
+                    /*
+                     * Również w widoku całego dnia
+                     * brak domyślnego ANWESEND.
+                     */
                     initialStatuses[
                         student.entryKey
                         ] =
                         existing?.status ||
-                        'ANWESEND';
+                        '';
 
                     initialBemerkungen[
                         student.entryKey
@@ -964,8 +959,14 @@ function AnwesenheitPage() {
             (previous) => ({
                 ...previous,
 
+                /*
+                 * Zweites Klicken auf denselben Status
+                 * entfernt die Auswahl wieder.
+                 */
                 [entryKey]:
-                status
+                    previous[entryKey] === status
+                        ? ''
+                        : status
             })
         );
     };
@@ -1308,22 +1309,38 @@ function AnwesenheitPage() {
             }
         }
 
+        /*
+         * Jeder Schüler muss bewusst markiert werden.
+         * Kein automatisches "Anwesend".
+         */
+        const studentsWithoutStatus =
+            students.filter(
+                (student) =>
+                    !statuses[
+                        student.entryKey
+                        ]
+            );
+
+        if (
+            studentsWithoutStatus.length > 0
+        ) {
+
+            showError(
+                `Bitte markieren Sie noch ${studentsWithoutStatus.length} ${
+                    studentsWithoutStatus.length === 1
+                        ? 'Kind'
+                        : 'Kinder'
+                } als Anwesend, Fehlt oder Entschuldigt.`
+            );
+
+            return;
+        }
+
         try {
 
             setSaveLoading(true);
             clearMessage();
 
-            /*
-             * WICHTIG:
-             *
-             * Besonderheiten werden hier NICHT gespeichert.
-             *
-             * Sie gehören zur Buchung und können nur
-             * in den Schülerdetails geändert werden.
-             *
-             * Hier speichern wir ausschließlich:
-             * Datum + Status + Bemerkung.
-             */
             for (const student of students) {
 
                 const kursId =
@@ -1340,8 +1357,7 @@ function AnwesenheitPage() {
                         status:
                             statuses[
                                 student.entryKey
-                                ] ||
-                            'ANWESEND',
+                                ],
 
                         bemerkung:
                             bemerkungen[
@@ -1568,10 +1584,6 @@ function AnwesenheitPage() {
 
         try {
 
-            /*
-             * Auch beim Bearbeiten des Verlaufs
-             * keine Besonderheiten mitsenden.
-             */
             await createAnwesenheit(
                 anwesenheit.student.id,
                 anwesenheit.kurs.id,
@@ -1803,10 +1815,6 @@ function AnwesenheitPage() {
 
             </header>
 
-            {/* =================================================
-                TABS
-               ================================================= */}
-
             <div className="anwesenheit-tabs">
 
                 <button
@@ -1849,10 +1857,6 @@ function AnwesenheitPage() {
 
             </div>
 
-            {/* =================================================
-                MELDUNG
-               ================================================= */}
-
             {message && (
 
                 <div
@@ -1877,10 +1881,6 @@ function AnwesenheitPage() {
 
             )}
 
-            {/* =================================================
-                ANWESENHEIT ERFASSEN
-               ================================================= */}
-
             {activeTab === 'erfassen' && (
 
                 <section className="anwesenheit-section">
@@ -1901,8 +1901,6 @@ function AnwesenheitPage() {
                         </div>
 
                     </div>
-
-                    {/* ERFASSUNGSMODUS */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -1939,8 +1937,6 @@ function AnwesenheitPage() {
                         </button>
 
                     </div>
-
-                    {/* DATUM / KURS */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -2017,8 +2013,6 @@ function AnwesenheitPage() {
                         )}
 
                     </div>
-
-                    {/* SCHÜLER FILTER */}
 
                     {students.length > 0 && (
 
@@ -2122,8 +2116,6 @@ function AnwesenheitPage() {
                         </div>
 
                     )}
-
-                    {/* SCHÜLER */}
 
                     {studentsLoading ? (
 
@@ -2292,14 +2284,6 @@ function AnwesenheitPage() {
 
                                                 )}
 
-                                                {/* =================================
-                                                    BESONDERHEITEN
-
-                                                    Nur Anzeige.
-                                                    Keine Bearbeitung im
-                                                    Anwesenheitsmenü.
-                                                   ================================= */}
-
                                                 <td className="besonderheiten-cell">
 
                                                     <span className="besonderheiten-readonly">
@@ -2310,8 +2294,6 @@ function AnwesenheitPage() {
                                                     </span>
 
                                                 </td>
-
-                                                {/* ANWESEND */}
 
                                                 <td className="attendance-checkbox-cell">
 
@@ -2334,8 +2316,6 @@ function AnwesenheitPage() {
 
                                                 </td>
 
-                                                {/* ENTSCHULDIGT */}
-
                                                 <td className="attendance-checkbox-cell">
 
                                                     <input
@@ -2357,8 +2337,6 @@ function AnwesenheitPage() {
 
                                                 </td>
 
-                                                {/* FEHLT */}
-
                                                 <td className="attendance-checkbox-cell">
 
                                                     <input
@@ -2379,8 +2357,6 @@ function AnwesenheitPage() {
                                                     />
 
                                                 </td>
-
-                                                {/* BEMERKUNG */}
 
                                                 <td>
 
@@ -2446,10 +2422,6 @@ function AnwesenheitPage() {
 
             )}
 
-            {/* =================================================
-                VERLAUF
-               ================================================= */}
-
             {activeTab === 'verlauf' && (
 
                 <section className="anwesenheit-section">
@@ -2477,8 +2449,6 @@ function AnwesenheitPage() {
                         </span>
 
                     </div>
-
-                    {/* FILTER */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -2625,8 +2595,6 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* ANZEIGEMODUS */}
-
                     <div className="anwesenheit-view-switch">
 
                         <button
@@ -2690,8 +2658,6 @@ function AnwesenheitPage() {
                     ) : (
 
                         <>
-
-                            {/* GESAMT */}
 
                             {anzeigeModus === 'gesamt' && (
 
@@ -2877,8 +2843,6 @@ function AnwesenheitPage() {
 
                             )}
 
-                            {/* NACH KURSEN */}
-
                             {anzeigeModus === 'kurse' && (
 
                                 <div className="anwesenheit-group-list">
@@ -2974,8 +2938,6 @@ function AnwesenheitPage() {
                                 </div>
 
                             )}
-
-                            {/* NACH KINDERN */}
 
                             {anzeigeModus === 'kinder' && (
 

@@ -15,6 +15,7 @@ const emptyKurs = {
     kursleitung: '',
     wochentag: '',
     uhrzeit: '',
+    uhrzeitEnde: '',
     buchungsart: '',
     kursgebuehr: ''
 };
@@ -183,6 +184,7 @@ function KursePage() {
                             kurs.kursleitung,
                             kurs.wochentag,
                             kurs.uhrzeit,
+                            kurs.uhrzeitEnde,
                             kurs.buchungsart,
                             kurs.kursgebuehr
                         ].some(
@@ -509,6 +511,14 @@ function KursePage() {
         setEditData({
             ...kurs,
 
+            uhrzeit:
+                kurs.uhrzeit ??
+                '',
+
+            uhrzeitEnde:
+                kurs.uhrzeitEnde ??
+                '',
+
             kursgebuehr:
                 kurs.kursgebuehr ??
                 ''
@@ -591,8 +601,18 @@ function KursePage() {
                 editData.wochentag ||
                 '',
 
+            /*
+             * Beginn des Kurses.
+             */
             uhrzeit:
                 editData.uhrzeit ||
+                '',
+
+            /*
+             * Ende des Kurses.
+             */
+            uhrzeitEnde:
+                editData.uhrzeitEnde ||
                 '',
 
             buchungsart:
@@ -655,6 +675,49 @@ function KursePage() {
 
             setError(
                 'Bitte wählen Sie einen Wochentag aus.'
+            );
+
+            return false;
+        }
+
+        /*
+         * Beginn und Ende müssen angegeben werden.
+         */
+        if (
+            !editData.uhrzeit
+        ) {
+
+            setError(
+                'Bitte geben Sie den Beginn des Kurses ein.'
+            );
+
+            return false;
+        }
+
+        if (
+            !editData.uhrzeitEnde
+        ) {
+
+            setError(
+                'Bitte geben Sie das Ende des Kurses ein.'
+            );
+
+            return false;
+        }
+
+        /*
+         * Das Kursende muss nach dem Kursbeginn liegen.
+         *
+         * Da beide Werte im Format HH:mm vorliegen,
+         * können sie direkt miteinander verglichen werden.
+         */
+        if (
+            editData.uhrzeitEnde <=
+            editData.uhrzeit
+        ) {
+
+            setError(
+                'Das Kursende muss nach dem Kursbeginn liegen.'
             );
 
             return false;
@@ -1049,6 +1112,10 @@ function KursePage() {
                                     ? ` · ${kurs.uhrzeit}`
                                     : ''}
 
+                                {kurs.uhrzeitEnde
+                                    ? ` – ${kurs.uhrzeitEnde}`
+                                    : ''}
+
                             </small>
 
                         </div>
@@ -1180,6 +1247,12 @@ function KursePage() {
             field ===
             'kursgebuehr';
 
+        const istUhrzeit =
+            field ===
+            'uhrzeit' ||
+            field ===
+            'uhrzeitEnde';
+
         return (
 
             <input
@@ -1188,8 +1261,7 @@ function KursePage() {
                 type={
                     istKursgebuehr
                         ? 'number'
-                        : field ===
-                        'uhrzeit'
+                        : istUhrzeit
                             ? 'time'
                             : 'text'
                 }
@@ -1622,9 +1694,23 @@ function KursePage() {
                                     )
                                 }
                             >
-                                Uhrzeit
+                                Beginn
                                 {renderSortIndicator(
                                     'uhrzeit'
+                                )}
+                            </th>
+
+                            <th
+                                className="kurse-sortable-header"
+                                onClick={() =>
+                                    handleSort(
+                                        'uhrzeitEnde'
+                                    )
+                                }
+                            >
+                                Ende
+                                {renderSortIndicator(
+                                    'uhrzeitEnde'
                                 )}
                             </th>
 
@@ -1671,7 +1757,7 @@ function KursePage() {
                             <tr>
 
                                 <td
-                                    colSpan="7"
+                                    colSpan="8"
                                     className="kurse-empty-row"
                                 >
                                     Kurse werden geladen...
@@ -1685,7 +1771,7 @@ function KursePage() {
                             <tr>
 
                                 <td
-                                    colSpan="7"
+                                    colSpan="8"
                                     className="kurse-empty-row"
                                 >
                                     Keine Kurse gefunden.
@@ -1740,6 +1826,13 @@ function KursePage() {
                                             {renderCell(
                                                 kurs,
                                                 'uhrzeit'
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {renderCell(
+                                                kurs,
+                                                'uhrzeitEnde'
                                             )}
                                         </td>
 

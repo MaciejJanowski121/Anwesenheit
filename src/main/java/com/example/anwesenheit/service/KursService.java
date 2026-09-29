@@ -11,16 +11,22 @@ public class KursService {
 
     private final KursRepository kursRepository;
 
-    public KursService(KursRepository kursRepository) {
-        this.kursRepository = kursRepository;
+    public KursService(
+            KursRepository kursRepository
+    ) {
+        this.kursRepository =
+                kursRepository;
     }
 
     public List<Kurs> getAllKurse() {
         return kursRepository.findAll();
     }
 
-    public Kurs getKursById(Long id) {
-        return kursRepository.findById(id)
+    public Kurs getKursById(
+            Long id
+    ) {
+        return kursRepository
+                .findById(id)
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Kurs nicht gefunden"
@@ -28,15 +34,20 @@ public class KursService {
                 );
     }
 
-    public Kurs createKurs(Kurs kurs) {
+    public Kurs createKurs(
+            Kurs kurs
+    ) {
 
         /*
          * AG ist ausschließlich eine zusätzliche
          * Schülereinteilung.
          *
-         * Für AG dürfen keine Kurskosten gespeichert werden.
+         * Für AG dürfen keine Kurskosten
+         * gespeichert werden.
          */
-        if (istAG(kurs.getBuchungsart())) {
+        if (istAG(
+                kurs.getBuchungsart()
+        )) {
             kurs.setKursgebuehr(null);
         }
 
@@ -49,7 +60,8 @@ public class KursService {
     ) {
 
         Kurs kurs =
-                kursRepository.findById(id)
+                kursRepository
+                        .findById(id)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Kurs nicht gefunden"
@@ -64,8 +76,18 @@ public class KursService {
                 updatedKurs.getWochentag()
         );
 
+        /*
+         * Beginn des Kurses.
+         */
         kurs.setUhrzeit(
                 updatedKurs.getUhrzeit()
+        );
+
+        /*
+         * Ende des Kurses.
+         */
+        kurs.setUhrzeitEnde(
+                updatedKurs.getUhrzeitEnde()
         );
 
         kurs.setKursleitung(
@@ -99,7 +121,9 @@ public class KursService {
         return kursRepository.save(kurs);
     }
 
-    public void deleteKurs(Long id) {
+    public void deleteKurs(
+            Long id
+    ) {
         kursRepository.deleteById(id);
     }
 

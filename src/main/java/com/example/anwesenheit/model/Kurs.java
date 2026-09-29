@@ -1,11 +1,11 @@
 package com.example.anwesenheit.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
 
@@ -28,9 +28,25 @@ public class Kurs {
 
     private String wochentag;
 
+    /*
+     * Beginn des Kurses.
+     *
+     * Das bestehende Feld "uhrzeit" bleibt erhalten,
+     * damit bereits gespeicherte Kurszeiten nicht
+     * verloren gehen.
+     */
     private String uhrzeit;
 
+    /*
+     * Ende des Kurses.
+     *
+     * Dieses Feld wurde zusätzlich eingeführt.
+     */
+    private String uhrzeitEnde;
+
     private String kursleitung;
+
     private String buchungsart;
+
     private Double kursgebuehr;
 }

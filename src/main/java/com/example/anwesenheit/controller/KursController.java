@@ -22,22 +22,34 @@ public class KursController {
     }
 
     @PostMapping
-    public Kurs createKurs(@RequestBody Kurs kurs) {
+    public Kurs createKurs(
+            @RequestBody Kurs kurs
+    ) {
         return kursService.createKurs(kurs);
     }
 
     @GetMapping("/{id}")
-    public Kurs getKursById(@PathVariable Long id) {
+    public Kurs getKursById(
+            @PathVariable Long id
+    ) {
         return kursService.getKursById(id);
     }
 
     @PutMapping("/{id}")
-    public Kurs updateKurs(@PathVariable Long id, @RequestBody Kurs kurs) {
-        return kursService.updateKurs(id, kurs);
+    public Kurs updateKurs(
+            @PathVariable Long id,
+            @RequestBody Kurs kurs
+    ) {
+        return kursService.updateKurs(
+                id,
+                kurs
+        );
     }
 
     @DeleteMapping("/{id}")
-    public void deleteKurs(@PathVariable Long id) {
+    public void deleteKurs(
+            @PathVariable Long id
+    ) {
         kursService.deleteKurs(id);
     }
 }
