@@ -38,6 +38,9 @@ function StudentDetailView({
 
     /* =====================================================
        BESONDERHEITEN
+
+       Besonderheiten gehören zur Kursbuchung und
+       gelten damit dauerhaft für Schüler + Kurs.
        ===================================================== */
 
     const [
@@ -50,10 +53,6 @@ function StudentDetailView({
         setSavingBesonderheitenId
     ] = useState(null);
 
-    /*
-     * Die Eingabefelder mit den gespeicherten
-     * Besonderheiten der Buchungen synchronisieren.
-     */
     useEffect(() => {
 
         const values = {};
@@ -294,9 +293,6 @@ function StudentDetailView({
         value
     ) => {
 
-        /*
-         * Maximal 50 Zeichen.
-         */
         const limitedValue =
             value.slice(
                 0,
@@ -306,6 +302,7 @@ function StudentDetailView({
         setBesonderheitenValues(
             (previous) => ({
                 ...previous,
+
                 [buchungId]:
                 limitedValue
             })
@@ -500,10 +497,6 @@ function StudentDetailView({
 
                     </div>
 
-                    {/* =============================================
-                        15:30
-                       ============================================= */}
-
                     <div
                         className="
                             detail-item
@@ -683,8 +676,6 @@ function StudentDetailView({
 
                 <div className="assign-kurs-box">
 
-                    {/* Wochentag */}
-
                     <div className="assign-kurs-field">
 
                         <label htmlFor="kurs-wochentag">
@@ -720,8 +711,6 @@ function StudentDetailView({
                         </select>
 
                     </div>
-
-                    {/* Kurs */}
 
                     <div className="assign-kurs-field">
 
@@ -833,32 +822,27 @@ function StudentDetailView({
                                     >
 
                                         <td>
-                                            {buchung.kurs
-                                                    ?.name ||
+                                            {buchung.kurs?.name ||
                                                 '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs
-                                                    ?.kursleitung ||
+                                            {buchung.kurs?.kursleitung ||
                                                 '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs
-                                                    ?.wochentag ||
+                                            {buchung.kurs?.wochentag ||
                                                 '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs
-                                                    ?.uhrzeit ||
+                                            {buchung.kurs?.uhrzeit ||
                                                 '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs
-                                                    ?.buchungsart ||
+                                            {buchung.kurs?.buchungsart ||
                                                 '–'}
                                         </td>
 
@@ -887,9 +871,7 @@ function StudentDetailView({
                                                             buchung.id
                                                             ] ?? ''
                                                     }
-                                                    maxLength={
-                                                        50
-                                                    }
+                                                    maxLength={50}
                                                     placeholder="Hinweis..."
                                                     onChange={
                                                         (event) =>
@@ -940,10 +922,6 @@ function StudentDetailView({
                                             </div>
 
                                         </td>
-
-                                        {/* =================================
-                                            AKTIONEN
-                                           ================================= */}
 
                                         <td>
 
@@ -1016,13 +994,7 @@ function StudentDetailView({
 
                 </div>
 
-                {/* =============================================
-                    FILTER
-                   ============================================= */}
-
                 <div className="detail-anwesenheit-filter">
-
-                    {/* Datum */}
 
                     <div className="detail-filter-field">
 
@@ -1044,8 +1016,6 @@ function StudentDetailView({
                         />
 
                     </div>
-
-                    {/* Kurs */}
 
                     <div className="detail-filter-field">
 
@@ -1084,8 +1054,6 @@ function StudentDetailView({
                         </select>
 
                     </div>
-
-                    {/* Status */}
 
                     <div className="detail-filter-field">
 
@@ -1127,10 +1095,6 @@ function StudentDetailView({
 
                 </div>
 
-                {/* =============================================
-                    ERGEBNISANZAHL
-                   ============================================= */}
-
                 <div className="detail-anwesenheit-count">
 
                     <strong>
@@ -1144,10 +1108,6 @@ function StudentDetailView({
                         : 'Einträge'}
 
                 </div>
-
-                {/* =============================================
-                    TABELLE
-                   ============================================= */}
 
                 {filteredAnwesenheiten.length > 0 ? (
 
@@ -1183,8 +1143,7 @@ function StudentDetailView({
                                         </td>
 
                                         <td>
-                                            {anwesenheit.kurs
-                                                    ?.name ||
+                                            {anwesenheit.kurs?.name ||
                                                 '–'}
                                         </td>
 

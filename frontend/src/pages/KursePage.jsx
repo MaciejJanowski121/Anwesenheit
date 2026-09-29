@@ -27,6 +27,14 @@ const WOCHENTAGE = [
     'Freitag'
 ];
 
+/*
+ * AG ist eine zusätzliche Kurskategorie.
+ *
+ * Besonderheiten von AG:
+ * - keine Kursgebühr
+ * - kein Zählnachmittag
+ * - normale Zuordnung von Schülern möglich
+ */
 const BUCHUNGSARTEN = [
     'Kurz',
     'OGS',
@@ -34,48 +42,100 @@ const BUCHUNGSARTEN = [
     'OGSF',
     'M',
     'P',
-    'Zuschussfrei'
+    'Zuschussfrei',
+    'AG'
 ];
 
 function KursePage() {
+
     const navigate = useNavigate();
 
+    /* =====================================================
+       GRUNDDATEN
+       ===================================================== */
+
     const [kurse, setKurse] = useState([]);
-
-    const [filter, setFilter] = useState('');
-    const [nameFilter, setNameFilter] = useState('');
-    const [kursleitungFilter, setKursleitungFilter] = useState('');
-    const [wochentagFilter, setWochentagFilter] = useState('');
-    const [buchungsartFilter, setBuchungsartFilter] = useState('');
-
-    const [sortKey, setSortKey] = useState(null);
-    const [sortDirection, setSortDirection] = useState('asc');
-
-    const [editingId, setEditingId] = useState(null);
-    const [editData, setEditData] = useState({});
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
     const [error, setError] = useState('');
 
+    /* =====================================================
+       FILTER
+       ===================================================== */
+
+    const [filter, setFilter] = useState('');
+
+    const [
+        nameFilter,
+        setNameFilter
+    ] = useState('');
+
+    const [
+        kursleitungFilter,
+        setKursleitungFilter
+    ] = useState('');
+
+    const [
+        wochentagFilter,
+        setWochentagFilter
+    ] = useState('');
+
+    const [
+        buchungsartFilter,
+        setBuchungsartFilter
+    ] = useState('');
+
+    /* =====================================================
+       SORTIERUNG
+       ===================================================== */
+
+    const [sortKey, setSortKey] = useState(null);
+
+    const [
+        sortDirection,
+        setSortDirection
+    ] = useState('asc');
+
+    /* =====================================================
+       BEARBEITUNG
+       ===================================================== */
+
+    const [editingId, setEditingId] = useState(null);
+
+    const [editData, setEditData] = useState({});
+
+    /* =====================================================
+       INITIALISIERUNG
+       ===================================================== */
+
     useEffect(() => {
         loadKurse();
     }, []);
 
+    /* =====================================================
+       KURSE LADEN
+       ===================================================== */
+
     const loadKurse = async () => {
+
         try {
+
             setLoading(true);
             setError('');
 
-            const data = await getKurse();
+            const data =
+                await getKurse();
 
             setKurse(
                 Array.isArray(data)
                     ? data
                     : []
             );
+
         } catch (error) {
+
             console.error(
                 'Fehler beim Laden der Kurse:',
                 error
@@ -84,170 +144,320 @@ function KursePage() {
             setError(
                 'Die Kurse konnten nicht geladen werden.'
             );
+
         } finally {
+
             setLoading(false);
         }
     };
 
-    const filteredKurse = useMemo(() => {
-        const generalTerm =
-            filter.trim().toLowerCase();
+    /* =====================================================
+       KURSE FILTERN
+       ===================================================== */
 
-        const nameTerm =
-            nameFilter.trim().toLowerCase();
+    const filteredKurse =
+        useMemo(() => {
 
-        const kursleitungTerm =
-            kursleitungFilter.trim().toLowerCase();
+            const generalTerm =
+                filter
+                    .trim()
+                    .toLowerCase();
 
-        return kurse.filter((kurs) => {
-            const matchesGeneral =
-                !generalTerm ||
-                [
-                    kurs.name,
-                    kurs.kursleitung,
-                    kurs.wochentag,
-                    kurs.uhrzeit,
-                    kurs.buchungsart,
-                    kurs.kursgebuehr
-                ].some((value) =>
-                    String(value ?? '')
-                        .toLowerCase()
-                        .includes(generalTerm)
-                );
+            const nameTerm =
+                nameFilter
+                    .trim()
+                    .toLowerCase();
 
-            const matchesName =
-                !nameTerm ||
-                String(kurs.name ?? '')
-                    .toLowerCase()
-                    .includes(nameTerm);
+            const kursleitungTerm =
+                kursleitungFilter
+                    .trim()
+                    .toLowerCase();
 
-            const matchesKursleitung =
-                !kursleitungTerm ||
-                String(kurs.kursleitung ?? '')
-                    .toLowerCase()
-                    .includes(kursleitungTerm);
+            return kurse.filter(
+                (kurs) => {
 
-            const matchesWochentag =
-                !wochentagFilter ||
-                String(kurs.wochentag ?? '') ===
-                String(wochentagFilter);
+                    const matchesGeneral =
+                        !generalTerm ||
+                        [
+                            kurs.name,
+                            kurs.kursleitung,
+                            kurs.wochentag,
+                            kurs.uhrzeit,
+                            kurs.buchungsart,
+                            kurs.kursgebuehr
+                        ].some(
+                            (value) =>
+                                String(
+                                    value ?? ''
+                                )
+                                    .toLowerCase()
+                                    .includes(
+                                        generalTerm
+                                    )
+                        );
 
-            const matchesBuchungsart =
-                !buchungsartFilter ||
-                String(kurs.buchungsart ?? '') ===
-                String(buchungsartFilter);
+                    const matchesName =
+                        !nameTerm ||
+                        String(
+                            kurs.name ?? ''
+                        )
+                            .toLowerCase()
+                            .includes(
+                                nameTerm
+                            );
 
-            return (
-                matchesGeneral &&
-                matchesName &&
-                matchesKursleitung &&
-                matchesWochentag &&
-                matchesBuchungsart
+                    const matchesKursleitung =
+                        !kursleitungTerm ||
+                        String(
+                            kurs.kursleitung ?? ''
+                        )
+                            .toLowerCase()
+                            .includes(
+                                kursleitungTerm
+                            );
+
+                    const matchesWochentag =
+                        !wochentagFilter ||
+                        String(
+                            kurs.wochentag ?? ''
+                        ) ===
+                        String(
+                            wochentagFilter
+                        );
+
+                    const matchesBuchungsart =
+                        !buchungsartFilter ||
+                        String(
+                            kurs.buchungsart ?? ''
+                        ) ===
+                        String(
+                            buchungsartFilter
+                        );
+
+                    return (
+                        matchesGeneral &&
+                        matchesName &&
+                        matchesKursleitung &&
+                        matchesWochentag &&
+                        matchesBuchungsart
+                    );
+                }
             );
-        });
-    }, [
-        kurse,
-        filter,
-        nameFilter,
-        kursleitungFilter,
-        wochentagFilter,
-        buchungsartFilter
-    ]);
 
-    const sortedKurse = useMemo(() => {
-        return [...filteredKurse].sort((a, b) => {
-            if (!sortKey) {
-                return 0;
-            }
+        }, [
+            kurse,
+            filter,
+            nameFilter,
+            kursleitungFilter,
+            wochentagFilter,
+            buchungsartFilter
+        ]);
 
-            const valA = a[sortKey];
-            const valB = b[sortKey];
+    /* =====================================================
+       KURSE SORTIEREN
+       ===================================================== */
 
-            if (sortKey === 'kursgebuehr') {
-                const numberA =
-                    Number(valA) || 0;
+    const sortedKurse =
+        useMemo(() => {
 
-                const numberB =
-                    Number(valB) || 0;
+            return [
+                ...filteredKurse
+            ].sort(
+                (a, b) => {
 
-                return sortDirection === 'asc'
-                    ? numberA - numberB
-                    : numberB - numberA;
-            }
+                    if (!sortKey) {
+                        return 0;
+                    }
 
-            const strA =
-                String(valA ?? '')
-                    .toLowerCase();
+                    const valA =
+                        a[sortKey];
 
-            const strB =
-                String(valB ?? '')
-                    .toLowerCase();
+                    const valB =
+                        b[sortKey];
 
-            return sortDirection === 'asc'
-                ? strA.localeCompare(strB, 'de')
-                : strB.localeCompare(strA, 'de');
-        });
-    }, [
-        filteredKurse,
-        sortKey,
-        sortDirection
-    ]);
+                    if (
+                        sortKey ===
+                        'kursgebuehr'
+                    ) {
+
+                        const numberA =
+                            Number(valA) ||
+                            0;
+
+                        const numberB =
+                            Number(valB) ||
+                            0;
+
+                        return sortDirection ===
+                        'asc'
+                            ? numberA -
+                            numberB
+                            : numberB -
+                            numberA;
+                    }
+
+                    const strA =
+                        String(
+                            valA ?? ''
+                        )
+                            .toLowerCase();
+
+                    const strB =
+                        String(
+                            valB ?? ''
+                        )
+                            .toLowerCase();
+
+                    return sortDirection ===
+                    'asc'
+                        ? strA.localeCompare(
+                            strB,
+                            'de'
+                        )
+                        : strB.localeCompare(
+                            strA,
+                            'de'
+                        );
+                }
+            );
+
+        }, [
+            filteredKurse,
+            sortKey,
+            sortDirection
+        ]);
+
+    /* =====================================================
+       SORTIERUNG ÄNDERN
+       ===================================================== */
 
     const handleSort = (key) => {
-        if (sortKey === key) {
-            setSortDirection((direction) =>
-                direction === 'asc'
-                    ? 'desc'
-                    : 'asc'
+
+        if (
+            sortKey ===
+            key
+        ) {
+
+            setSortDirection(
+                (direction) =>
+                    direction ===
+                    'asc'
+                        ? 'desc'
+                        : 'asc'
             );
+
         } else {
+
             setSortKey(key);
             setSortDirection('asc');
         }
     };
 
-    const renderSortIndicator = (key) => {
-        if (sortKey !== key) {
-            return null;
-        }
+    /* =====================================================
+       SORTIERUNG SYMBOL
+       ===================================================== */
 
-        return sortDirection === 'asc'
-            ? ' ▲'
-            : ' ▼';
-    };
+    const renderSortIndicator =
+        (key) => {
 
-    const kursartenCount = useMemo(() => {
-        return new Set(
-            kurse
-                .map((kurs) => kurs.buchungsart)
-                .filter(Boolean)
-        ).size;
-    }, [kurse]);
+            if (
+                sortKey !==
+                key
+            ) {
+                return null;
+            }
 
-    const kostenpflichtigeKurse = useMemo(() => {
-        return kurse.filter((kurs) => {
-            return (
-                kurs.kursgebuehr !== null &&
-                kurs.kursgebuehr !== undefined &&
-                kurs.kursgebuehr !== ''
-            );
-        }).length;
-    }, [kurse]);
+            return sortDirection ===
+            'asc'
+                ? ' ▲'
+                : ' ▼';
+        };
 
-    const handleKursOpen = (kurs) => {
-        if (editingId !== null) {
+    /* =====================================================
+       STATISTIK
+       ===================================================== */
+
+    const kursartenCount =
+        useMemo(() => {
+
+            return new Set(
+                kurse
+                    .map(
+                        (kurs) =>
+                            kurs.buchungsart
+                    )
+                    .filter(Boolean)
+            ).size;
+
+        }, [kurse]);
+
+    const kostenpflichtigeKurse =
+        useMemo(() => {
+
+            return kurse.filter(
+                (kurs) => {
+
+                    /*
+                     * AG darf niemals als
+                     * kostenpflichtiger Kurs zählen.
+                     */
+                    if (
+                        String(
+                            kurs.buchungsart ??
+                            ''
+                        ).toUpperCase() ===
+                        'AG'
+                    ) {
+                        return false;
+                    }
+
+                    return (
+                        kurs.kursgebuehr !== null &&
+                        kurs.kursgebuehr !== undefined &&
+                        kurs.kursgebuehr !== ''
+                    );
+                }
+            ).length;
+
+        }, [kurse]);
+
+    /* =====================================================
+       KURS ÖFFNEN
+       ===================================================== */
+
+    const handleKursOpen = (
+        kurs
+    ) => {
+
+        if (
+            editingId !==
+            null
+        ) {
             return;
         }
 
-        if (typeof kurs.id !== 'number') {
+        if (
+            typeof kurs.id !==
+            'number'
+        ) {
             return;
         }
 
-        navigate(`/kurse/${kurs.id}`);
+        navigate(
+            `/kurse/${kurs.id}`
+        );
     };
+
+    /* =====================================================
+       NEUEN KURS ANLEGEN
+       ===================================================== */
 
     const handleAdd = () => {
-        if (editingId !== null) {
+
+        if (
+            editingId !==
+            null
+        ) {
             return;
         }
 
@@ -259,72 +469,167 @@ function KursePage() {
             id: tempId
         };
 
-        setKurse((previous) => [
-            newKurs,
-            ...previous
-        ]);
+        setKurse(
+            (previous) => [
+                newKurs,
+                ...previous
+            ]
+        );
 
-        setEditingId(tempId);
-        setEditData(newKurs);
+        setEditingId(
+            tempId
+        );
+
+        setEditData(
+            newKurs
+        );
+
         setError('');
     };
 
-    const handleEditStart = (kurs) => {
-        if (editingId !== null) {
+    /* =====================================================
+       BEARBEITUNG STARTEN
+       ===================================================== */
+
+    const handleEditStart = (
+        kurs
+    ) => {
+
+        if (
+            editingId !==
+            null
+        ) {
             return;
         }
 
-        setEditingId(kurs.id);
+        setEditingId(
+            kurs.id
+        );
 
         setEditData({
             ...kurs,
+
             kursgebuehr:
-                kurs.kursgebuehr ?? ''
+                kurs.kursgebuehr ??
+                ''
         });
 
         setError('');
     };
 
+    /* =====================================================
+       FELD ÄNDERN
+       ===================================================== */
+
     const handleEditChange = (
         field,
         value
     ) => {
-        setEditData((previous) => ({
-            ...previous,
-            [field]: value
-        }));
+
+        setEditData(
+            (previous) => {
+
+                /*
+                 * AG ist immer kostenlos.
+                 *
+                 * Wenn die Buchungsart auf AG
+                 * geändert wird, wird eine eventuell
+                 * vorhandene Kursgebühr entfernt.
+                 */
+                if (
+                    field ===
+                    'buchungsart' &&
+                    value ===
+                    'AG'
+                ) {
+
+                    return {
+                        ...previous,
+
+                        buchungsart:
+                            'AG',
+
+                        kursgebuehr:
+                            ''
+                    };
+                }
+
+                return {
+                    ...previous,
+                    [field]: value
+                };
+            }
+        );
     };
 
+    /* =====================================================
+       PAYLOAD ERSTELLEN
+       ===================================================== */
+
     const createPayload = () => {
+
+        const istAG =
+            String(
+                editData.buchungsart ??
+                ''
+            ).toUpperCase() ===
+            'AG';
+
         return {
+
             name:
-                editData.name?.trim() || '',
+                editData.name
+                    ?.trim() ||
+                '',
 
             kursleitung:
-                editData.kursleitung?.trim() || '',
+                editData.kursleitung
+                    ?.trim() ||
+                '',
 
             wochentag:
-                editData.wochentag || '',
+                editData.wochentag ||
+                '',
 
             uhrzeit:
-                editData.uhrzeit || '',
+                editData.uhrzeit ||
+                '',
 
             buchungsart:
-                editData.buchungsart || '',
+                editData.buchungsart ||
+                '',
 
+            /*
+             * AG hat grundsätzlich
+             * keine Kursgebühr.
+             */
             kursgebuehr:
-                editData.kursgebuehr === '' ||
-                editData.kursgebuehr === null ||
-                editData.kursgebuehr === undefined
+                istAG
                     ? null
-                    : Number(
-                        editData.kursgebuehr
-                    )
+                    : editData.kursgebuehr ===
+                    '' ||
+                    editData.kursgebuehr ===
+                    null ||
+                    editData.kursgebuehr ===
+                    undefined
+                        ? null
+                        : Number(
+                            editData.kursgebuehr
+                        )
         };
     };
 
+    /* =====================================================
+       VALIDIERUNG
+       ===================================================== */
+
     const validateKurs = () => {
-        if (!editData.name?.trim()) {
+
+        if (
+            !editData.name
+                ?.trim()
+        ) {
+
             setError(
                 'Bitte geben Sie einen Kursnamen ein.'
             );
@@ -332,7 +637,11 @@ function KursePage() {
             return false;
         }
 
-        if (!editData.kursleitung?.trim()) {
+        if (
+            !editData.kursleitung
+                ?.trim()
+        ) {
+
             setError(
                 'Bitte geben Sie eine Kursleitung ein.'
             );
@@ -340,7 +649,10 @@ function KursePage() {
             return false;
         }
 
-        if (!editData.wochentag) {
+        if (
+            !editData.wochentag
+        ) {
+
             setError(
                 'Bitte wählen Sie einen Wochentag aus.'
             );
@@ -348,7 +660,10 @@ function KursePage() {
             return false;
         }
 
-        if (!editData.buchungsart) {
+        if (
+            !editData.buchungsart
+        ) {
+
             setError(
                 'Bitte wählen Sie eine Buchungsart aus.'
             );
@@ -356,12 +671,20 @@ function KursePage() {
             return false;
         }
 
+        /*
+         * Für AG ist keine Gebührenprüfung nötig,
+         * weil AG grundsätzlich kostenlos ist.
+         */
         if (
-            editData.kursgebuehr !== '' &&
+            editData.buchungsart !==
+            'AG' &&
+            editData.kursgebuehr !==
+            '' &&
             Number(
                 editData.kursgebuehr
             ) < 0
         ) {
+
             setError(
                 'Die Kursgebühr darf nicht negativ sein.'
             );
@@ -372,69 +695,105 @@ function KursePage() {
         return true;
     };
 
-    const handleEditSave = async () => {
-        if (!validateKurs()) {
-            return;
-        }
+    /* =====================================================
+       KURS SPEICHERN
+       ===================================================== */
 
-        try {
-            setSaving(true);
-            setError('');
-
-            const payload =
-                createPayload();
-
-            let savedKurs;
+    const handleEditSave =
+        async () => {
 
             if (
-                typeof editingId === 'number'
+                !validateKurs()
             ) {
-                savedKurs =
-                    await updateKurs(
-                        editingId,
-                        payload
-                    );
-            } else {
-                savedKurs =
-                    await createKurs(
-                        payload
-                    );
+                return;
             }
 
-            setKurse((previous) =>
-                previous.map((kurs) =>
-                    kurs.id === editingId
-                        ? savedKurs
-                        : kurs
-                )
-            );
+            try {
 
-            setEditingId(null);
-            setEditData({});
-        } catch (error) {
-            console.error(
-                'Fehler beim Speichern des Kurses:',
-                error
-            );
+                setSaving(true);
+                setError('');
 
-            setError(
-                error.response?.data?.message ||
-                'Der Kurs konnte nicht gespeichert werden.'
-            );
-        } finally {
-            setSaving(false);
-        }
-    };
+                const payload =
+                    createPayload();
+
+                let savedKurs;
+
+                if (
+                    typeof editingId ===
+                    'number'
+                ) {
+
+                    savedKurs =
+                        await updateKurs(
+                            editingId,
+                            payload
+                        );
+
+                } else {
+
+                    savedKurs =
+                        await createKurs(
+                            payload
+                        );
+                }
+
+                setKurse(
+                    (previous) =>
+                        previous.map(
+                            (kurs) =>
+                                kurs.id ===
+                                editingId
+                                    ? savedKurs
+                                    : kurs
+                        )
+                );
+
+                setEditingId(
+                    null
+                );
+
+                setEditData(
+                    {}
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Fehler beim Speichern des Kurses:',
+                    error
+                );
+
+                setError(
+                    error.response
+                        ?.data
+                        ?.message ||
+                    'Der Kurs konnte nicht gespeichert werden.'
+                );
+
+            } finally {
+
+                setSaving(false);
+            }
+        };
+
+    /* =====================================================
+       BEARBEITUNG ABBRECHEN
+       ===================================================== */
 
     const handleEditCancel = () => {
+
         if (
-            typeof editingId !== 'number'
+            typeof editingId !==
+            'number'
         ) {
-            setKurse((previous) =>
-                previous.filter(
-                    (kurs) =>
-                        kurs.id !== editingId
-                )
+
+            setKurse(
+                (previous) =>
+                    previous.filter(
+                        (kurs) =>
+                            kurs.id !==
+                            editingId
+                    )
             );
         }
 
@@ -443,54 +802,83 @@ function KursePage() {
         setError('');
     };
 
-    const handleDelete = async (kurs) => {
-        const confirmed =
-            window.confirm(
-                `Möchten Sie den Kurs „${kurs.name}“ wirklich löschen?`
-            );
+    /* =====================================================
+       KURS LÖSCHEN
+       ===================================================== */
 
-        if (!confirmed) {
-            return;
-        }
+    const handleDelete =
+        async (kurs) => {
 
-        try {
-            setError('');
+            const confirmed =
+                window.confirm(
+                    `Möchten Sie den Kurs „${kurs.name}“ wirklich löschen?`
+                );
 
             if (
-                typeof kurs.id === 'number'
+                !confirmed
             ) {
-                await deleteKurs(
+                return;
+            }
+
+            try {
+
+                setError('');
+
+                if (
+                    typeof kurs.id ===
+                    'number'
+                ) {
+
+                    await deleteKurs(
+                        kurs.id
+                    );
+                }
+
+                setKurse(
+                    (previous) =>
+                        previous.filter(
+                            (item) =>
+                                item.id !==
+                                kurs.id
+                        )
+                );
+
+                if (
+                    editingId ===
                     kurs.id
+                ) {
+
+                    setEditingId(
+                        null
+                    );
+
+                    setEditData(
+                        {}
+                    );
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Fehler beim Löschen des Kurses:',
+                    error
+                );
+
+                setError(
+                    error.response
+                        ?.data
+                        ?.message ||
+                    'Der Kurs konnte nicht gelöscht werden.'
                 );
             }
+        };
 
-            setKurse((previous) =>
-                previous.filter(
-                    (item) =>
-                        item.id !== kurs.id
-                )
-            );
-
-            if (
-                editingId === kurs.id
-            ) {
-                setEditingId(null);
-                setEditData({});
-            }
-        } catch (error) {
-            console.error(
-                'Fehler beim Löschen des Kurses:',
-                error
-            );
-
-            setError(
-                error.response?.data?.message ||
-                'Der Kurs konnte nicht gelöscht werden.'
-            );
-        }
-    };
+    /* =====================================================
+       FILTER ZURÜCKSETZEN
+       ===================================================== */
 
     const resetFilters = () => {
+
         setFilter('');
         setNameFilter('');
         setKursleitungFilter('');
@@ -505,9 +893,14 @@ function KursePage() {
         wochentagFilter ||
         buchungsartFilter;
 
+    /* =====================================================
+       KURSGEBÜHR FORMATIEREN
+       ===================================================== */
+
     const formatKursgebuehr = (
         value
     ) => {
+
         if (
             value === null ||
             value === undefined ||
@@ -522,228 +915,396 @@ function KursePage() {
                 style: 'currency',
                 currency: 'EUR'
             }
-        ).format(Number(value));
+        ).format(
+            Number(value)
+        );
     };
+
+    /* =====================================================
+       BADGE
+       ===================================================== */
 
     const getBadgeClass = (
         buchungsart
     ) => {
+
         const normalized =
             String(
-                buchungsart || ''
+                buchungsart ||
+                ''
             )
                 .toLowerCase()
-                .replace(/\s+/g, '-');
+                .replace(
+                    /\s+/g,
+                    '-'
+                );
 
-        return `kurs-badge kurs-badge-${normalized}`;
+        return (
+            `kurs-badge kurs-badge-${normalized}`
+        );
     };
+
+    /* =====================================================
+       TABELLENZELLE
+       ===================================================== */
 
     const renderCell = (
         kurs,
         field
     ) => {
+
         const isEditing =
-            editingId === kurs.id;
+            editingId ===
+            kurs.id;
+
+        /* =================================================
+           NORMALER ANZEIGEMODUS
+           ================================================= */
 
         if (!isEditing) {
+
             if (
-                field === 'kursgebuehr'
+                field ===
+                'kursgebuehr'
             ) {
+
+                /*
+                 * AG zeigt grundsätzlich keine Kosten.
+                 */
+                if (
+                    String(
+                        kurs.buchungsart ??
+                        ''
+                    ).toUpperCase() ===
+                    'AG'
+                ) {
+
+                    return (
+                        <span className="kurs-fee">
+                            –
+                        </span>
+                    );
+                }
+
                 return (
                     <span className="kurs-fee">
+
                         {formatKursgebuehr(
                             kurs.kursgebuehr
                         )}
+
                     </span>
                 );
             }
 
             if (
-                field === 'buchungsart'
+                field ===
+                'buchungsart'
             ) {
-                return kurs.buchungsart ? (
-                    <span
-                        className={getBadgeClass(
-                            kurs.buchungsart
-                        )}
-                    >
-                        {kurs.buchungsart}
-                    </span>
-                ) : (
-                    '–'
-                );
+
+                return kurs.buchungsart
+                    ? (
+
+                        <span
+                            className={
+                                getBadgeClass(
+                                    kurs.buchungsart
+                                )
+                            }
+                        >
+                            {
+                                kurs.buchungsart
+                            }
+                        </span>
+
+                    )
+                    : '–';
             }
 
-            if (field === 'name') {
+            if (
+                field ===
+                'name'
+            ) {
+
                 return (
+
                     <div className="kurs-name">
+
                         <span className="kurs-name-icon">
                             K
                         </span>
 
                         <div className="kurs-name-content">
+
                             <strong>
                                 {kurs.name || '–'}
                             </strong>
 
                             <small>
+
                                 {kurs.wochentag ||
                                     'Kein Tag'}
 
                                 {kurs.uhrzeit
                                     ? ` · ${kurs.uhrzeit}`
                                     : ''}
+
                             </small>
+
                         </div>
+
                     </div>
                 );
             }
 
             return (
-                kurs[field] || '–'
+                kurs[field] ||
+                '–'
             );
         }
 
+        /* =================================================
+           WOCHENTAG
+           ================================================= */
+
         if (
-            field === 'wochentag'
+            field ===
+            'wochentag'
         ) {
+
             return (
+
                 <select
                     className="kurs-edit-input"
                     value={
                         editData[field] ??
                         ''
                     }
-                    onClick={(event) =>
-                        event.stopPropagation()
+                    onClick={
+                        (event) =>
+                            event.stopPropagation()
                     }
-                    onChange={(event) =>
-                        handleEditChange(
-                            field,
-                            event.target.value
-                        )
+                    onChange={
+                        (event) =>
+                            handleEditChange(
+                                field,
+                                event.target.value
+                            )
                     }
                 >
+
                     <option value="">
                         Bitte wählen
                     </option>
 
                     {WOCHENTAGE.map(
                         (tag) => (
+
                             <option
                                 key={tag}
                                 value={tag}
                             >
                                 {tag}
                             </option>
+
                         )
                     )}
+
                 </select>
             );
         }
 
+        /* =================================================
+           BUCHUNGSART
+           ================================================= */
+
         if (
-            field === 'buchungsart'
+            field ===
+            'buchungsart'
         ) {
+
             return (
+
                 <select
                     className="kurs-edit-input"
                     value={
                         editData[field] ??
                         ''
                     }
-                    onClick={(event) =>
-                        event.stopPropagation()
+                    onClick={
+                        (event) =>
+                            event.stopPropagation()
                     }
-                    onChange={(event) =>
-                        handleEditChange(
-                            field,
-                            event.target.value
-                        )
+                    onChange={
+                        (event) =>
+                            handleEditChange(
+                                field,
+                                event.target.value
+                            )
                     }
                 >
+
                     <option value="">
                         Bitte wählen
                     </option>
 
                     {BUCHUNGSARTEN.map(
                         (art) => (
+
                             <option
                                 key={art}
                                 value={art}
                             >
                                 {art}
                             </option>
+
                         )
                     )}
+
                 </select>
             );
         }
 
+        /* =================================================
+           NORMALE INPUTS
+           ================================================= */
+
+        const istAG =
+            String(
+                editData.buchungsart ??
+                ''
+            ).toUpperCase() ===
+            'AG';
+
+        const istKursgebuehr =
+            field ===
+            'kursgebuehr';
+
         return (
+
             <input
                 className="kurs-edit-input"
+
                 type={
-                    field === 'kursgebuehr'
+                    istKursgebuehr
                         ? 'number'
-                        : field === 'uhrzeit'
+                        : field ===
+                        'uhrzeit'
                             ? 'time'
                             : 'text'
                 }
+
                 min={
-                    field === 'kursgebuehr'
+                    istKursgebuehr
                         ? '0'
                         : undefined
                 }
+
                 step={
-                    field === 'kursgebuehr'
+                    istKursgebuehr
                         ? '0.01'
                         : undefined
                 }
+
+                /*
+                 * Bei AG bleibt das Gebührenfeld leer.
+                 */
                 value={
-                    editData[field] ?? ''
+                    istKursgebuehr &&
+                    istAG
+                        ? ''
+                        : editData[field] ??
+                        ''
                 }
-                onClick={(event) =>
-                    event.stopPropagation()
+
+                /*
+                 * AG hat keine Kosten.
+                 */
+                disabled={
+                    istKursgebuehr &&
+                    istAG
                 }
-                onChange={(event) =>
-                    handleEditChange(
-                        field,
-                        event.target.value
-                    )
+
+                placeholder={
+                    istKursgebuehr &&
+                    istAG
+                        ? 'Keine Kosten'
+                        : undefined
+                }
+
+                onClick={
+                    (event) =>
+                        event.stopPropagation()
+                }
+
+                onChange={
+                    (event) =>
+                        handleEditChange(
+                            field,
+                            event.target.value
+                        )
                 }
             />
         );
     };
 
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
     return (
+
         <div className="kurse-page">
 
+            {/* =================================================
+                HEADER
+               ================================================= */}
+
             <header className="page-header">
+
                 <div className="page-header-content">
-                    <h1>Kurse</h1>
+
+                    <h1>
+                        Kurse
+                    </h1>
 
                     <p>
                         Kurse, Kursleitungen,
                         Buchungsarten und Gebühren verwalten
                     </p>
+
                 </div>
 
                 <button
                     type="button"
                     className="kurse-add-button"
-                    onClick={handleAdd}
+                    onClick={
+                        handleAdd
+                    }
                     disabled={
-                        editingId !== null
+                        editingId !==
+                        null
                     }
                 >
-                    <span>+</span>
+
+                    <span>
+                        +
+                    </span>
+
                     Neuer Kurs
+
                 </button>
+
             </header>
 
+            {/* =================================================
+                STATISTIK
+               ================================================= */}
+
             <section className="kurse-stats">
+
                 <div className="kurse-stat-card">
+
                     <span>
                         Alle Kurse
                     </span>
@@ -751,9 +1312,11 @@ function KursePage() {
                     <strong>
                         {kurse.length}
                     </strong>
+
                 </div>
 
                 <div className="kurse-stat-card">
+
                     <span>
                         Buchungsarten
                     </span>
@@ -761,9 +1324,11 @@ function KursePage() {
                     <strong>
                         {kursartenCount}
                     </strong>
+
                 </div>
 
                 <div className="kurse-stat-card">
+
                     <span>
                         Mit Kursgebühr
                     </span>
@@ -771,18 +1336,33 @@ function KursePage() {
                     <strong>
                         {kostenpflichtigeKurse}
                     </strong>
+
                 </div>
+
             </section>
 
+            {/* =================================================
+                FEHLER
+               ================================================= */}
+
             {error && (
+
                 <div className="kurse-error">
                     {error}
                 </div>
+
             )}
 
+            {/* =================================================
+                FILTER
+               ================================================= */}
+
             <section className="kurse-filter-section">
+
                 <div className="kurse-filter-header">
+
                     <div>
+
                         <h2>
                             Filter
                         </h2>
@@ -791,9 +1371,11 @@ function KursePage() {
                             Kurse nach Name, Kursleitung,
                             Wochentag oder Buchungsart filtern
                         </p>
+
                     </div>
 
                     {hasActiveFilters && (
+
                         <button
                             type="button"
                             className="kurse-reset-button"
@@ -803,11 +1385,15 @@ function KursePage() {
                         >
                             Filter zurücksetzen
                         </button>
+
                     )}
+
                 </div>
 
                 <div className="kurse-filter-grid">
+
                     <div className="kurse-filter-field kurse-filter-field-wide">
+
                         <label htmlFor="kurs-allgemeine-suche">
                             Allgemeine Suche
                         </label>
@@ -817,15 +1403,18 @@ function KursePage() {
                             type="text"
                             value={filter}
                             placeholder="Kurs, Kursleitung, Uhrzeit..."
-                            onChange={(event) =>
-                                setFilter(
-                                    event.target.value
-                                )
+                            onChange={
+                                (event) =>
+                                    setFilter(
+                                        event.target.value
+                                    )
                             }
                         />
+
                     </div>
 
                     <div className="kurse-filter-field">
+
                         <label htmlFor="kurs-name-filter">
                             Name
                         </label>
@@ -833,17 +1422,22 @@ function KursePage() {
                         <input
                             id="kurs-name-filter"
                             type="text"
-                            value={nameFilter}
+                            value={
+                                nameFilter
+                            }
                             placeholder="Kursname..."
-                            onChange={(event) =>
-                                setNameFilter(
-                                    event.target.value
-                                )
+                            onChange={
+                                (event) =>
+                                    setNameFilter(
+                                        event.target.value
+                                    )
                             }
                         />
+
                     </div>
 
                     <div className="kurse-filter-field">
+
                         <label htmlFor="kursleitung-filter">
                             Kursleitung
                         </label>
@@ -855,15 +1449,18 @@ function KursePage() {
                                 kursleitungFilter
                             }
                             placeholder="Kursleitung..."
-                            onChange={(event) =>
-                                setKursleitungFilter(
-                                    event.target.value
-                                )
+                            onChange={
+                                (event) =>
+                                    setKursleitungFilter(
+                                        event.target.value
+                                    )
                             }
                         />
+
                     </div>
 
                     <div className="kurse-filter-field">
+
                         <label htmlFor="wochentag-filter">
                             Wochentag
                         </label>
@@ -873,30 +1470,37 @@ function KursePage() {
                             value={
                                 wochentagFilter
                             }
-                            onChange={(event) =>
-                                setWochentagFilter(
-                                    event.target.value
-                                )
+                            onChange={
+                                (event) =>
+                                    setWochentagFilter(
+                                        event.target.value
+                                    )
                             }
                         >
+
                             <option value="">
                                 Alle Wochentage
                             </option>
 
                             {WOCHENTAGE.map(
                                 (tag) => (
+
                                     <option
                                         key={tag}
                                         value={tag}
                                     >
                                         {tag}
                                     </option>
+
                                 )
                             )}
+
                         </select>
+
                     </div>
 
                     <div className="kurse-filter-field">
+
                         <label htmlFor="buchungsart-filter">
                             Buchungsart
                         </label>
@@ -906,47 +1510,68 @@ function KursePage() {
                             value={
                                 buchungsartFilter
                             }
-                            onChange={(event) =>
-                                setBuchungsartFilter(
-                                    event.target.value
-                                )
+                            onChange={
+                                (event) =>
+                                    setBuchungsartFilter(
+                                        event.target.value
+                                    )
                             }
                         >
+
                             <option value="">
                                 Alle Buchungsarten
                             </option>
 
                             {BUCHUNGSARTEN.map(
                                 (art) => (
+
                                     <option
                                         key={art}
                                         value={art}
                                     >
                                         {art}
                                     </option>
+
                                 )
                             )}
+
                         </select>
+
                     </div>
+
                 </div>
+
             </section>
+
+            {/* =================================================
+                KURSLISTE
+               ================================================= */}
 
             <section className="kurse-content">
 
                 <div className="kurse-toolbar">
+
                     <span className="kurse-result-count">
+
                         {sortedKurse.length}{' '}
 
-                        {sortedKurse.length === 1
+                        {sortedKurse.length ===
+                        1
                             ? 'Kurs'
                             : 'Kurse'}
+
                     </span>
+
                 </div>
 
                 <div className="kurse-table-scroll">
+
                     <table className="kurse-table">
+
                         <thead>
+
                         <tr>
+
                             <th
                                 className="kurse-sortable-header"
                                 onClick={() =>
@@ -1034,33 +1659,49 @@ function KursePage() {
                             <th className="aktionen-header">
                                 Aktionen
                             </th>
+
                         </tr>
+
                         </thead>
 
                         <tbody>
+
                         {loading ? (
+
                             <tr>
+
                                 <td
                                     colSpan="7"
                                     className="kurse-empty-row"
                                 >
                                     Kurse werden geladen...
                                 </td>
+
                             </tr>
-                        ) : sortedKurse.length === 0 ? (
+
+                        ) : sortedKurse.length ===
+                        0 ? (
+
                             <tr>
+
                                 <td
                                     colSpan="7"
                                     className="kurse-empty-row"
                                 >
                                     Keine Kurse gefunden.
                                 </td>
+
                             </tr>
+
                         ) : (
+
                             sortedKurse.map(
                                 (kurs) => (
+
                                     <tr
-                                        key={kurs.id}
+                                        key={
+                                            kurs.id
+                                        }
                                         className={
                                             editingId ===
                                             kurs.id
@@ -1073,6 +1714,7 @@ function KursePage() {
                                             )
                                         }
                                     >
+
                                         <td>
                                             {renderCell(
                                                 kurs,
@@ -1117,13 +1759,17 @@ function KursePage() {
 
                                         <td
                                             className="kurse-action-cell"
-                                            onClick={(event) =>
-                                                event.stopPropagation()
+                                            onClick={
+                                                (event) =>
+                                                    event.stopPropagation()
                                             }
                                         >
+
                                             {editingId ===
                                             kurs.id ? (
+
                                                 <>
+
                                                     <button
                                                         type="button"
                                                         className="kurse-save-button"
@@ -1134,9 +1780,11 @@ function KursePage() {
                                                             saving
                                                         }
                                                     >
+
                                                         {saving
                                                             ? 'Speichern...'
                                                             : 'Speichern'}
+
                                                     </button>
 
                                                     <button
@@ -1151,9 +1799,13 @@ function KursePage() {
                                                     >
                                                         Abbrechen
                                                     </button>
+
                                                 </>
+
                                             ) : (
+
                                                 <>
+
                                                     <button
                                                         type="button"
                                                         className="kurse-edit-button"
@@ -1185,17 +1837,28 @@ function KursePage() {
                                                     >
                                                         Löschen
                                                     </button>
+
                                                 </>
+
                                             )}
+
                                         </td>
+
                                     </tr>
+
                                 )
                             )
+
                         )}
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </section>
+
         </div>
     );
 }

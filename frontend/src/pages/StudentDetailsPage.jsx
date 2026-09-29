@@ -24,6 +24,7 @@ import {
 import './StudentDetailsPage.css';
 
 function StudentDetailsPage() {
+
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ function StudentDetailsPage() {
     const [error, setError] = useState('');
 
     useEffect(() => {
+
         setLoading(true);
 
         Promise.all([
@@ -50,6 +52,7 @@ function StudentDetailsPage() {
                        kurseData,
                        anwesenheitenData
                    ]) => {
+
                 setStudent(studentData);
                 setBuchungen(buchungenData);
                 setKurse(kurseData);
@@ -57,6 +60,7 @@ function StudentDetailsPage() {
                 setError('');
             })
             .catch((error) => {
+
                 console.error(error);
 
                 setError(
@@ -64,6 +68,7 @@ function StudentDetailsPage() {
                 );
             })
             .finally(() => {
+
                 setLoading(false);
             });
 
@@ -73,20 +78,29 @@ function StudentDetailsPage() {
        KURS ZUWEISEN
        ===================================================== */
 
-    const handleAssignKurs = async (kursId) => {
+    const handleAssignKurs = async (
+        kursId
+    ) => {
+
         try {
+
+            setError('');
+
             const newBuchung =
                 await createBuchung(
                     id,
                     kursId
                 );
 
-            setBuchungen((previous) => [
-                ...previous,
-                newBuchung
-            ]);
+            setBuchungen(
+                (previous) => [
+                    ...previous,
+                    newBuchung
+                ]
+            );
 
         } catch (error) {
+
             console.error(error);
 
             setError(
@@ -102,19 +116,26 @@ function StudentDetailsPage() {
     const handleDeleteBuchung = async (
         buchungId
     ) => {
+
         try {
+
+            setError('');
+
             await deleteBuchung(
                 buchungId
             );
 
-            setBuchungen((previous) =>
-                previous.filter(
-                    (buchung) =>
-                        buchung.id !== buchungId
-                )
+            setBuchungen(
+                (previous) =>
+                    previous.filter(
+                        (buchung) =>
+                            buchung.id !==
+                            buchungId
+                    )
             );
 
         } catch (error) {
+
             console.error(error);
 
             setError(
@@ -125,13 +146,21 @@ function StudentDetailsPage() {
 
     /* =====================================================
        BESONDERHEITEN AKTUALISIEREN
+
+       Besonderheiten gehören zur Buchung:
+       Schüler + Kurs
+
+       Dadurch werden sie bei jeder Anwesenheit
+       dieses Kurses angezeigt.
        ===================================================== */
 
     const handleUpdateBesonderheiten = async (
         buchungId,
         besonderheiten
     ) => {
+
         try {
+
             setError('');
 
             const updatedBuchung =
@@ -140,23 +169,20 @@ function StudentDetailsPage() {
                     besonderheiten
                 );
 
-            /*
-             * Die aktualisierte Buchung direkt im lokalen
-             * Zustand ersetzen. Dadurch muss die Seite
-             * nicht neu geladen werden.
-             */
-            setBuchungen((previous) =>
-                previous.map(
-                    (buchung) =>
-                        buchung.id === buchungId
-                            ? updatedBuchung
-                            : buchung
-                )
+            setBuchungen(
+                (previous) =>
+                    previous.map(
+                        (buchung) =>
+                            buchung.id === buchungId
+                                ? updatedBuchung
+                                : buchung
+                    )
             );
 
             return updatedBuchung;
 
         } catch (error) {
+
             console.error(
                 'Besonderheiten konnten nicht gespeichert werden:',
                 error
@@ -177,7 +203,9 @@ function StudentDetailsPage() {
     const handleUpdateGehtUm1530 = async (
         value
     ) => {
+
         try {
+
             setError('');
 
             const updatedStudent =
@@ -185,15 +213,19 @@ function StudentDetailsPage() {
                     id,
                     {
                         ...student,
-                        gehtUm1530: value
+                        gehtUm1530:
+                        value
                     }
                 );
 
-            setStudent(updatedStudent);
+            setStudent(
+                updatedStudent
+            );
 
             return updatedStudent;
 
         } catch (error) {
+
             console.error(
                 'Fehler beim Speichern von gehtUm1530:',
                 error
@@ -207,7 +239,12 @@ function StudentDetailsPage() {
         }
     };
 
+    /* =====================================================
+       LADEN
+       ===================================================== */
+
     if (loading) {
+
         return (
             <p className="details-message">
                 Schüler wird geladen...
@@ -215,7 +252,12 @@ function StudentDetailsPage() {
         );
     }
 
+    /* =====================================================
+       FEHLER
+       ===================================================== */
+
     if (error) {
+
         return (
             <p className="details-message error">
                 {error}
@@ -223,7 +265,12 @@ function StudentDetailsPage() {
         );
     }
 
+    /* =====================================================
+       SCHÜLER NICHT GEFUNDEN
+       ===================================================== */
+
     if (!student) {
+
         return (
             <p className="details-message error">
                 Schüler nicht gefunden.
@@ -231,13 +278,30 @@ function StudentDetailsPage() {
         );
     }
 
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
     return (
+
         <div className="student-details-page">
+
             <StudentDetailView
-                student={student}
-                buchungen={buchungen}
-                kurse={kurse}
-                anwesenheiten={anwesenheiten}
+                student={
+                    student
+                }
+
+                buchungen={
+                    buchungen
+                }
+
+                kurse={
+                    kurse
+                }
+
+                anwesenheiten={
+                    anwesenheiten
+                }
 
                 onAssignKurs={
                     handleAssignKurs
@@ -261,6 +325,7 @@ function StudentDetailsPage() {
                     )
                 }
             />
+
         </div>
     );
 }

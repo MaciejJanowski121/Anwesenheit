@@ -3,10 +3,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { getKurse } from '../services/kursService';
 
 import {
-    updateBesonderheiten
-} from '../services/buchungService';
-
-import {
     createAnwesenheit,
     getAnwesenheitenByZeitraum,
     deleteAnwesenheit,
@@ -28,10 +24,6 @@ const getToday = () => {
         .toISOString()
         .split('T')[0];
 };
-
-/* =====================================================
-   WOCHENTAG AUS DATUM ERMITTELN
-   ===================================================== */
 
 const getWochentagFromDate = (dateString) => {
 
@@ -71,10 +63,6 @@ const getWochentagFromDate = (dateString) => {
     }
 };
 
-/* =====================================================
-   EINDEUTIGER SCHLÜSSEL FÜR SCHÜLER + KURS
-   ===================================================== */
-
 const getEntryKey = (
     studentId,
     kursId
@@ -95,7 +83,6 @@ function AnwesenheitPage() {
 
     const [statuses, setStatuses] = useState({});
     const [bemerkungen, setBemerkungen] = useState({});
-    const [besonderheiten, setBesonderheiten] = useState({});
 
     const [
         savedAnwesenheiten,
@@ -110,15 +97,6 @@ function AnwesenheitPage() {
         erfassungsModus,
         setErfassungsModus
     ] = useState('kurs');
-
-    /* =====================================================
-       BESONDERHEITEN
-       ===================================================== */
-
-    const [
-        savingBesonderheitenId,
-        setSavingBesonderheitenId
-    ] = useState(null);
 
     /* =====================================================
        SCHÜLER FILTER / SORTIERUNG
@@ -419,10 +397,6 @@ function AnwesenheitPage() {
         );
     };
 
-    /* =====================================================
-       WOCHENTAG DES DATUMS
-       ===================================================== */
-
     const selectedWochentag =
         useMemo(() => {
 
@@ -431,10 +405,6 @@ function AnwesenheitPage() {
             );
 
         }, [datum]);
-
-    /* =====================================================
-       KURSE DES DATUMS
-       ===================================================== */
 
     const kurseFuerDatum =
         useMemo(() => {
@@ -500,7 +470,6 @@ function AnwesenheitPage() {
             setStudents([]);
             setStatuses({});
             setBemerkungen({});
-            setBesonderheiten({});
 
             return;
         }
@@ -509,6 +478,11 @@ function AnwesenheitPage() {
 
             setStudentsLoading(true);
 
+            /*
+             * Buchungen des Kurses laden.
+             *
+             * Besonderheiten kommen direkt aus der Buchung.
+             */
             const response =
                 await fetch(
                     `/api/buchungen/kurs/${kursId}`
@@ -566,13 +540,19 @@ function AnwesenheitPage() {
                                 buchungId:
                                 buchung.id,
 
+                                /*
+                                 * Besonderheiten gehören zur
+                                 * Buchung und sind hier nur lesbar.
+                                 */
                                 besonderheiten:
-                                    buchung.besonderheiten ??
-                                    ''
+                                    buchung.besonderheiten ?? ''
                             };
                         }
                     );
 
+            /*
+             * Anwesenheiten für das konkrete Datum laden.
+             */
             const anwesenheitenData =
                 await getAnwesenheitenByZeitraum(
                     selectedDatum,
@@ -597,7 +577,6 @@ function AnwesenheitPage() {
 
             const initialStatuses = {};
             const initialBemerkungen = {};
-            const initialBesonderheiten = {};
 
             studentList.forEach(
                 (student) => {
@@ -624,19 +603,12 @@ function AnwesenheitPage() {
                         ] =
                         existing?.bemerkung ||
                         '';
-
-                    initialBesonderheiten[
-                        student.entryKey
-                        ] =
-                        student.besonderheiten ||
-                        '';
                 }
             );
 
             setStudents(studentList);
             setStatuses(initialStatuses);
             setBemerkungen(initialBemerkungen);
-            setBesonderheiten(initialBesonderheiten);
 
         } catch (error) {
 
@@ -648,7 +620,6 @@ function AnwesenheitPage() {
             setStudents([]);
             setStatuses({});
             setBemerkungen({});
-            setBesonderheiten({});
 
             showError(
                 'Schüler oder gespeicherte Anwesenheiten konnten nicht geladen werden.'
@@ -694,14 +665,10 @@ function AnwesenheitPage() {
                 setStudents([]);
                 setStatuses({});
                 setBemerkungen({});
-                setBesonderheiten({});
 
                 return;
             }
 
-            /*
-             * Buchungen aller Kurse parallel laden.
-             */
             const buchungenResponses =
                 await Promise.all(
                     coursesForDay.map(
@@ -724,6 +691,7 @@ function AnwesenheitPage() {
 
                             return {
                                 kurs,
+
                                 buchungen:
                                     Array.isArray(data)
                                         ? data
@@ -733,13 +701,6 @@ function AnwesenheitPage() {
                     )
                 );
 
-            /*
-             * Aus allen Buchungen eine gemeinsame
-             * Liste erstellen.
-             *
-             * Derselbe Schüler kann mehrfach vorkommen,
-             * wenn er mehrere Kurse am selben Tag hat.
-             */
             const studentList = [];
 
             buchungenResponses.forEach(
@@ -767,26 +728,25 @@ function AnwesenheitPage() {
                                 entryKey,
 
                                 kursId:
-                                kurs.id,
+                                    Number(kurs.id),
 
                                 kurs,
 
                                 buchungId:
                                 buchung.id,
 
+                                /*
+                                 * Auch im Tagesmodus kommen
+                                 * Besonderheiten aus der Buchung.
+                                 */
                                 besonderheiten:
-                                    buchung.besonderheiten ??
-                                    ''
+                                    buchung.besonderheiten ?? ''
                             });
                         }
                     );
                 }
             );
 
-            /*
-             * Bereits gespeicherte Anwesenheiten
-             * für dieses Datum laden.
-             */
             const anwesenheitenData =
                 await getAnwesenheitenByZeitraum(
                     selectedDatum,
@@ -802,7 +762,6 @@ function AnwesenheitPage() {
 
             const initialStatuses = {};
             const initialBemerkungen = {};
-            const initialBesonderheiten = {};
 
             studentList.forEach(
                 (student) => {
@@ -835,19 +794,12 @@ function AnwesenheitPage() {
                         ] =
                         existing?.bemerkung ||
                         '';
-
-                    initialBesonderheiten[
-                        student.entryKey
-                        ] =
-                        student.besonderheiten ||
-                        '';
                 }
             );
 
             setStudents(studentList);
             setStatuses(initialStatuses);
             setBemerkungen(initialBemerkungen);
-            setBesonderheiten(initialBesonderheiten);
 
         } catch (error) {
 
@@ -859,7 +811,6 @@ function AnwesenheitPage() {
             setStudents([]);
             setStatuses({});
             setBemerkungen({});
-            setBesonderheiten({});
 
             showError(
                 'Die Schüler des ausgewählten Tages konnten nicht geladen werden.'
@@ -898,15 +849,10 @@ function AnwesenheitPage() {
             return;
         }
 
-        /*
-         * Zurück zu "Nach Kurs":
-         * Erst einmal leeren.
-         */
         setSelectedKurs('');
         setStudents([]);
         setStatuses({});
         setBemerkungen({});
-        setBesonderheiten({});
     };
 
     /* =====================================================
@@ -947,10 +893,6 @@ function AnwesenheitPage() {
         setStudentJahrgangFilter('');
         setStudentKlasseFilter('');
 
-        /*
-         * Im Tagesmodus direkt alle Buchungen
-         * des neuen Datums laden.
-         */
         if (erfassungsModus === 'tag') {
 
             setSelectedKurs('');
@@ -1007,7 +949,6 @@ function AnwesenheitPage() {
         setStudents([]);
         setStatuses({});
         setBemerkungen({});
-        setBesonderheiten({});
     };
 
     /* =====================================================
@@ -1022,6 +963,7 @@ function AnwesenheitPage() {
         setStatuses(
             (previous) => ({
                 ...previous,
+
                 [entryKey]:
                 status
             })
@@ -1040,104 +982,11 @@ function AnwesenheitPage() {
         setBemerkungen(
             (previous) => ({
                 ...previous,
+
                 [entryKey]:
                 bemerkung
             })
         );
-    };
-
-    /* =====================================================
-       BESONDERHEITEN ÄNDERN
-       ===================================================== */
-
-    const handleBesonderheitenChange = (
-        entryKey,
-        value
-    ) => {
-
-        setBesonderheiten(
-            (previous) => ({
-                ...previous,
-                [entryKey]:
-                    value.slice(
-                        0,
-                        50
-                    )
-            })
-        );
-    };
-
-    /* =====================================================
-       BESONDERHEITEN SPEICHERN
-       ===================================================== */
-
-    const handleBesonderheitenSave = async (
-        student
-    ) => {
-
-        if (!student.buchungId) {
-
-            showError(
-                'Die Kursbuchung konnte nicht gefunden werden.'
-            );
-
-            return;
-        }
-
-        try {
-
-            setSavingBesonderheitenId(
-                student.entryKey
-            );
-
-            clearMessage();
-
-            await updateBesonderheiten(
-                student.buchungId,
-                besonderheiten[
-                    student.entryKey
-                    ] || ''
-            );
-
-            setStudents(
-                (previous) =>
-                    previous.map(
-                        (currentStudent) =>
-                            currentStudent.entryKey ===
-                            student.entryKey
-                                ? {
-                                    ...currentStudent,
-
-                                    besonderheiten:
-                                        besonderheiten[
-                                            student.entryKey
-                                            ] || ''
-                                }
-                                : currentStudent
-                    )
-            );
-
-            showSuccess(
-                'Besonderheiten wurden erfolgreich gespeichert.'
-            );
-
-        } catch (error) {
-
-            console.error(
-                'Besonderheiten konnten nicht gespeichert werden:',
-                error
-            );
-
-            showError(
-                'Besonderheiten konnten nicht gespeichert werden.'
-            );
-
-        } finally {
-
-            setSavingBesonderheitenId(
-                null
-            );
-        }
     };
 
     /* =====================================================
@@ -1363,7 +1212,7 @@ function AnwesenheitPage() {
         ]);
 
     /* =====================================================
-       SORTIERUNG ÄNDERN
+       SORTIERUNG
        ===================================================== */
 
     const handleStudentSort = (key) => {
@@ -1419,9 +1268,6 @@ function AnwesenheitPage() {
             return;
         }
 
-        /*
-         * Normaler Kursmodus.
-         */
         if (
             erfassungsModus === 'kurs' &&
             !selectedKurs
@@ -1434,9 +1280,6 @@ function AnwesenheitPage() {
             return;
         }
 
-        /*
-         * Sicherheitsprüfung im Kursmodus.
-         */
         if (erfassungsModus === 'kurs') {
 
             const currentKurs =
@@ -1472,8 +1315,14 @@ function AnwesenheitPage() {
 
             /*
              * WICHTIG:
-             * Es werden alle geladenen Schüler gespeichert,
-             * nicht nur die aktuell gefilterten.
+             *
+             * Besonderheiten werden hier NICHT gespeichert.
+             *
+             * Sie gehören zur Buchung und können nur
+             * in den Schülerdetails geändert werden.
+             *
+             * Hier speichern wir ausschließlich:
+             * Datum + Status + Bemerkung.
              */
             for (const student of students) {
 
@@ -1719,6 +1568,10 @@ function AnwesenheitPage() {
 
         try {
 
+            /*
+             * Auch beim Bearbeiten des Verlaufs
+             * keine Besonderheiten mitsenden.
+             */
             await createAnwesenheit(
                 anwesenheit.student.id,
                 anwesenheit.kurs.id,
@@ -2049,9 +1902,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        ERFASSUNGSMODUS
-                       ================================================= */}
+                    {/* ERFASSUNGSMODUS */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -2089,9 +1940,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        DATUM / KURS
-                       ================================================= */}
+                    {/* DATUM / KURS */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -2169,9 +2018,7 @@ function AnwesenheitPage() {
 
                     </div>
 
-                    {/* =================================================
-                        SCHÜLER FILTER
-                       ================================================= */}
+                    {/* SCHÜLER FILTER */}
 
                     {students.length > 0 && (
 
@@ -2276,9 +2123,7 @@ function AnwesenheitPage() {
 
                     )}
 
-                    {/* =================================================
-                        SCHÜLER
-                       ================================================= */}
+                    {/* SCHÜLER */}
 
                     {studentsLoading ? (
 
@@ -2447,64 +2292,20 @@ function AnwesenheitPage() {
 
                                                 )}
 
-                                                {/* BESONDERHEITEN */}
+                                                {/* =================================
+                                                    BESONDERHEITEN
+
+                                                    Nur Anzeige.
+                                                    Keine Bearbeitung im
+                                                    Anwesenheitsmenü.
+                                                   ================================= */}
 
                                                 <td className="besonderheiten-cell">
 
-                                                    <div className="besonderheiten-edit">
+                                                    <span className="besonderheiten-readonly">
 
-                                                        <input
-                                                            type="text"
-                                                            className="besonderheiten-input"
-                                                            maxLength={50}
-                                                            placeholder="Hinweis..."
-                                                            value={
-                                                                besonderheiten[
-                                                                    student.entryKey
-                                                                    ] ||
-                                                                ''
-                                                            }
-                                                            onChange={(event) =>
-                                                                handleBesonderheitenChange(
-                                                                    student.entryKey,
-                                                                    event.target.value
-                                                                )
-                                                            }
-                                                        />
-
-                                                        <button
-                                                            type="button"
-                                                            className="besonderheiten-save-button"
-                                                            disabled={
-                                                                savingBesonderheitenId ===
-                                                                student.entryKey
-                                                            }
-                                                            onClick={() =>
-                                                                handleBesonderheitenSave(
-                                                                    student
-                                                                )
-                                                            }
-                                                        >
-
-                                                            {savingBesonderheitenId ===
-                                                            student.entryKey
-                                                                ? '...'
-                                                                : 'Speichern'}
-
-                                                        </button>
-
-                                                    </div>
-
-                                                    <span className="besonderheiten-counter">
-
-                                                        {
-                                                            (
-                                                                besonderheiten[
-                                                                    student.entryKey
-                                                                    ] ||
-                                                                ''
-                                                            ).length
-                                                        } / 50
+                                                        {student.besonderheiten ||
+                                                            '–'}
 
                                                     </span>
 
