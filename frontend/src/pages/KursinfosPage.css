@@ -1,0 +1,117 @@
+.kursinfos-page {
+    width: 100%;
+}
+
+.kursinfos-error {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+
+    border-radius: 8px;
+
+    background: var(--error-background);
+    color: var(--error-text);
+}
+
+.kursinfos-content {
+    background: var(--surface-primary);
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.kursinfos-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 18px;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.kursinfos-toolbar input {
+    width: 100%;
+    max-width: 400px;
+
+    box-sizing: border-box;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font: inherit;
+    outline: none;
+}
+
+.kursinfos-toolbar input:focus {
+    border-color: var(--accent);
+}
+
+.kursinfos-toolbar span {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.kursinfos-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.kursinfos-table {
+    width: 100%;
+    min-width: 750px;
+
+    border-collapse: collapse;
+}
+
+.kursinfos-table th {
+    padding: 13px 16px;
+
+    background: var(--table-header-background);
+    color: var(--table-header-text);
+
+    text-align: left;
+    font-weight: 600;
+}
+
+.kursinfos-table td {
+    padding: 14px 16px;
+
+    border-top: 1px solid var(--table-row-border);
+
+    color: var(--text-primary);
+}
+
+.kursinfos-row {
+    cursor: pointer;
+}
+
+.kursinfos-row:hover td {
+    background: var(--surface-hover);
+}
+
+.kursinfos-empty {
+    padding: 30px !important;
+
+    text-align: center;
+    color: var(--text-muted) !important;
+}
+
+@media (max-width: 700px) {
+
+    .kursinfos-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .kursinfos-toolbar input {
+        max-width: none;
+    }
+}
