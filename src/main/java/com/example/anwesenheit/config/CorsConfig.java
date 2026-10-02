@@ -23,15 +23,14 @@ public class CorsConfig {
 
                         /*
                          * Frontend lokalny podczas developmentu.
+                         * Vite może uruchomić się np. na 5173,
+                         * 5174 itd.
                          */
-                        .allowedOrigins(
-                                "http://localhost:5173"
+                        .allowedOriginPatterns(
+                                "http://localhost:*",
+                                "http://127.0.0.1:*"
                         )
 
-                        /*
-                         * PATCH jest potrzebny m.in. do
-                         * aktualizacji Besonderheiten.
-                         */
                         .allowedMethods(
                                 "GET",
                                 "POST",
@@ -41,7 +40,12 @@ public class CorsConfig {
                                 "OPTIONS"
                         )
 
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+
+                        /*
+                         * Potrzebne dla JSESSIONID.
+                         */
+                        .allowCredentials(true);
             }
         };
     }

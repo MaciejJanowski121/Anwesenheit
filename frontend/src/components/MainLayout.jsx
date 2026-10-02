@@ -1,34 +1,85 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import React, {
+    useEffect,
+    useState
+} from 'react';
+
+import {
+    NavLink,
+    Outlet
+} from 'react-router-dom';
+
 import logo from '../assets/montessori.png';
+
 import './MainLayout.css';
 
-function MainLayout() {
+function MainLayout({
+                        user,
+                        onLogout
+                    }) {
 
-    // Zapisany motyw lub domyślnie "dark"
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('theme') || 'dark';
-    });
+    /* =====================================================
+       THEME
+       ===================================================== */
 
-    // Ustawienie motywu dla całej aplikacji
+    const [theme, setTheme] =
+        useState(() => {
+
+            return (
+                localStorage.getItem(
+                    'theme'
+                ) ||
+                'dark'
+            );
+        });
+
+
     useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+
+        document.documentElement
+            .setAttribute(
+                'data-theme',
+                theme
+            );
+
+        localStorage.setItem(
+            'theme',
+            theme
+        );
+
     }, [theme]);
 
-    // Przełączanie light <-> dark
+
     const toggleTheme = () => {
-        setTheme((currentTheme) =>
-            currentTheme === 'dark' ? 'light' : 'dark'
+
+        setTheme(
+            (currentTheme) =>
+                currentTheme === 'dark'
+                    ? 'light'
+                    : 'dark'
         );
     };
 
+
+    /* =====================================================
+       ROLLE
+       ===================================================== */
+
+    const isAdmin =
+        user?.role === 'ADMIN';
+
+
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
     return (
+
         <div className="app-layout">
 
             <header className="app-header">
 
                 <div className="header-brand">
+
                     <img
                         src={logo}
                         alt="Montessori Logo"
@@ -38,70 +89,196 @@ function MainLayout() {
                     <h1 className="header-title">
                         Anwesenheitsliste
                     </h1>
+
                 </div>
 
-                <button
-                    className="theme-toggle"
-                    onClick={toggleTheme}
-                    type="button"
-                    title={
-                        theme === 'dark'
-                            ? 'Helles Design'
-                            : 'Dunkles Design'
-                    }
-                    aria-label="Design wechseln"
-                >
-                    <span className="theme-icon">
-                        {theme === 'dark' ? '☀️' : '🌙'}
-                    </span>
 
-                    <span className="theme-text">
-                        {theme === 'dark' ? 'Hell' : 'Dunkel'}
-                    </span>
-                </button>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                    }}
+                >
+
+                    <div
+                        style={{
+                            color:
+                                'var(--text-secondary)',
+                            fontSize:
+                                '0.85rem',
+                            textAlign:
+                                'right'
+                        }}
+                    >
+
+                        <div>
+                            {user?.username}
+                        </div>
+
+                        <div
+                            style={{
+                                color:
+                                    'var(--text-muted)',
+                                fontSize:
+                                    '0.75rem'
+                            }}
+                        >
+
+                            {isAdmin
+                                ? 'Administrator'
+                                : 'Anwender'}
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        className="theme-toggle"
+                        onClick={
+                            toggleTheme
+                        }
+                        type="button"
+                        title={
+                            theme === 'dark'
+                                ? 'Helles Design'
+                                : 'Dunkles Design'
+                        }
+                        aria-label="Design wechseln"
+                    >
+
+                        <span className="theme-icon">
+
+                            {theme === 'dark'
+                                ? '☀️'
+                                : '🌙'}
+
+                        </span>
+
+                        <span className="theme-text">
+
+                            {theme === 'dark'
+                                ? 'Hell'
+                                : 'Dunkel'}
+
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        className="theme-toggle"
+                        onClick={
+                            onLogout
+                        }
+                        type="button"
+                        title="Abmelden"
+                    >
+                        Abmelden
+                    </button>
+
+                </div>
 
             </header>
+
+
+            {/* =============================================
+                NAVIGATION
+               ============================================= */}
 
             <div className="main-nav-wrapper">
 
                 <nav className="main-nav">
 
-                    <NavLink to="/" end>
-                        Startseite
-                    </NavLink>
+                    {isAdmin && (
 
-                    <NavLink to="/gesamtuebersicht">
-                        Gesamtübersicht
-                    </NavLink>
+                        <>
 
-                    <NavLink to="/kurse">
-                        Kurse
-                    </NavLink>
+                            <NavLink
+                                to="/"
+                                end
+                            >
+                                Startseite
+                            </NavLink>
 
-                    <NavLink to="/anwesenheit">
+                            <NavLink
+                                to="/gesamtuebersicht"
+                            >
+                                Gesamtübersicht
+                            </NavLink>
+
+                            <NavLink
+                                to="/kurse"
+                            >
+                                Kurse
+                            </NavLink>
+
+                        </>
+
+                    )}
+
+
+                    {/* ADMIN + ANWENDER */}
+
+                    <NavLink
+                        to="/anwesenheit"
+                    >
                         Anwesenheit
                     </NavLink>
 
-                    <NavLink to="/zuschuesse">
-                        Zuschüsse
+                    <NavLink
+                        to="/kursinfos"
+                    >
+                        Kursinfos
                     </NavLink>
 
-                    <NavLink to="/gebuehren">
-                        Gebühren
-                    </NavLink>
 
-                    <NavLink to="/import">
-                        Import
-                    </NavLink>
+                    {isAdmin && (
+
+                        <>
+
+                            <NavLink
+                                to="/zuschuesse"
+                            >
+                                Zuschüsse
+                            </NavLink>
+
+                            <NavLink
+                                to="/gebuehren"
+                            >
+                                Gebühren
+                            </NavLink>
+
+                            <NavLink
+                                to="/import"
+                            >
+                                Import
+                            </NavLink>
+
+                            <NavLink
+                                to="/benutzer"
+                            >
+                                Benutzer
+                            </NavLink>
+
+                        </>
+
+                    )}
 
                 </nav>
 
             </div>
 
+
             <main className="app-main">
+
                 <div className="app-content">
+
                     <Outlet />
+
                 </div>
+
             </main>
 
         </div>
