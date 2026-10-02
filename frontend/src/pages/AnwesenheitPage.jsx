@@ -581,11 +581,10 @@ function AnwesenheitPage() {
                         );
 
                     /*
-                     * WICHTIG:
-                     * Kein Standardwert "ANWESEND".
+                     * Kein Standardwert ANWESEND.
                      *
-                     * Wenn noch kein Eintrag existiert,
-                     * bleibt der Status leer.
+                     * Nur bereits gespeicherte Einträge
+                     * erhalten ihren vorhandenen Status.
                      */
                     initialStatuses[
                         student.entryKey
@@ -775,8 +774,7 @@ function AnwesenheitPage() {
                         );
 
                     /*
-                     * Również w widoku całego dnia
-                     * brak domyślnego ANWESEND.
+                     * Auch hier kein Standardwert ANWESEND.
                      */
                     initialStatuses[
                         student.entryKey
@@ -960,8 +958,8 @@ function AnwesenheitPage() {
                 ...previous,
 
                 /*
-                 * Zweites Klicken auf denselben Status
-                 * entfernt die Auswahl wieder.
+                 * Wenn derselbe Status erneut
+                 * angeklickt wird, Auswahl entfernen.
                  */
                 [entryKey]:
                     previous[entryKey] === status
@@ -1310,10 +1308,24 @@ function AnwesenheitPage() {
         }
 
         /*
-         * Jeder Schüler muss bewusst markiert werden.
-         * Kein automatisches "Anwesend".
+         * Nur Schüler mit ausgewähltem Status
+         * werden gespeichert.
          */
-        const studentsWithoutStatus =
+        const erfassteStudents =
+            students.filter(
+                (student) =>
+                    Boolean(
+                        statuses[
+                            student.entryKey
+                            ]
+                    )
+            );
+
+        /*
+         * Schüler ohne Status bleiben offen
+         * und werden nicht gespeichert.
+         */
+        const nichtErfassteStudents =
             students.filter(
                 (student) =>
                     !statuses[
@@ -1321,19 +1333,42 @@ function AnwesenheitPage() {
                         ]
             );
 
-        if (
-            studentsWithoutStatus.length > 0
-        ) {
+        /*
+         * Wenn noch niemand erfasst wurde,
+         * gibt es nichts zu speichern.
+         */
+        if (erfassteStudents.length === 0) {
 
             showError(
-                `Bitte markieren Sie noch ${studentsWithoutStatus.length} ${
-                    studentsWithoutStatus.length === 1
-                        ? 'Kind'
-                        : 'Kinder'
-                } als Anwesend, Fehlt oder Entschuldigt.`
+                'Bitte mindestens einen Schüler als Anwesend, Fehlt oder Entschuldigt markieren.'
             );
 
             return;
+        }
+
+        /*
+         * Zwischenspeichern:
+         *
+         * Wenn nicht alle Schüler erfasst wurden,
+         * Benutzer vorher fragen.
+         */
+        if (nichtErfassteStudents.length > 0) {
+
+            const confirmed =
+                window.confirm(
+                    `Es wurden noch nicht alle Schüler erfasst.\n\n` +
+                    `${erfassteStudents.length} von ${students.length} Schülern wurden erfasst.\n` +
+                    `${nichtErfassteStudents.length} ${
+                        nichtErfassteStudents.length === 1
+                            ? 'Schüler ist'
+                            : 'Schüler sind'
+                    } noch offen.\n\n` +
+                    `Möchten Sie die bereits erfassten Anwesenheiten trotzdem speichern?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
         }
 
         try {
@@ -1341,7 +1376,16 @@ function AnwesenheitPage() {
             setSaveLoading(true);
             clearMessage();
 
-            for (const student of students) {
+            /*
+             * WICHTIG:
+             *
+             * Wir speichern NUR Schüler,
+             * die tatsächlich einen Status haben.
+             *
+             * Schüler ohne Status bekommen keinen
+             * Anwesenheitseintrag.
+             */
+            for (const student of erfassteStudents) {
 
                 const kursId =
                     erfassungsModus === 'tag'
@@ -1368,10 +1412,31 @@ function AnwesenheitPage() {
                 );
             }
 
-            showSuccess(
-                'Anwesenheit wurde erfolgreich gespeichert.'
-            );
+            /*
+             * Unterschiedliche Meldung bei
+             * vollständiger oder teilweiser Erfassung.
+             */
+            if (nichtErfassteStudents.length > 0) {
 
+                showSuccess(
+                    `Zwischengespeichert: ${erfassteStudents.length} von ${students.length} Schülern wurden erfasst.`
+                );
+
+            } else {
+
+                showSuccess(
+                    'Anwesenheit wurde vollständig gespeichert.'
+                );
+            }
+
+            /*
+             * Aktuelle Ansicht neu laden.
+             *
+             * Bereits gespeicherte Schüler bekommen
+             * ihren Status aus der Datenbank zurück.
+             *
+             * Nicht erfasste Schüler bleiben leer.
+             */
             if (erfassungsModus === 'tag') {
 
                 await loadStudentsForDay(
@@ -1386,6 +1451,10 @@ function AnwesenheitPage() {
                 );
             }
 
+            /*
+             * Verlauf aktualisieren, wenn das Datum
+             * im aktuell ausgewählten Zeitraum liegt.
+             */
             if (
                 datum >= filterVon &&
                 datum <= filterBis
@@ -1815,6 +1884,10 @@ function AnwesenheitPage() {
 
             </header>
 
+            {/* =================================================
+                TABS
+               ================================================= */}
+
             <div className="anwesenheit-tabs">
 
                 <button
@@ -1857,6 +1930,10 @@ function AnwesenheitPage() {
 
             </div>
 
+            {/* =================================================
+                MELDUNG
+               ================================================= */}
+
             {message && (
 
                 <div
@@ -1881,6 +1958,10 @@ function AnwesenheitPage() {
 
             )}
 
+            {/* =================================================
+                ANWESENHEIT ERFASSEN
+               ================================================= */}
+
             {activeTab === 'erfassen' && (
 
                 <section className="anwesenheit-section">
@@ -1901,6 +1982,8 @@ function AnwesenheitPage() {
                         </div>
 
                     </div>
+
+                    {/* ERFASSUNGSMODUS */}
 
                     <div className="anwesenheit-view-switch">
 
@@ -1937,6 +2020,8 @@ function AnwesenheitPage() {
                         </button>
 
                     </div>
+
+                    {/* DATUM / KURS */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -2013,6 +2098,8 @@ function AnwesenheitPage() {
                         )}
 
                     </div>
+
+                    {/* SCHÜLER FILTER */}
 
                     {students.length > 0 && (
 
@@ -2116,6 +2203,8 @@ function AnwesenheitPage() {
                         </div>
 
                     )}
+
+                    {/* SCHÜLER */}
 
                     {studentsLoading ? (
 
@@ -2284,6 +2373,8 @@ function AnwesenheitPage() {
 
                                                 )}
 
+                                                {/* BESONDERHEITEN */}
+
                                                 <td className="besonderheiten-cell">
 
                                                     <span className="besonderheiten-readonly">
@@ -2294,6 +2385,8 @@ function AnwesenheitPage() {
                                                     </span>
 
                                                 </td>
+
+                                                {/* ANWESEND */}
 
                                                 <td className="attendance-checkbox-cell">
 
@@ -2316,6 +2409,8 @@ function AnwesenheitPage() {
 
                                                 </td>
 
+                                                {/* ENTSCHULDIGT */}
+
                                                 <td className="attendance-checkbox-cell">
 
                                                     <input
@@ -2337,6 +2432,8 @@ function AnwesenheitPage() {
 
                                                 </td>
 
+                                                {/* FEHLT */}
+
                                                 <td className="attendance-checkbox-cell">
 
                                                     <input
@@ -2357,6 +2454,8 @@ function AnwesenheitPage() {
                                                     />
 
                                                 </td>
+
+                                                {/* BEMERKUNG */}
 
                                                 <td>
 
@@ -2422,6 +2521,10 @@ function AnwesenheitPage() {
 
             )}
 
+            {/* =================================================
+                VERLAUF
+               ================================================= */}
+
             {activeTab === 'verlauf' && (
 
                 <section className="anwesenheit-section">
@@ -2449,6 +2552,8 @@ function AnwesenheitPage() {
                         </span>
 
                     </div>
+
+                    {/* FILTER */}
 
                     <div className="anwesenheit-toolbar">
 
@@ -2595,6 +2700,8 @@ function AnwesenheitPage() {
 
                     </div>
 
+                    {/* ANZEIGEMODUS */}
+
                     <div className="anwesenheit-view-switch">
 
                         <button
@@ -2658,6 +2765,8 @@ function AnwesenheitPage() {
                     ) : (
 
                         <>
+
+                            {/* GESAMT */}
 
                             {anzeigeModus === 'gesamt' && (
 
@@ -2843,6 +2952,8 @@ function AnwesenheitPage() {
 
                             )}
 
+                            {/* NACH KURSEN */}
+
                             {anzeigeModus === 'kurse' && (
 
                                 <div className="anwesenheit-group-list">
@@ -2938,6 +3049,8 @@ function AnwesenheitPage() {
                                 </div>
 
                             )}
+
+                            {/* NACH KINDERN */}
 
                             {anzeigeModus === 'kinder' && (
 
