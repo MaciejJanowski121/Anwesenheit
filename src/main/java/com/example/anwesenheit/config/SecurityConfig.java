@@ -119,7 +119,28 @@ public class SecurityConfig {
 
                                 .requestMatchers(
                                         HttpMethod.GET,
+                                        "/api/buchungen",
                                         "/api/buchungen/**"
+                                )
+                                .hasAnyRole(
+                                        "ADMIN",
+                                        "ANWENDER"
+                                )
+
+
+                                /* =========================
+                                   SCHÜLERINFOS LESEN
+
+                                   ADMIN + ANWENDER
+
+                                   Nur GET erlaubt.
+                                   Keine Änderungen durch ANWENDER.
+                                   ========================= */
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/schuelerinfos",
+                                        "/api/schuelerinfos/**"
                                 )
                                 .hasAnyRole(
                                         "ADMIN",

@@ -22,15 +22,23 @@ function StudentDetailView({
                                onAssignKurs,
                                onDeleteBuchung,
                                onUpdateBesonderheiten,
-                               onUpdateGehtUm1530,
                                onClose
                            }) {
+
+    /* =====================================================
+       KURS ZUWEISEN
+       ===================================================== */
 
     const [selectedWochentag, setSelectedWochentag] =
         useState('');
 
     const [selectedKursId, setSelectedKursId] =
         useState('');
+
+
+    /* =====================================================
+       BESONDERHEITEN
+       ===================================================== */
 
     const [
         besonderheitenValues,
@@ -41,6 +49,7 @@ function StudentDetailView({
         savingBesonderheitenId,
         setSavingBesonderheitenId
     ] = useState(null);
+
 
     useEffect(() => {
 
@@ -54,18 +63,14 @@ function StudentDetailView({
             }
         );
 
-        setBesonderheitenValues(
-            values
-        );
+        setBesonderheitenValues(values);
 
     }, [buchungen]);
 
-    const [gehtUm1530, setGehtUm1530] = useState(
-        student.gehtUm1530 ?? false
-    );
 
-    const [saving1530, setSaving1530] =
-        useState(false);
+    /* =====================================================
+       ANWESENHEIT FILTER
+       ===================================================== */
 
     const [
         anwesenheitDatumFilter,
@@ -82,13 +87,18 @@ function StudentDetailView({
         setAnwesenheitStatusFilter
     ] = useState('');
 
+
+    /* =====================================================
+       KURSE NACH WOCHENTAG FILTERN
+       ===================================================== */
+
     const filteredKurse = useMemo(() => {
 
         if (!selectedWochentag) {
             return [];
         }
 
-        return kurse.filter(
+        return (kurse || []).filter(
             (kurs) =>
                 kurs.wochentag === selectedWochentag
         );
@@ -98,6 +108,11 @@ function StudentDetailView({
         selectedWochentag
     ]);
 
+
+    /* =====================================================
+       KURSE AUS ANWESENHEITEN ERMITTELN
+       ===================================================== */
+
     const anwesenheitKurse = useMemo(() => {
 
         const kursMap = new Map();
@@ -105,8 +120,7 @@ function StudentDetailView({
         (anwesenheiten || []).forEach(
             (anwesenheit) => {
 
-                const kurs =
-                    anwesenheit.kurs;
+                const kurs = anwesenheit.kurs;
 
                 if (kurs?.id) {
 
@@ -128,6 +142,11 @@ function StudentDetailView({
         );
 
     }, [anwesenheiten]);
+
+
+    /* =====================================================
+       VERFÜGBARE ANWESENHEITSSTATUS
+       ===================================================== */
 
     const anwesenheitStatus = useMemo(() => {
 
@@ -151,6 +170,11 @@ function StudentDetailView({
 
     }, [anwesenheiten]);
 
+
+    /* =====================================================
+       ANWESENHEITEN FILTERN UND SORTIEREN
+       ===================================================== */
+
     const filteredAnwesenheiten = useMemo(() => {
 
         return [...(anwesenheiten || [])]
@@ -161,15 +185,13 @@ function StudentDetailView({
                     !anwesenheitDatumFilter ||
                     String(
                         anwesenheit.datum ?? ''
-                    ) ===
-                    anwesenheitDatumFilter;
+                    ) === anwesenheitDatumFilter;
 
                 const matchesKurs =
                     !anwesenheitKursFilter ||
                     String(
                         anwesenheit.kurs?.id ?? ''
-                    ) ===
-                    String(
+                    ) === String(
                         anwesenheitKursFilter
                     );
 
@@ -177,8 +199,7 @@ function StudentDetailView({
                     !anwesenheitStatusFilter ||
                     String(
                         anwesenheit.status ?? ''
-                    ) ===
-                    anwesenheitStatusFilter;
+                    ) === anwesenheitStatusFilter;
 
                 return (
                     matchesDatum &&
@@ -205,6 +226,7 @@ function StudentDetailView({
         anwesenheitStatusFilter
     ]);
 
+
     const hasAnwesenheitFilter =
         Boolean(
             anwesenheitDatumFilter ||
@@ -212,9 +234,12 @@ function StudentDetailView({
             anwesenheitStatusFilter
         );
 
-    const handleWochentagChange = (
-        event
-    ) => {
+
+    /* =====================================================
+       WOCHENTAG ÄNDERN
+       ===================================================== */
+
+    const handleWochentagChange = (event) => {
 
         setSelectedWochentag(
             event.target.value
@@ -223,14 +248,22 @@ function StudentDetailView({
         setSelectedKursId('');
     };
 
-    const handleKursChange = (
-        event
-    ) => {
+
+    /* =====================================================
+       KURS AUSWÄHLEN
+       ===================================================== */
+
+    const handleKursChange = (event) => {
 
         setSelectedKursId(
             event.target.value
         );
     };
+
+
+    /* =====================================================
+       KURS HINZUFÜGEN
+       ===================================================== */
 
     const handleAssign = async () => {
 
@@ -245,26 +278,39 @@ function StudentDetailView({
         setSelectedKursId('');
     };
 
+
+    /* =====================================================
+       BESONDERHEITEN ÄNDERN
+
+       Maximal 50 Zeichen.
+
+       Die Besonderheiten gehören zu einer
+       bestimmten Buchung (Schüler + Kurs).
+
+       Auch Informationen zur Abholzeit können
+       hier individuell eingetragen werden.
+       ===================================================== */
+
     const handleBesonderheitenChange = (
         buchungId,
         value
     ) => {
 
         const limitedValue =
-            value.slice(
-                0,
-                50
-            );
+            value.slice(0, 50);
 
         setBesonderheitenValues(
             (previous) => ({
                 ...previous,
-
-                [buchungId]:
-                limitedValue
+                [buchungId]: limitedValue
             })
         );
     };
+
+
+    /* =====================================================
+       BESONDERHEITEN SPEICHERN
+       ===================================================== */
 
     const handleBesonderheitenSave = async (
         buchungId
@@ -278,9 +324,7 @@ function StudentDetailView({
 
             await onUpdateBesonderheiten(
                 buchungId,
-                besonderheitenValues[
-                    buchungId
-                    ] ?? ''
+                besonderheitenValues[buchungId] ?? ''
             );
 
         } catch (error) {
@@ -292,47 +336,14 @@ function StudentDetailView({
 
         } finally {
 
-            setSavingBesonderheitenId(
-                null
-            );
+            setSavingBesonderheitenId(null);
         }
     };
 
-    const handle1530Change = async (
-        newValue
-    ) => {
 
-        if (
-            newValue ===
-            gehtUm1530
-        ) {
-            return;
-        }
-
-        try {
-
-            setSaving1530(true);
-
-            await onUpdateGehtUm1530(
-                newValue
-            );
-
-            setGehtUm1530(
-                newValue
-            );
-
-        } catch (error) {
-
-            console.error(
-                '15:30-Einstellung konnte nicht gespeichert werden:',
-                error
-            );
-
-        } finally {
-
-            setSaving1530(false);
-        }
-    };
+    /* =====================================================
+       ANWESENHEITSFILTER ZURÜCKSETZEN
+       ===================================================== */
 
     const resetAnwesenheitFilter = () => {
 
@@ -341,9 +352,18 @@ function StudentDetailView({
         setAnwesenheitStatusFilter('');
     };
 
+
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
     return (
 
         <div className="student-detail-view">
+
+            {/* =========================================
+                ZURÜCK
+               ========================================= */}
 
             <button
                 type="button"
@@ -352,6 +372,11 @@ function StudentDetailView({
             >
                 Zurück zur Übersicht
             </button>
+
+
+            {/* =========================================
+                SCHÜLER HEADER
+               ========================================= */}
 
             <div className="detail-header">
 
@@ -366,6 +391,11 @@ function StudentDetailView({
 
             </div>
 
+
+            {/* =========================================
+                ALLGEMEINE INFORMATIONEN
+               ========================================= */}
+
             <section className="detail-section">
 
                 <h3>
@@ -375,103 +405,77 @@ function StudentDetailView({
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Vorname
                         </span>
+
                         <span className="detail-value">
                             {student.vorname || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Nachname
                         </span>
+
                         <span className="detail-value">
                             {student.nachname || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Jahrgang
                         </span>
+
                         <span className="detail-value">
                             {student.jahrgang ?? '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Klasse
                         </span>
+
                         <span className="detail-value">
                             {student.klasse || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Foto- und Bildfreigabe
                         </span>
+
                         <span className="detail-value">
                             {student.fotoFreigabe || '–'}
                         </span>
-                    </div>
-
-                    <div className="detail-item detail-item-1530">
-
-                        <div className="detail-1530-header">
-
-                            <span className="detail-label">
-                                Geht um 15:30 Uhr
-                            </span>
-
-                            <div className="detail-1530-options">
-
-                                <button
-                                    type="button"
-                                    className={
-                                        gehtUm1530
-                                            ? 'detail-1530-option active'
-                                            : 'detail-1530-option'
-                                    }
-                                    disabled={saving1530}
-                                    onClick={() =>
-                                        handle1530Change(
-                                            true
-                                        )
-                                    }
-                                >
-                                    Ja
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className={
-                                        !gehtUm1530
-                                            ? 'detail-1530-option active'
-                                            : 'detail-1530-option'
-                                    }
-                                    disabled={saving1530}
-                                    onClick={() =>
-                                        handle1530Change(
-                                            false
-                                        )
-                                    }
-                                >
-                                    Nein
-                                </button>
-
-                            </div>
-
-                        </div>
 
                     </div>
 
                 </div>
 
             </section>
+
+
+            {/* =========================================
+                KONTAKT 1
+               ========================================= */}
 
             <section className="detail-section">
 
@@ -482,35 +486,51 @@ function StudentDetailView({
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Email 1
                         </span>
+
                         <span className="detail-value">
                             {student.email1 || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Telefon 1
                         </span>
+
                         <span className="detail-value">
                             {student.telefon1 || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Mobil 1
                         </span>
+
                         <span className="detail-value">
                             {student.mobil1 || '–'}
                         </span>
+
                     </div>
 
                 </div>
 
             </section>
+
+
+            {/* =========================================
+                KONTAKT 2
+               ========================================= */}
 
             <section className="detail-section">
 
@@ -521,41 +541,62 @@ function StudentDetailView({
                 <div className="detail-grid">
 
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Email 2
                         </span>
+
                         <span className="detail-value">
                             {student.email2 || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Telefon 2
                         </span>
+
                         <span className="detail-value">
                             {student.telefon2 || '–'}
                         </span>
+
                     </div>
 
+
                     <div className="detail-item">
+
                         <span className="detail-label">
                             Mobil 2
                         </span>
+
                         <span className="detail-value">
                             {student.mobil2 || '–'}
                         </span>
+
                     </div>
 
                 </div>
 
             </section>
 
+
+            {/* =========================================
+                KURSBUCHUNGEN
+               ========================================= */}
+
             <section className="detail-section">
 
                 <h3>
                     Kursbuchungen
                 </h3>
+
+
+                {/* =====================================
+                    KURS ZUWEISEN
+                   ===================================== */}
 
                 <div className="assign-kurs-box">
 
@@ -568,9 +609,7 @@ function StudentDetailView({
                         <select
                             id="kurs-wochentag"
                             value={selectedWochentag}
-                            onChange={
-                                handleWochentagChange
-                            }
+                            onChange={handleWochentagChange}
                         >
 
                             <option value="">
@@ -586,12 +625,14 @@ function StudentDetailView({
                                     >
                                         {tag}
                                     </option>
+
                                 )
                             )}
 
                         </select>
 
                     </div>
+
 
                     <div className="assign-kurs-field">
 
@@ -602,12 +643,8 @@ function StudentDetailView({
                         <select
                             id="kurs-auswahl"
                             value={selectedKursId}
-                            onChange={
-                                handleKursChange
-                            }
-                            disabled={
-                                !selectedWochentag
-                            }
+                            onChange={handleKursChange}
+                            disabled={!selectedWochentag}
                         >
 
                             <option value="">
@@ -633,6 +670,7 @@ function StudentDetailView({
                                             : ''}
 
                                     </option>
+
                                 )
                             )}
 
@@ -640,20 +678,18 @@ function StudentDetailView({
 
                     </div>
 
+
                     <button
                         type="button"
                         className="assign-kurs-button"
-                        onClick={
-                            handleAssign
-                        }
-                        disabled={
-                            !selectedKursId
-                        }
+                        onClick={handleAssign}
+                        disabled={!selectedKursId}
                     >
                         Kurs hinzufügen
                     </button>
 
                 </div>
+
 
                 {selectedWochentag &&
                     filteredKurse.length === 0 && (
@@ -661,10 +697,15 @@ function StudentDetailView({
                         <p className="empty-text">
                             Für {selectedWochentag} sind keine Kurse vorhanden.
                         </p>
+
                     )}
 
-                {buchungen &&
-                buchungen.length > 0 ? (
+
+                {/* =====================================
+                    BESTEHENDE KURSBUCHUNGEN
+                   ===================================== */}
+
+                {buchungen && buchungen.length > 0 ? (
 
                     <div className="detail-table-scroll">
 
@@ -685,6 +726,7 @@ function StudentDetailView({
 
                             </thead>
 
+
                             <tbody>
 
                             {buchungen.map(
@@ -693,38 +735,35 @@ function StudentDetailView({
                                     <tr key={buchung.id}>
 
                                         <td>
-                                            {buchung.kurs?.name ||
-                                                '–'}
+                                            {buchung.kurs?.name || '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs?.kursleitung ||
-                                                '–'}
+                                            {buchung.kurs?.kursleitung || '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs?.wochentag ||
-                                                '–'}
+                                            {buchung.kurs?.wochentag || '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs?.uhrzeit ||
-                                                '–'}
+                                            {buchung.kurs?.uhrzeit || '–'}
                                         </td>
 
                                         <td>
-                                            {buchung.kurs?.buchungsart ||
-                                                '–'}
+                                            {buchung.kurs?.buchungsart || '–'}
                                         </td>
 
                                         <td>
-
-                                            {buchung.kurs
-                                                ?.kursgebuehr != null
+                                            {buchung.kurs?.kursgebuehr != null
                                                 ? `${buchung.kurs.kursgebuehr} €`
                                                 : '–'}
-
                                         </td>
+
+
+                                        {/* =========================
+                                                BESONDERHEITEN
+                                               ========================= */}
 
                                         <td>
 
@@ -740,28 +779,29 @@ function StudentDetailView({
                                                     }
                                                     maxLength={50}
                                                     placeholder="Hinweis..."
-                                                    onChange={
-                                                        (event) =>
-                                                            handleBesonderheitenChange(
-                                                                buchung.id,
-                                                                event.target.value
-                                                            )
+                                                    onChange={(event) =>
+                                                        handleBesonderheitenChange(
+                                                            buchung.id,
+                                                            event.target.value
+                                                        )
                                                     }
                                                 />
 
+
                                                 <div className="besonderheiten-footer">
 
-                                                    <span className="besonderheiten-counter">
+                                                        <span className="besonderheiten-counter">
 
-                                                        {
-                                                            (
-                                                                besonderheitenValues[
-                                                                    buchung.id
-                                                                    ] ?? ''
-                                                            ).length
-                                                        } / 50
+                                                            {
+                                                                (
+                                                                    besonderheitenValues[
+                                                                        buchung.id
+                                                                        ] ?? ''
+                                                                ).length
+                                                            } / 50
 
-                                                    </span>
+                                                        </span>
+
 
                                                     <button
                                                         type="button"
@@ -777,8 +817,7 @@ function StudentDetailView({
                                                         }
                                                     >
 
-                                                        {savingBesonderheitenId ===
-                                                        buchung.id
+                                                        {savingBesonderheitenId === buchung.id
                                                             ? 'Speichert...'
                                                             : 'Speichern'}
 
@@ -789,6 +828,11 @@ function StudentDetailView({
                                             </div>
 
                                         </td>
+
+
+                                        {/* =========================
+                                                BUCHUNG ENTFERNEN
+                                               ========================= */}
 
                                         <td>
 
@@ -807,6 +851,7 @@ function StudentDetailView({
                                         </td>
 
                                     </tr>
+
                                 )
                             )}
 
@@ -821,9 +866,15 @@ function StudentDetailView({
                     <p className="empty-text">
                         Noch keine Kursbuchungen vorhanden.
                     </p>
+
                 )}
 
             </section>
+
+
+            {/* =========================================
+                ANWESENHEIT
+               ========================================= */}
 
             <section className="detail-section">
 
@@ -842,20 +893,25 @@ function StudentDetailView({
 
                     </div>
 
+
                     {hasAnwesenheitFilter && (
 
                         <button
                             type="button"
                             className="detail-filter-reset"
-                            onClick={
-                                resetAnwesenheitFilter
-                            }
+                            onClick={resetAnwesenheitFilter}
                         >
                             Filter zurücksetzen
                         </button>
+
                     )}
 
                 </div>
+
+
+                {/* =====================================
+                    ANWESENHEITSFILTER
+                   ===================================== */}
 
                 <div className="detail-anwesenheit-filter">
 
@@ -868,9 +924,7 @@ function StudentDetailView({
                         <input
                             id="anwesenheit-datum"
                             type="date"
-                            value={
-                                anwesenheitDatumFilter
-                            }
+                            value={anwesenheitDatumFilter}
                             onChange={(event) =>
                                 setAnwesenheitDatumFilter(
                                     event.target.value
@@ -880,6 +934,7 @@ function StudentDetailView({
 
                     </div>
 
+
                     <div className="detail-filter-field">
 
                         <label htmlFor="anwesenheit-kurs">
@@ -888,9 +943,7 @@ function StudentDetailView({
 
                         <select
                             id="anwesenheit-kurs"
-                            value={
-                                anwesenheitKursFilter
-                            }
+                            value={anwesenheitKursFilter}
                             onChange={(event) =>
                                 setAnwesenheitKursFilter(
                                     event.target.value
@@ -911,12 +964,14 @@ function StudentDetailView({
                                     >
                                         {kurs.name}
                                     </option>
+
                                 )
                             )}
 
                         </select>
 
                     </div>
+
 
                     <div className="detail-filter-field">
 
@@ -926,9 +981,7 @@ function StudentDetailView({
 
                         <select
                             id="anwesenheit-status"
-                            value={
-                                anwesenheitStatusFilter
-                            }
+                            value={anwesenheitStatusFilter}
                             onChange={(event) =>
                                 setAnwesenheitStatusFilter(
                                     event.target.value
@@ -949,6 +1002,7 @@ function StudentDetailView({
                                     >
                                         {status}
                                     </option>
+
                                 )
                             )}
 
@@ -957,6 +1011,11 @@ function StudentDetailView({
                     </div>
 
                 </div>
+
+
+                {/* =====================================
+                    ANZAHL ANWESENHEITEN
+                   ===================================== */}
 
                 <div className="detail-anwesenheit-count">
 
@@ -971,6 +1030,11 @@ function StudentDetailView({
                         : 'Einträge'}
 
                 </div>
+
+
+                {/* =====================================
+                    ANWESENHEITSTABELLE
+                   ===================================== */}
 
                 {filteredAnwesenheiten.length > 0 ? (
 
@@ -989,38 +1053,32 @@ function StudentDetailView({
 
                             </thead>
 
+
                             <tbody>
 
                             {filteredAnwesenheiten.map(
                                 (anwesenheit) => (
 
-                                    <tr
-                                        key={
-                                            anwesenheit.id
-                                        }
-                                    >
+                                    <tr key={anwesenheit.id}>
 
                                         <td>
-                                            {anwesenheit.datum ||
-                                                '–'}
+                                            {anwesenheit.datum || '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.kurs?.name ||
-                                                '–'}
+                                            {anwesenheit.kurs?.name || '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.status ||
-                                                '–'}
+                                            {anwesenheit.status || '–'}
                                         </td>
 
                                         <td>
-                                            {anwesenheit.bemerkung ||
-                                                '–'}
+                                            {anwesenheit.bemerkung || '–'}
                                         </td>
 
                                     </tr>
+
                                 )
                             )}
 
@@ -1039,6 +1097,7 @@ function StudentDetailView({
                             : 'Noch keine Anwesenheitsdaten vorhanden.'}
 
                     </p>
+
                 )}
 
             </section>

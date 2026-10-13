@@ -191,6 +191,10 @@ function MainLayout({
 
                 <nav className="main-nav">
 
+                    {/* =====================================
+                        NUR ADMIN
+                       ===================================== */}
+
                     {isAdmin && (
 
                         <>
@@ -219,7 +223,9 @@ function MainLayout({
                     )}
 
 
-                    {/* ADMIN + ANWENDER */}
+                    {/* =====================================
+                        ADMIN + ANWENDER
+                       ===================================== */}
 
                     <NavLink
                         to="/anwesenheit"
@@ -233,6 +239,18 @@ function MainLayout({
                         Kursinfos
                     </NavLink>
 
+                    {/* NEU: Schülerinfos für beide Rollen */}
+
+                    <NavLink
+                        to="/schuelerinfos"
+                    >
+                        Schülerinfos
+                    </NavLink>
+
+
+                    {/* =====================================
+                        NUR ADMIN
+                       ===================================== */}
 
                     {isAdmin && (
 
@@ -270,6 +288,10 @@ function MainLayout({
 
             </div>
 
+
+            {/* =============================================
+                HAUPTINHALT
+               ============================================= */}
 
             <main className="app-main">
 

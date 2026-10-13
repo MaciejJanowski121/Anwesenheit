@@ -19,6 +19,8 @@ import GebuehrenPage from './pages/GebuehrenPage';
 import ZuschuessePage from './pages/ZuschuessePage';
 import KursDetailsPage from './pages/KursDetailsPage';
 import LoginPage from './pages/LoginPage';
+import SchuelerinfosPage from './pages/SchuelerinfosPage';
+import SchuelerinfoDetailsPage from './pages/SchuelerinfoDetailsPage';
 
 import KursinfosPage from './pages/KursinfosPage';
 import KursinfoDetailsPage from './pages/KursinfoDetailsPage';
@@ -280,6 +282,16 @@ function App() {
                         element={
                             <KursinfosPage />
                         }
+                    />
+
+                    <Route
+                        path="/schuelerinfos"
+                        element={<SchuelerinfosPage />}
+                    />
+
+                    <Route
+                        path="/schuelerinfos/:id"
+                        element={<SchuelerinfoDetailsPage />}
                     />
 
                     <Route
