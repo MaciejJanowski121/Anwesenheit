@@ -1,21 +1,28 @@
 /* =====================================================
-   SCHÜLERINFOS – SEITE
+   SCHÜLERINFOS – HAUPTSEITE
    ===================================================== */
 
 .schuelerinfos-page {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+
+    box-sizing: border-box;
+
     color: var(--text-primary);
 }
 
 
 /* =====================================================
-   HAUPTBEREICH
+   HAUPTBEREICH – SCHÜLERLISTE
    ===================================================== */
 
 .schuelerinfos-content {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+
+    box-sizing: border-box;
 
     background: var(--bg-secondary, #262626);
 
@@ -32,16 +39,23 @@
 
 .schuelerinfos-toolbar {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
     gap: 20px;
+
     padding: 20px 24px;
 
     background: transparent;
 
     border-bottom: 1px solid var(--border-color, #404040);
 }
+
+
+/* =====================================================
+   SUCHFELD
+   ===================================================== */
 
 .schuelerinfos-toolbar input {
     width: 100%;
@@ -71,38 +85,52 @@
 
 .schuelerinfos-toolbar input:focus {
     border-color: #f97316;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+
+    box-shadow:
+            0 0 0 3px rgba(249, 115, 22, 0.12);
 }
+
+
+/* =====================================================
+   SCHÜLERANZAHL
+   ===================================================== */
 
 .schuelerinfos-toolbar span {
     color: var(--text-secondary, #b0b0b0);
+
     font-size: 0.95rem;
+
     white-space: nowrap;
 }
 
 
 /* =====================================================
-   TABELLE – CONTAINER
+   TABELLE – SCROLLCONTAINER
    ===================================================== */
 
 .schuelerinfos-table-scroll {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
 
     overflow-x: auto;
     overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 
 /* =====================================================
-   TABELLE
+   SCHÜLERTABELLE
    ===================================================== */
 
 .schuelerinfos-table {
     width: 100%;
+
     min-width: 1450px;
 
     border-collapse: collapse;
+
     table-layout: auto;
 
     background: transparent;
@@ -165,12 +193,14 @@
     min-width: 120px;
 }
 
+
 /* Vorname */
 
 .schuelerinfos-table th:nth-child(2),
 .schuelerinfos-table td:nth-child(2) {
     min-width: 110px;
 }
+
 
 /* Jahrgang */
 
@@ -179,6 +209,7 @@
     min-width: 80px;
 }
 
+
 /* Klasse */
 
 .schuelerinfos-table th:nth-child(4),
@@ -186,24 +217,30 @@
     min-width: 100px;
 }
 
+
 /* Fotofreigabe */
 
 .schuelerinfos-table th:nth-child(5),
 .schuelerinfos-table td:nth-child(5) {
     width: 240px;
+
     min-width: 200px;
     max-width: 240px;
 }
+
 
 /* Lange Fotofreigaben umbrechen */
 
 .schuelerinfos-table td:nth-child(5) {
     white-space: normal;
+
     overflow-wrap: break-word;
+
     line-height: 1.5;
 }
 
-/* E-Mail */
+
+/* E-Mail-Adressen */
 
 .schuelerinfos-table th:nth-child(6),
 .schuelerinfos-table td:nth-child(6),
@@ -211,6 +248,7 @@
 .schuelerinfos-table td:nth-child(9) {
     min-width: 210px;
 }
+
 
 /* Telefonnummern */
 
@@ -224,6 +262,7 @@
 .schuelerinfos-table td:nth-child(11) {
     min-width: 140px;
 }
+
 
 /* Details */
 
@@ -240,7 +279,8 @@
 .schuelerinfos-table tbody tr {
     background: var(--bg-secondary, #262626);
 
-    transition: background-color 0.15s ease;
+    transition:
+            background-color 0.15s ease;
 }
 
 .schuelerinfos-table tbody tr:nth-child(even) {
@@ -266,6 +306,7 @@
 
 .schuelerinfos-clickable-row:focus-visible {
     outline: 2px solid #f97316;
+
     outline-offset: -2px;
 }
 
@@ -303,6 +344,7 @@
 
 .schuelerinfos-details-button:focus-visible {
     outline: 2px solid #ffffff;
+
     outline-offset: 3px;
 }
 
@@ -328,6 +370,7 @@
 
 .schuelerinfos-error {
     padding: 14px 18px;
+
     margin-bottom: 20px;
 
     border: 1px solid rgba(220, 38, 38, 0.3);
@@ -339,14 +382,16 @@
 
 
 /* =====================================================
-   DETAILS – ZURÜCK BUTTON
+   SCHÜLERDETAILS – ZURÜCK BUTTON
    ===================================================== */
 
 .schuelerinfos-back-button {
     display: inline-flex;
+
     align-items: center;
 
     margin-bottom: 24px;
+
     padding: 10px 16px;
 
     border: 1px solid var(--border-color, #484848);
@@ -367,7 +412,44 @@
 
 .schuelerinfos-back-button:hover {
     background: var(--bg-tertiary, #333333);
+
     border-color: #f97316;
+}
+
+
+/* =====================================================
+   SCHÜLERDETAILS – GRUPPIERTE INFORMATIONEN
+   ===================================================== */
+
+.schuelerinfos-detail-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    margin-bottom: 24px;
+
+    padding: 28px;
+
+    background: var(--bg-secondary, #262626);
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 12px;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   SEKTIONSÜBERSCHRIFT
+   ===================================================== */
+
+.schuelerinfos-detail-section h2 {
+    margin: 0 0 24px;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+
+    color: var(--text-primary, #ffffff);
 }
 
 
@@ -379,9 +461,9 @@
     display: grid;
 
     grid-template-columns:
-        repeat(auto-fit, minmax(230px, 1fr));
+        repeat(3, minmax(0, 1fr));
 
-    gap: 16px;
+    gap: 20px;
 }
 
 
@@ -393,13 +475,20 @@
     display: flex;
     flex-direction: column;
 
-    gap: 10px;
-    padding: 20px;
+    align-items: flex-start;
+
+    gap: 8px;
+
+    min-width: 0;
+
+    padding: 16px;
+
+    background: var(--bg-primary, #1f1f1f);
 
     border: 1px solid var(--border-color, #404040);
-    border-radius: 10px;
+    border-radius: 9px;
 
-    background: var(--bg-secondary, #262626);
+    box-sizing: border-box;
 
     transition:
             border-color 0.15s ease,
@@ -407,31 +496,225 @@
 }
 
 .schuelerinfos-detail-card:hover {
-    border-color: var(--border-hover, #555555);
+    border-color: var(--border-strong, #555555);
 }
+
+
+/* =====================================================
+   DETAILS – LABEL
+   ===================================================== */
 
 .schuelerinfos-detail-card span {
+    display: block;
+
+    width: 100%;
+
     font-size: 0.85rem;
+    font-weight: 400;
 
     color: var(--text-secondary, #aaaaaa);
+
+    line-height: 1.4;
 }
 
+
+/* =====================================================
+   DETAILS – WERT
+   ===================================================== */
+
 .schuelerinfos-detail-card strong {
+    display: block;
+
+    width: 100%;
+
     font-size: 1rem;
     font-weight: 600;
 
     color: var(--text-primary, #ffffff);
+
+    line-height: 1.5;
 
     overflow-wrap: anywhere;
 }
 
 
 /* =====================================================
-   HELLER MODUS
+   KURSE – HEADER
+   ===================================================== */
+
+.schuelerinfos-kurse-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+.schuelerinfos-kurse-header h2 {
+    margin: 0;
+}
+
+
+/* =====================================================
+   KURSE – ANZAHL
+   ===================================================== */
+
+.schuelerinfos-kurse-count {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 12px;
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 20px;
+
+    background: var(--bg-primary, #1f1f1f);
+
+    color: var(--text-secondary, #aaaaaa);
+
+    font-size: 0.85rem;
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   KURSE – SCROLLCONTAINER
+   ===================================================== */
+
+.schuelerinfos-kurse-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: auto;
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 9px;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =====================================================
+   KURSE – TABELLE
+   ===================================================== */
+
+.schuelerinfos-kurse-table {
+    width: 100%;
+    min-width: 650px;
+
+    border-collapse: collapse;
+
+    background: transparent;
+}
+
+
+/* =====================================================
+   KURSE – TABELLENKOPF
+   ===================================================== */
+
+.schuelerinfos-kurse-table thead {
+    background: var(--bg-tertiary, #303030);
+}
+
+.schuelerinfos-kurse-table th {
+    padding: 15px 16px;
+
+    text-align: left;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    color: var(--text-primary, #ffffff);
+
+    border-bottom: 1px solid var(--border-color, #404040);
+}
+
+
+/* =====================================================
+   KURSE – TABELLENZELLEN
+   ===================================================== */
+
+.schuelerinfos-kurse-table td {
+    padding: 15px 16px;
+
+    font-size: 0.9rem;
+
+    color: var(--text-primary, #ffffff);
+
+    border-bottom: 1px solid var(--border-color, #404040);
+}
+
+
+/* =====================================================
+   KURSE – TABELLENZEILEN
+   ===================================================== */
+
+.schuelerinfos-kurse-table tbody tr:hover {
+    background: rgba(249, 115, 22, 0.06);
+}
+
+.schuelerinfos-kurse-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   KURSE – SPALTENBREITEN
+   ===================================================== */
+
+.schuelerinfos-kurse-table th:nth-child(1),
+.schuelerinfos-kurse-table td:nth-child(1) {
+    width: 35%;
+}
+
+.schuelerinfos-kurse-table th:nth-child(2),
+.schuelerinfos-kurse-table td:nth-child(2) {
+    width: 25%;
+}
+
+.schuelerinfos-kurse-table th:nth-child(3),
+.schuelerinfos-kurse-table td:nth-child(3) {
+    width: 20%;
+}
+
+.schuelerinfos-kurse-table th:nth-child(4),
+.schuelerinfos-kurse-table td:nth-child(4) {
+    width: 20%;
+}
+
+
+/* =====================================================
+   KEINE KURSE
+   ===================================================== */
+
+.schuelerinfos-kurse-empty {
+    padding: 24px;
+
+    text-align: center;
+
+    color: var(--text-secondary, #aaaaaa);
+
+    background: var(--bg-primary, #1f1f1f);
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 8px;
+}
+
+
+/* =====================================================
+   HELLER MODUS – SCHÜLERLISTE
    ===================================================== */
 
 [data-theme="light"] .schuelerinfos-content {
     background: #ffffff;
+
     border-color: #dedede;
 }
 
@@ -442,6 +725,7 @@
 [data-theme="light"] .schuelerinfos-toolbar input {
     background: #ffffff;
     color: #222222;
+
     border-color: #d1d1d1;
 }
 
@@ -451,11 +735,13 @@
 
 [data-theme="light"] .schuelerinfos-table th {
     color: #222222;
+
     border-bottom-color: #dedede;
 }
 
 [data-theme="light"] .schuelerinfos-table td {
     color: #333333;
+
     border-bottom-color: #e5e5e5;
 }
 
@@ -467,23 +753,53 @@
     background: #f8f8f8;
 }
 
-[data-theme="light"] .schuelerinfos-table tbody .schuelerinfos-clickable-row:hover {
+[data-theme="light"]
+.schuelerinfos-table tbody
+.schuelerinfos-clickable-row:hover {
     background: #fff0e5;
 }
+
+
+/* =====================================================
+   HELLER MODUS – ZURÜCK BUTTON
+   ===================================================== */
 
 [data-theme="light"] .schuelerinfos-back-button {
     background: #ffffff;
     color: #222222;
+
     border-color: #dedede;
 }
 
 [data-theme="light"] .schuelerinfos-back-button:hover {
     background: #f5f5f5;
+
     border-color: #f97316;
 }
 
-[data-theme="light"] .schuelerinfos-detail-card {
+
+/* =====================================================
+   HELLER MODUS – DETAILSEKTIONEN
+   ===================================================== */
+
+[data-theme="light"] .schuelerinfos-detail-section {
     background: #ffffff;
+
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-detail-section h2 {
+    color: #222222;
+}
+
+
+/* =====================================================
+   HELLER MODUS – DETAILKARTEN
+   ===================================================== */
+
+[data-theme="light"] .schuelerinfos-detail-card {
+    background: #f8f8f8;
+
     border-color: #dedede;
 }
 
@@ -497,14 +813,75 @@
 
 
 /* =====================================================
-   RESPONSIVE
+   HELLER MODUS – KURSE
+   ===================================================== */
+
+[data-theme="light"] .schuelerinfos-kurse-count {
+    background: #f8f8f8;
+    color: #666666;
+
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-scroll {
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-table thead {
+    background: #f3f3f3;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-table th {
+    color: #222222;
+
+    border-bottom-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-table td {
+    color: #333333;
+
+    border-bottom-color: #e5e5e5;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-table tbody tr:hover {
+    background: #fff0e5;
+}
+
+[data-theme="light"] .schuelerinfos-kurse-empty {
+    background: #f8f8f8;
+    color: #666666;
+
+    border-color: #dedede;
+}
+
+
+/* =====================================================
+   RESPONSIVE – TABLET
+   ===================================================== */
+
+@media (max-width: 1000px) {
+
+    .schuelerinfos-details-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE – SMARTPHONE
    ===================================================== */
 
 @media (max-width: 700px) {
 
+    /* Suchleiste */
+
     .schuelerinfos-toolbar {
         flex-direction: column;
         align-items: stretch;
+
+        gap: 12px;
 
         padding: 16px;
     }
@@ -517,17 +894,55 @@
         text-align: right;
     }
 
+
+    /* Schülertabelle */
+
     .schuelerinfos-table th,
     .schuelerinfos-table td {
         padding: 12px 10px;
+
         font-size: 0.85rem;
+    }
+
+
+    /* Details */
+
+    .schuelerinfos-detail-section {
+        padding: 18px;
+
+        margin-bottom: 18px;
+    }
+
+    .schuelerinfos-detail-section h2 {
+        font-size: 1.1rem;
+
+        margin-bottom: 18px;
     }
 
     .schuelerinfos-details-grid {
         grid-template-columns: 1fr;
+
+        gap: 12px;
     }
 
     .schuelerinfos-detail-card {
-        padding: 16px;
+        padding: 14px;
     }
+
+
+    /* Kurse */
+
+    .schuelerinfos-kurse-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .schuelerinfos-kurse-table th,
+    .schuelerinfos-kurse-table td {
+        padding: 12px;
+
+        font-size: 0.85rem;
+    }
+
 }

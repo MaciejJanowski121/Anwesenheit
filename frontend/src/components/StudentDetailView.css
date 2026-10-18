@@ -1,26 +1,33 @@
+/* =====================================================
+   STUDENT DETAIL VIEW
+   ===================================================== */
+
 .student-detail-view {
     width: 100%;
-    max-width: 1100px;
+    max-width: 100%;
     min-width: 0;
+
+    box-sizing: border-box;
 
     color: var(--text-primary);
 }
+
 
 /* =====================================================
    BACK BUTTON
    ===================================================== */
 
-.back-button {
+.student-detail-view .back-button {
     margin-bottom: 24px;
     padding: 10px 18px;
 
     border: 1px solid var(--border-color);
     border-radius: 8px;
 
-    background-color: var(--surface-secondary);
+    background: var(--surface-secondary);
     color: var(--text-primary);
 
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 600;
 
     cursor: pointer;
@@ -31,118 +38,164 @@
             opacity 0.15s ease;
 }
 
-.back-button:hover {
-    border-color: var(--border-strong);
-    background-color: var(--surface-hover);
+.student-detail-view .back-button:hover {
+    border-color: var(--accent);
+    background: var(--surface-hover);
 }
+
 
 /* =====================================================
    HEADER
    ===================================================== */
 
-.detail-header {
+.student-detail-view .detail-header {
     margin-bottom: 30px;
 }
 
-.detail-header h2 {
+.student-detail-view .detail-header h2 {
     margin: 0;
 
     color: var(--text-heading);
 
     font-size: 2rem;
-    font-weight: 650;
+    font-weight: 700;
 }
 
-.detail-header p {
+.student-detail-view .detail-header p {
     margin: 8px 0 0;
 
     color: var(--text-muted);
 
-    font-size: 14px;
+    font-size: 0.9rem;
 }
+
 
 /* =====================================================
    SECTIONS
    ===================================================== */
 
-.detail-section {
+.student-detail-view .detail-section {
     width: 100%;
     min-width: 0;
 
     box-sizing: border-box;
 
-    margin-bottom: 20px;
-    padding: 24px;
+    margin-bottom: 24px;
+    padding: 28px;
 
     border: 1px solid var(--border-color);
     border-radius: 12px;
 
-    background: var(--surface-primary);
+    background: var(--bg-secondary);
 }
 
-.detail-section h3 {
-    margin: 0 0 18px;
 
-    color: var(--text-heading);
+/* =====================================================
+   SECTION HEADINGS
+   ===================================================== */
 
-    font-size: 1.1rem;
-    font-weight: 650;
+.student-detail-view .detail-section h3 {
+    margin: 0 0 24px;
+
+    color: var(--text-primary);
+
+    font-size: 1.25rem;
+    font-weight: 700;
 }
+
 
 /* =====================================================
    INFORMATION GRID
    ===================================================== */
 
-.detail-grid {
+.student-detail-view .detail-grid {
     display: grid;
 
     grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(220px, 1fr)
-        );
+        repeat(3, minmax(0, 1fr));
 
-    gap: 16px;
+    gap: 20px;
 }
 
-.detail-item {
+
+/* =====================================================
+   INFORMATION CARDS
+   ===================================================== */
+
+.student-detail-view .detail-item {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 8px;
+
     min-width: 0;
 
-    padding: 12px;
+    padding: 16px;
 
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 9px;
 
-    background: var(--surface-secondary);
+    background: var(--bg-primary);
+
+    box-sizing: border-box;
+
+    transition:
+            border-color 0.15s ease,
+            background-color 0.15s ease;
 }
 
-.detail-label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: var(--text-muted);
-
-    font-size: 0.8rem;
-    font-weight: 500;
+.student-detail-view .detail-item:hover {
+    border-color: var(--border-strong);
 }
 
-.detail-value {
+
+/* =====================================================
+   INFORMATION LABEL
+   ===================================================== */
+
+.student-detail-view .detail-label {
     display: block;
+
+    width: 100%;
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 0.85rem;
+    font-weight: 400;
+
+    line-height: 1.4;
+}
+
+
+/* =====================================================
+   INFORMATION VALUE
+   ===================================================== */
+
+.student-detail-view .detail-value {
+    display: block;
+
+    width: 100%;
+
+    color: var(--text-primary);
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    line-height: 1.5;
 
     overflow-wrap: anywhere;
-
-    color: var(--text-heading);
-
-    font-size: 0.95rem;
-    font-weight: 500;
 }
+
 
 /* =====================================================
    15:30 SETTING
    ===================================================== */
 
-.detail-item-1530 {
+.student-detail-view .detail-item-1530 {
     display: flex;
     flex-direction: column;
 
@@ -151,10 +204,10 @@
 
     min-width: 0;
 
-    padding: 12px;
+    padding: 16px;
 }
 
-.detail-1530-header {
+.student-detail-view .detail-1530-header {
     display: flex;
     flex-direction: column;
 
@@ -165,22 +218,23 @@
     gap: 10px;
 }
 
-.detail-item-1530 .detail-label {
+.student-detail-view .detail-item-1530 .detail-label {
     margin: 0;
 
-    color: var(--text-muted);
+    color: var(--text-secondary);
 
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 400;
 
     white-space: nowrap;
 }
+
 
 /* =====================================================
    15:30 JA / NEIN SWITCH
    ===================================================== */
 
-.detail-1530-options {
+.student-detail-view .detail-1530-options {
     display: inline-flex;
 
     width: auto;
@@ -196,7 +250,7 @@
     background: var(--input-background);
 }
 
-.detail-1530-option {
+.student-detail-view .detail-1530-option {
     width: auto;
     min-width: 50px;
 
@@ -220,26 +274,27 @@
             opacity 0.15s ease;
 }
 
-.detail-1530-option:hover:not(.active):not(:disabled) {
+.student-detail-view .detail-1530-option:hover:not(.active):not(:disabled) {
     background: var(--surface-hover);
     color: var(--text-heading);
 }
 
-.detail-1530-option.active {
+.student-detail-view .detail-1530-option.active {
     background: var(--accent);
     color: #ffffff;
 }
 
-.detail-1530-option:disabled {
+.student-detail-view .detail-1530-option:disabled {
     cursor: wait;
     opacity: 0.7;
 }
+
 
 /* =====================================================
    COURSE ASSIGNMENT
    ===================================================== */
 
-.assign-kurs-box {
+.student-detail-view .assign-kurs-box {
     display: grid;
 
     grid-template-columns:
@@ -249,45 +304,51 @@
 
     align-items: end;
 
-    gap: 14px;
+    gap: 16px;
 
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
-.assign-kurs-field {
+
+/* =====================================================
+   COURSE ASSIGNMENT FIELDS
+   ===================================================== */
+
+.student-detail-view .assign-kurs-field {
     display: flex;
+    flex-direction: column;
 
     min-width: 0;
 
-    flex-direction: column;
-
-    gap: 6px;
+    gap: 8px;
 }
 
-.assign-kurs-field label {
+.student-detail-view .assign-kurs-field label {
     color: var(--text-secondary);
 
-    font-size: 13px;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
-.assign-kurs-field select {
-    box-sizing: border-box;
-
+.student-detail-view .assign-kurs-field select {
     width: 100%;
     min-width: 0;
+    min-height: 42px;
+
+    box-sizing: border-box;
 
     padding: 10px 12px;
 
     border: 1px solid var(--border-color);
-    border-radius: 7px;
+    border-radius: 8px;
 
     outline: none;
 
-    background-color: var(--input-background);
+    background: var(--input-background);
     color: var(--input-text);
 
-    font-size: 0.88rem;
+    font-family: inherit;
+    font-size: 0.9rem;
 
     transition:
             border-color 0.15s ease,
@@ -295,40 +356,41 @@
             opacity 0.15s ease;
 }
 
-.assign-kurs-field select:focus {
+.student-detail-view .assign-kurs-field select:focus {
     border-color: var(--accent);
 
     box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
+            0 0 0 3px rgba(232, 121, 43, 0.12);
 }
 
-.assign-kurs-field select:disabled {
+.student-detail-view .assign-kurs-field select:disabled {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
-.assign-kurs-field select option {
+.student-detail-view .assign-kurs-field select option {
     background: var(--input-background);
     color: var(--input-text);
 }
+
 
 /* =====================================================
    ASSIGN COURSE BUTTON
    ===================================================== */
 
-.assign-kurs-button {
-    min-height: 38px;
+.student-detail-view .assign-kurs-button {
+    min-height: 42px;
 
-    padding: 10px 15px;
+    padding: 10px 16px;
 
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
 
     background: var(--accent);
     color: #ffffff;
 
-    font-size: 0.86rem;
+    font-family: inherit;
+    font-size: 0.9rem;
     font-weight: 600;
 
     cursor: pointer;
@@ -340,39 +402,46 @@
             opacity 0.15s ease;
 }
 
-.assign-kurs-button:hover:not(:disabled) {
+.student-detail-view .assign-kurs-button:hover:not(:disabled) {
     background: var(--accent-hover);
 }
 
-.assign-kurs-button:disabled {
+.student-detail-view .assign-kurs-button:disabled {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
+
 /* =====================================================
-   BESONDERHEITEN
+   BESONDERHEITEN EDITOR
    ===================================================== */
 
-.besonderheiten-editor {
+.student-detail-view .besonderheiten-editor {
     display: flex;
     flex-direction: column;
 
     width: 100%;
     min-width: 0;
 
-    gap: 6px;
+    gap: 8px;
 }
 
-.besonderheiten-input {
-    box-sizing: border-box;
 
+/* =====================================================
+   BESONDERHEITEN INPUT
+   ===================================================== */
+
+.student-detail-view .besonderheiten-input {
     width: 100%;
     min-width: 0;
+    min-height: 40px;
 
-    padding: 8px 10px;
+    box-sizing: border-box;
+
+    padding: 10px 12px;
 
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 8px;
 
     outline: none;
 
@@ -380,7 +449,7 @@
     color: var(--input-text);
 
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.9rem;
 
     transition:
             border-color 0.15s ease,
@@ -388,20 +457,25 @@
             background-color 0.15s ease;
 }
 
-.besonderheiten-input::placeholder {
+.student-detail-view .besonderheiten-input::placeholder {
     color: var(--input-placeholder);
 }
 
-.besonderheiten-input:focus {
+.student-detail-view .besonderheiten-input:focus {
     border-color: var(--accent);
 
     box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
+            0 0 0 3px rgba(232, 121, 43, 0.12);
 }
 
-.besonderheiten-footer {
+
+/* =====================================================
+   BESONDERHEITEN FOOTER
+   ===================================================== */
+
+.student-detail-view .besonderheiten-footer {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
@@ -410,28 +484,38 @@
     gap: 8px;
 }
 
-.besonderheiten-counter {
+
+/* =====================================================
+   BESONDERHEITEN COUNTER
+   ===================================================== */
+
+.student-detail-view .besonderheiten-counter {
     color: var(--text-muted);
 
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 500;
 
     white-space: nowrap;
 }
 
-.btn-save-besonderheiten {
+
+/* =====================================================
+   SAVE BESONDERHEITEN BUTTON
+   ===================================================== */
+
+.student-detail-view .btn-save-besonderheiten {
     flex-shrink: 0;
 
-    padding: 6px 10px;
+    padding: 8px 12px;
 
     border: none;
-    border-radius: 6px;
+    border-radius: 7px;
 
     background: var(--accent);
     color: #ffffff;
 
     font-family: inherit;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
 
     cursor: pointer;
@@ -443,23 +527,25 @@
             opacity 0.15s ease;
 }
 
-.btn-save-besonderheiten:hover:not(:disabled) {
+.student-detail-view .btn-save-besonderheiten:hover:not(:disabled) {
     background: var(--accent-hover);
 }
 
-.btn-save-besonderheiten:disabled {
+.student-detail-view .btn-save-besonderheiten:disabled {
     cursor: wait;
     opacity: 0.6;
 }
+
 
 /* =====================================================
    ANWESENHEIT HEADER
    ===================================================== */
 
-.detail-anwesenheit-header {
+.student-detail-view .detail-anwesenheit-header {
     position: relative;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
@@ -470,43 +556,36 @@
     text-align: center;
 }
 
-.detail-anwesenheit-header > div {
+.student-detail-view .detail-anwesenheit-header > div {
     display: flex;
     flex-direction: column;
+
     align-items: center;
 }
 
-.detail-anwesenheit-header h3 {
+.student-detail-view .detail-anwesenheit-header h3 {
     margin: 0 0 6px;
 
-    color: var(--text-heading);
+    color: var(--text-primary);
 
-    font-size: 1.1rem;
-    font-weight: 650;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
-.detail-anwesenheit-header p {
+.student-detail-view .detail-anwesenheit-header p {
     margin: 0;
 
     color: var(--text-muted);
 
-    font-size: 0.86rem;
+    font-size: 0.9rem;
 }
 
-.detail-filter-reset {
-    position: absolute;
-
-    top: 50%;
-    right: 0;
-
-    transform: translateY(-50%);
-}
 
 /* =====================================================
    ANWESENHEIT FILTER
    ===================================================== */
 
-.detail-anwesenheit-filter {
+.student-detail-view .detail-anwesenheit-filter {
     display: grid;
 
     grid-template-columns:
@@ -514,39 +593,44 @@
         minmax(240px, 1.4fr)
         minmax(180px, 0.9fr);
 
-    gap: 14px;
+    gap: 16px;
 
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
-.detail-filter-field {
+
+/* =====================================================
+   FILTER FIELDS
+   ===================================================== */
+
+.student-detail-view .detail-filter-field {
     display: flex;
     flex-direction: column;
 
     min-width: 0;
 
-    gap: 7px;
+    gap: 8px;
 }
 
-.detail-filter-field label {
+.student-detail-view .detail-filter-field label {
     color: var(--text-secondary);
 
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
-.detail-filter-field input,
-.detail-filter-field select {
-    box-sizing: border-box;
-
+.student-detail-view .detail-filter-field input,
+.student-detail-view .detail-filter-field select {
     width: 100%;
     min-width: 0;
-    min-height: 40px;
+    min-height: 42px;
 
-    padding: 9px 11px;
+    box-sizing: border-box;
+
+    padding: 10px 12px;
 
     border: 1px solid var(--border-color);
-    border-radius: 7px;
+    border-radius: 8px;
 
     outline: none;
 
@@ -554,7 +638,7 @@
     color: var(--input-text);
 
     font-family: inherit;
-    font-size: 0.86rem;
+    font-size: 0.9rem;
 
     transition:
             border-color 0.15s ease,
@@ -562,51 +646,61 @@
             background-color 0.15s ease;
 }
 
-.detail-filter-field input::placeholder {
+.student-detail-view .detail-filter-field input::placeholder {
     color: var(--input-placeholder);
 }
 
-.detail-filter-field input:focus,
-.detail-filter-field select:focus {
+.student-detail-view .detail-filter-field input:focus,
+.student-detail-view .detail-filter-field select:focus {
     border-color: var(--accent);
 
     box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
+            0 0 0 3px rgba(232, 121, 43, 0.12);
 }
 
-.detail-filter-field select option {
+.student-detail-view .detail-filter-field select option {
     background: var(--input-background);
     color: var(--input-text);
 }
+
 
 /* =====================================================
    DATE INPUT
    ===================================================== */
 
-.detail-filter-field input[type="date"] {
+.student-detail-view .detail-filter-field input[type="date"] {
     color-scheme: light;
 }
 
-[data-theme="dark"] .detail-filter-field input[type="date"] {
+[data-theme="dark"]
+.student-detail-view .detail-filter-field input[type="date"] {
     color-scheme: dark;
 }
 
+
 /* =====================================================
-   FILTER RESET
+   FILTER RESET BUTTON
    ===================================================== */
 
-.detail-filter-reset {
+.student-detail-view .detail-filter-reset {
+    position: absolute;
+
+    top: 50%;
+    right: 0;
+
+    transform: translateY(-50%);
+
     flex-shrink: 0;
 
     padding: 8px 12px;
 
     border: 1px solid var(--border-color);
-    border-radius: 7px;
+    border-radius: 8px;
 
     background: var(--surface-secondary);
     color: var(--text-secondary);
 
+    font-family: inherit;
     font-size: 0.8rem;
     font-weight: 600;
 
@@ -618,38 +712,36 @@
             color 0.15s ease;
 }
 
-.detail-filter-reset:hover {
+.student-detail-view .detail-filter-reset:hover {
     border-color: var(--accent);
 
-    background:
-            rgba(232, 121, 43, 0.1);
-
+    background: rgba(232, 121, 43, 0.1);
     color: var(--accent);
 }
+
 
 /* =====================================================
    ANWESENHEIT RESULT COUNT
    ===================================================== */
 
-.detail-anwesenheit-count {
+.student-detail-view .detail-anwesenheit-count {
     display: inline-flex;
+
     align-items: center;
 
-    margin-bottom: 14px;
-
-    padding: 6px 10px;
+    margin-bottom: 16px;
+    padding: 7px 12px;
 
     border-radius: 999px;
 
-    background:
-            rgba(232, 121, 43, 0.11);
+    background: rgba(232, 121, 43, 0.11);
 
     color: var(--text-secondary);
 
-    font-size: 0.78rem;
+    font-size: 0.85rem;
 }
 
-.detail-anwesenheit-count strong {
+.student-detail-view .detail-anwesenheit-count strong {
     margin-right: 4px;
 
     color: var(--accent);
@@ -657,11 +749,12 @@
     font-weight: 700;
 }
 
+
 /* =====================================================
    TABLE SCROLL
    ===================================================== */
 
-.detail-table-scroll {
+.student-detail-view .detail-table-scroll {
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -680,31 +773,32 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.detail-table-scroll::-webkit-scrollbar {
+.student-detail-view .detail-table-scroll::-webkit-scrollbar {
     height: 10px;
 }
 
-.detail-table-scroll::-webkit-scrollbar-track {
+.student-detail-view .detail-table-scroll::-webkit-scrollbar-track {
     border-radius: 999px;
 
     background: var(--scrollbar-track);
 }
 
-.detail-table-scroll::-webkit-scrollbar-thumb {
+.student-detail-view .detail-table-scroll::-webkit-scrollbar-thumb {
     border-radius: 999px;
 
     background: var(--scrollbar-thumb);
 }
 
-.detail-table-scroll::-webkit-scrollbar-thumb:hover {
+.student-detail-view .detail-table-scroll::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover);
 }
+
 
 /* =====================================================
    GENERAL TABLE
    ===================================================== */
 
-.detail-table {
+.student-detail-view .detail-table {
     width: 100%;
     min-width: 700px;
 
@@ -712,19 +806,24 @@
 
     border-collapse: collapse;
 
-    background: var(--surface-primary);
+    background: transparent;
 }
 
-.detail-table th {
-    padding: 12px 14px;
 
-    border-bottom: 2px solid var(--border-strong);
+/* =====================================================
+   TABLE HEADER
+   ===================================================== */
 
-    background-color: var(--table-header-background);
-    color: var(--table-header-text);
+.student-detail-view .detail-table th {
+    padding: 15px 16px;
 
-    font-size: 0.8rem;
-    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+
+    font-size: 0.9rem;
+    font-weight: 600;
 
     text-align: left;
     vertical-align: middle;
@@ -732,124 +831,141 @@
     white-space: nowrap;
 }
 
-.detail-table td {
-    padding: 12px 14px;
 
-    border-bottom: 1px solid var(--table-row-border);
+/* =====================================================
+   TABLE CELLS
+   ===================================================== */
 
-    color: var(--text-secondary);
+.student-detail-view .detail-table td {
+    padding: 15px 16px;
 
-    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border-color);
+
+    color: var(--text-primary);
+
+    font-size: 0.9rem;
 
     vertical-align: middle;
 
     white-space: nowrap;
 }
 
-.detail-table tbody tr {
-    transition:
-            background-color 0.15s ease;
+
+/* =====================================================
+   TABLE ROWS
+   ===================================================== */
+
+.student-detail-view .detail-table tbody tr {
+    transition: background-color 0.15s ease;
 }
 
-.detail-table tbody tr:hover {
-    background-color:
-            rgba(232, 121, 43, 0.08);
+.student-detail-view .detail-table tbody tr:hover {
+    background: rgba(249, 115, 22, 0.06);
 }
 
-.detail-table tbody tr:last-child td {
+.student-detail-view .detail-table tbody tr:last-child td {
     border-bottom: none;
 }
 
+
 /* =====================================================
    KURSBUCHUNGEN TABLE
-
-   Tabela pozostaje responsywna.
-   Scroll pojawia się dopiero, gdy faktycznie brakuje miejsca.
    ===================================================== */
 
-.kursbuchungen-table {
+.student-detail-view .kursbuchungen-table {
     width: 100%;
-    min-width: 950px;
+    min-width: 1050px;
 
     table-layout: auto;
+
+    border-collapse: collapse;
 }
 
-.kursbuchungen-table th,
-.kursbuchungen-table td {
-    padding: 12px 10px;
-}
+
+/* =====================================================
+   KURSBUCHUNGEN COLUMN WIDTHS
+   ===================================================== */
 
 /* Kurs */
 
-.kursbuchungen-table th:nth-child(1),
-.kursbuchungen-table td:nth-child(1) {
+.student-detail-view .kursbuchungen-table th:nth-child(1),
+.student-detail-view .kursbuchungen-table td:nth-child(1) {
     min-width: 180px;
 }
 
+
 /* Kursleitung */
 
-.kursbuchungen-table th:nth-child(2),
-.kursbuchungen-table td:nth-child(2) {
+.student-detail-view .kursbuchungen-table th:nth-child(2),
+.student-detail-view .kursbuchungen-table td:nth-child(2) {
     min-width: 130px;
 }
 
+
 /* Wochentag */
 
-.kursbuchungen-table th:nth-child(3),
-.kursbuchungen-table td:nth-child(3) {
-    width: 100px;
+.student-detail-view .kursbuchungen-table th:nth-child(3),
+.student-detail-view .kursbuchungen-table td:nth-child(3) {
+    min-width: 110px;
 }
+
 
 /* Uhrzeit */
 
-.kursbuchungen-table th:nth-child(4),
-.kursbuchungen-table td:nth-child(4) {
-    width: 80px;
+.student-detail-view .kursbuchungen-table th:nth-child(4),
+.student-detail-view .kursbuchungen-table td:nth-child(4) {
+    min-width: 90px;
 }
+
 
 /* Buchungsart */
 
-.kursbuchungen-table th:nth-child(5),
-.kursbuchungen-table td:nth-child(5) {
-    width: 100px;
+.student-detail-view .kursbuchungen-table th:nth-child(5),
+.student-detail-view .kursbuchungen-table td:nth-child(5) {
+    min-width: 110px;
 }
+
 
 /* Gebühr */
 
-.kursbuchungen-table th:nth-child(6),
-.kursbuchungen-table td:nth-child(6) {
-    width: 70px;
+.student-detail-view .kursbuchungen-table th:nth-child(6),
+.student-detail-view .kursbuchungen-table td:nth-child(6) {
+    min-width: 90px;
 }
+
 
 /* Besonderheiten */
 
-.kursbuchungen-table th:nth-child(7),
-.kursbuchungen-table td:nth-child(7) {
-    width: 230px;
-    min-width: 230px;
+.student-detail-view .kursbuchungen-table th:nth-child(7),
+.student-detail-view .kursbuchungen-table td:nth-child(7) {
+    width: 250px;
+    min-width: 250px;
 }
+
 
 /* Aktionen */
 
-.kursbuchungen-table th:nth-child(8),
-.kursbuchungen-table td:nth-child(8) {
-    width: 100px;
+.student-detail-view .kursbuchungen-table th:nth-child(8),
+.student-detail-view .kursbuchungen-table td:nth-child(8) {
+    min-width: 110px;
 }
+
 
 /* =====================================================
    REMOVE COURSE BUTTON
    ===================================================== */
 
-.btn-remove-kurs {
-    padding: 7px 10px;
+.student-detail-view .btn-remove-kurs {
+    padding: 9px 14px;
 
     border: none;
-    border-radius: 6px;
+    border-radius: 7px;
 
-    background-color: #d94a4a;
+    background: #d94a4a;
     color: #ffffff;
 
-    font-size: 0.8rem;
+    font-family: inherit;
+    font-size: 0.85rem;
     font-weight: 600;
 
     cursor: pointer;
@@ -861,83 +977,120 @@
             opacity 0.15s ease;
 }
 
-.btn-remove-kurs:hover {
-    background-color: #bd3535;
+.student-detail-view .btn-remove-kurs:hover {
+    background: #bd3535;
 }
+
 
 /* =====================================================
    EMPTY STATE
    ===================================================== */
 
-.empty-text {
+.student-detail-view .empty-text {
     margin: 16px 0 0;
-
     padding: 14px 0;
 
     color: var(--text-muted);
 
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-style: italic;
 
     text-align: left;
 }
 
+
 /* =====================================================
-   RESPONSIVE - TABLET
+   RESPONSIVE – TABLET
    ===================================================== */
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
 
-    .assign-kurs-box {
+    .student-detail-view .detail-grid {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
     }
 
-    .assign-kurs-button {
+}
+
+
+/* =====================================================
+   RESPONSIVE – SMALL TABLET
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+    .student-detail-view .assign-kurs-box {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .student-detail-view .assign-kurs-button {
         grid-column: span 2;
 
         width: 100%;
     }
 
-    .detail-anwesenheit-filter {
+    .student-detail-view .detail-anwesenheit-filter {
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
     }
 
-    .detail-filter-field:last-child {
+    .student-detail-view .detail-filter-field:last-child {
         grid-column: span 2;
     }
+
 }
 
+
 /* =====================================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE – MOBILE
    ===================================================== */
 
 @media (max-width: 768px) {
 
     .student-detail-view {
-        max-width: none;
+        max-width: 100%;
     }
 
-    .detail-header h2 {
+    /* Header */
+
+    .student-detail-view .detail-header h2 {
         font-size: 1.6rem;
     }
 
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
+    /* Sections */
 
-    .detail-section {
+    .student-detail-view .detail-section {
         padding: 18px;
+        margin-bottom: 18px;
     }
 
-    /* 15:30 */
-
-    .detail-item-1530 {
-        padding: 12px;
+    .student-detail-view .detail-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 18px;
     }
 
-    .detail-1530-header {
+    /* Information Grid */
+
+    .student-detail-view .detail-grid {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+    /* Information Cards */
+
+    .student-detail-view .detail-item {
+        padding: 14px;
+    }
+
+    /* 15:30 Setting */
+
+    .student-detail-view .detail-item-1530 {
+        padding: 14px;
+    }
+
+    .student-detail-view .detail-1530-header {
         width: auto;
 
         align-items: flex-start;
@@ -945,12 +1098,12 @@
         gap: 10px;
     }
 
-    .detail-1530-options {
+    .student-detail-view .detail-1530-options {
         width: auto;
         max-width: max-content;
     }
 
-    .detail-1530-option {
+    .student-detail-view .detail-1530-option {
         min-width: 48px;
 
         padding: 6px 9px;
@@ -958,19 +1111,19 @@
 
     /* Kurszuweisung */
 
-    .assign-kurs-box {
+    .student-detail-view .assign-kurs-box {
         grid-template-columns: 1fr;
     }
 
-    .assign-kurs-button {
+    .student-detail-view .assign-kurs-button {
         grid-column: auto;
 
         width: 100%;
     }
 
-    /* Anwesenheit */
+    /* Anwesenheit Header */
 
-    .detail-anwesenheit-header {
+    .student-detail-view .detail-anwesenheit-header {
         flex-direction: column;
 
         align-items: stretch;
@@ -978,7 +1131,9 @@
         gap: 12px;
     }
 
-    .detail-filter-reset {
+    /* Filter Reset */
+
+    .student-detail-view .detail-filter-reset {
         position: static;
 
         transform: none;
@@ -986,29 +1141,32 @@
         align-self: flex-start;
     }
 
-    .detail-anwesenheit-filter {
+    /* Anwesenheit Filter */
+
+    .student-detail-view .detail-anwesenheit-filter {
         grid-template-columns: 1fr;
     }
 
-    .detail-filter-field:last-child {
+    .student-detail-view .detail-filter-field:last-child {
         grid-column: auto;
     }
 
     /* Tabellen */
 
-    .detail-table {
+    .student-detail-view .detail-table {
         min-width: 700px;
     }
 
-    .kursbuchungen-table {
-        min-width: 950px;
+    .student-detail-view .kursbuchungen-table {
+        min-width: 1050px;
     }
 
     /* Besonderheiten */
 
-    .kursbuchungen-table th:nth-child(7),
-    .kursbuchungen-table td:nth-child(7) {
-        width: 210px;
-        min-width: 210px;
+    .student-detail-view .kursbuchungen-table th:nth-child(7),
+    .student-detail-view .kursbuchungen-table td:nth-child(7) {
+        width: 230px;
+        min-width: 230px;
     }
+
 }

@@ -1,14 +1,91 @@
+/* =====================================================
+   STUDENT DETAILS PAGE – ADMIN
+   ===================================================== */
+
 .student-details-page {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 32px 24px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
 }
 
+
+/* =====================================================
+   STUDENT DETAIL VIEW
+   ===================================================== */
+
+.student-details-page .student-detail-view {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+
+/* =====================================================
+   HEADER – WIE BEI LEITUNG
+   ===================================================== */
+
+.student-details-page .detail-header {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    margin-bottom: 32px;
+
+    text-align: center;
+}
+
+.student-details-page .detail-header h2 {
+    margin: 0 0 8px;
+
+    color: var(--text-heading);
+
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.student-details-page .detail-header p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 0.9rem;
+}
+
+
+/* =====================================================
+   LOADING / ERROR MESSAGES
+   ===================================================== */
+
 .details-message {
-    color: #ffffff;
     padding: 32px;
+
+    color: var(--text-primary);
+
+    text-align: center;
 }
 
 .details-message.error {
-    color: #ff6b6b;
+    color: var(--error-text, #ff6b6b);
+}
+
+
+/* =====================================================
+   RESPONSIVE – MOBILE
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    .student-details-page .detail-header h2 {
+        font-size: 1.6rem;
+    }
+
 }
