@@ -1,0 +1,533 @@
+/* =====================================================
+   SCHÜLERINFOS – SEITE
+   ===================================================== */
+
+.schuelerinfos-page {
+    width: 100%;
+    min-width: 0;
+    color: var(--text-primary);
+}
+
+
+/* =====================================================
+   HAUPTBEREICH
+   ===================================================== */
+
+.schuelerinfos-content {
+    width: 100%;
+    min-width: 0;
+
+    background: var(--bg-secondary, #262626);
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 12px;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   SUCHLEISTE
+   ===================================================== */
+
+.schuelerinfos-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 20px 24px;
+
+    background: transparent;
+
+    border-bottom: 1px solid var(--border-color, #404040);
+}
+
+.schuelerinfos-toolbar input {
+    width: 100%;
+    max-width: 420px;
+
+    padding: 12px 16px;
+
+    border: 1px solid var(--border-color, #484848);
+    border-radius: 8px;
+
+    background: var(--bg-primary, #1f1f1f);
+    color: var(--text-primary, #ffffff);
+
+    font: inherit;
+    font-size: 0.95rem;
+
+    outline: none;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.schuelerinfos-toolbar input::placeholder {
+    color: var(--text-muted, #999999);
+}
+
+.schuelerinfos-toolbar input:focus {
+    border-color: #f97316;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.schuelerinfos-toolbar span {
+    color: var(--text-secondary, #b0b0b0);
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   TABELLE – CONTAINER
+   ===================================================== */
+
+.schuelerinfos-table-scroll {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+
+/* =====================================================
+   TABELLE
+   ===================================================== */
+
+.schuelerinfos-table {
+    width: 100%;
+    min-width: 1450px;
+
+    border-collapse: collapse;
+    table-layout: auto;
+
+    background: transparent;
+}
+
+
+/* =====================================================
+   TABELLENKOPF
+   ===================================================== */
+
+.schuelerinfos-table thead {
+    background: var(--bg-tertiary, #303030);
+}
+
+.schuelerinfos-table th {
+    padding: 16px 14px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    color: var(--text-primary, #ffffff);
+
+    border-bottom: 1px solid var(--border-color, #454545);
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   TABELLENZELLEN
+   ===================================================== */
+
+.schuelerinfos-table td {
+    padding: 15px 14px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    font-size: 0.9rem;
+
+    color: var(--text-primary, #ffffff);
+
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
+
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   SPALTENBREITEN
+   ===================================================== */
+
+/* Nachname */
+
+.schuelerinfos-table th:nth-child(1),
+.schuelerinfos-table td:nth-child(1) {
+    min-width: 120px;
+}
+
+/* Vorname */
+
+.schuelerinfos-table th:nth-child(2),
+.schuelerinfos-table td:nth-child(2) {
+    min-width: 110px;
+}
+
+/* Jahrgang */
+
+.schuelerinfos-table th:nth-child(3),
+.schuelerinfos-table td:nth-child(3) {
+    min-width: 80px;
+}
+
+/* Klasse */
+
+.schuelerinfos-table th:nth-child(4),
+.schuelerinfos-table td:nth-child(4) {
+    min-width: 100px;
+}
+
+/* Fotofreigabe */
+
+.schuelerinfos-table th:nth-child(5),
+.schuelerinfos-table td:nth-child(5) {
+    width: 240px;
+    min-width: 200px;
+    max-width: 240px;
+}
+
+/* Lange Fotofreigaben umbrechen */
+
+.schuelerinfos-table td:nth-child(5) {
+    white-space: normal;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+}
+
+/* E-Mail */
+
+.schuelerinfos-table th:nth-child(6),
+.schuelerinfos-table td:nth-child(6),
+.schuelerinfos-table th:nth-child(9),
+.schuelerinfos-table td:nth-child(9) {
+    min-width: 210px;
+}
+
+/* Telefonnummern */
+
+.schuelerinfos-table th:nth-child(7),
+.schuelerinfos-table td:nth-child(7),
+.schuelerinfos-table th:nth-child(8),
+.schuelerinfos-table td:nth-child(8),
+.schuelerinfos-table th:nth-child(10),
+.schuelerinfos-table td:nth-child(10),
+.schuelerinfos-table th:nth-child(11),
+.schuelerinfos-table td:nth-child(11) {
+    min-width: 140px;
+}
+
+/* Details */
+
+.schuelerinfos-table th:nth-child(12),
+.schuelerinfos-table td:nth-child(12) {
+    min-width: 100px;
+}
+
+
+/* =====================================================
+   TABELLENZEILEN
+   ===================================================== */
+
+.schuelerinfos-table tbody tr {
+    background: var(--bg-secondary, #262626);
+
+    transition: background-color 0.15s ease;
+}
+
+.schuelerinfos-table tbody tr:nth-child(even) {
+    background: var(--bg-primary, #222222);
+}
+
+.schuelerinfos-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   KLICKBARER SCHÜLER
+   ===================================================== */
+
+.schuelerinfos-clickable-row {
+    cursor: pointer;
+}
+
+.schuelerinfos-table tbody .schuelerinfos-clickable-row:hover {
+    background: rgba(249, 115, 22, 0.12);
+}
+
+.schuelerinfos-clickable-row:focus-visible {
+    outline: 2px solid #f97316;
+    outline-offset: -2px;
+}
+
+
+/* =====================================================
+   DETAILS BUTTON
+   ===================================================== */
+
+.schuelerinfos-details-button {
+    padding: 8px 14px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #ea7625;
+    color: #ffffff;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            transform 0.15s ease;
+}
+
+.schuelerinfos-details-button:hover {
+    background: #d96517;
+}
+
+.schuelerinfos-details-button:active {
+    transform: scale(0.97);
+}
+
+.schuelerinfos-details-button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}
+
+
+/* =====================================================
+   LEERE TABELLE / LADEN
+   ===================================================== */
+
+.schuelerinfos-empty {
+    padding: 36px 20px !important;
+
+    text-align: center !important;
+
+    color: var(--text-secondary, #aaaaaa) !important;
+
+    background: transparent;
+}
+
+
+/* =====================================================
+   FEHLERMELDUNG
+   ===================================================== */
+
+.schuelerinfos-error {
+    padding: 14px 18px;
+    margin-bottom: 20px;
+
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+
+    background: rgba(220, 38, 38, 0.08);
+    color: #ef4444;
+}
+
+
+/* =====================================================
+   DETAILS – ZURÜCK BUTTON
+   ===================================================== */
+
+.schuelerinfos-back-button {
+    display: inline-flex;
+    align-items: center;
+
+    margin-bottom: 24px;
+    padding: 10px 16px;
+
+    border: 1px solid var(--border-color, #484848);
+    border-radius: 8px;
+
+    background: var(--bg-secondary, #262626);
+    color: var(--text-primary, #ffffff);
+
+    font: inherit;
+    font-size: 0.9rem;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease;
+}
+
+.schuelerinfos-back-button:hover {
+    background: var(--bg-tertiary, #333333);
+    border-color: #f97316;
+}
+
+
+/* =====================================================
+   DETAILS – GRID
+   ===================================================== */
+
+.schuelerinfos-details-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(230px, 1fr));
+
+    gap: 16px;
+}
+
+
+/* =====================================================
+   DETAILS – KARTEN
+   ===================================================== */
+
+.schuelerinfos-detail-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+    padding: 20px;
+
+    border: 1px solid var(--border-color, #404040);
+    border-radius: 10px;
+
+    background: var(--bg-secondary, #262626);
+
+    transition:
+            border-color 0.15s ease,
+            background-color 0.15s ease;
+}
+
+.schuelerinfos-detail-card:hover {
+    border-color: var(--border-hover, #555555);
+}
+
+.schuelerinfos-detail-card span {
+    font-size: 0.85rem;
+
+    color: var(--text-secondary, #aaaaaa);
+}
+
+.schuelerinfos-detail-card strong {
+    font-size: 1rem;
+    font-weight: 600;
+
+    color: var(--text-primary, #ffffff);
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =====================================================
+   HELLER MODUS
+   ===================================================== */
+
+[data-theme="light"] .schuelerinfos-content {
+    background: #ffffff;
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-toolbar {
+    border-bottom-color: #e5e5e5;
+}
+
+[data-theme="light"] .schuelerinfos-toolbar input {
+    background: #ffffff;
+    color: #222222;
+    border-color: #d1d1d1;
+}
+
+[data-theme="light"] .schuelerinfos-table thead {
+    background: #f3f3f3;
+}
+
+[data-theme="light"] .schuelerinfos-table th {
+    color: #222222;
+    border-bottom-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-table td {
+    color: #333333;
+    border-bottom-color: #e5e5e5;
+}
+
+[data-theme="light"] .schuelerinfos-table tbody tr {
+    background: #ffffff;
+}
+
+[data-theme="light"] .schuelerinfos-table tbody tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+[data-theme="light"] .schuelerinfos-table tbody .schuelerinfos-clickable-row:hover {
+    background: #fff0e5;
+}
+
+[data-theme="light"] .schuelerinfos-back-button {
+    background: #ffffff;
+    color: #222222;
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-back-button:hover {
+    background: #f5f5f5;
+    border-color: #f97316;
+}
+
+[data-theme="light"] .schuelerinfos-detail-card {
+    background: #ffffff;
+    border-color: #dedede;
+}
+
+[data-theme="light"] .schuelerinfos-detail-card span {
+    color: #666666;
+}
+
+[data-theme="light"] .schuelerinfos-detail-card strong {
+    color: #222222;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 700px) {
+
+    .schuelerinfos-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+
+        padding: 16px;
+    }
+
+    .schuelerinfos-toolbar input {
+        max-width: none;
+    }
+
+    .schuelerinfos-toolbar span {
+        text-align: right;
+    }
+
+    .schuelerinfos-table th,
+    .schuelerinfos-table td {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+
+    .schuelerinfos-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .schuelerinfos-detail-card {
+        padding: 16px;
+    }
+}

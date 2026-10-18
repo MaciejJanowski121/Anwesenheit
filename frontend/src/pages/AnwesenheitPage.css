@@ -1353,3 +1353,16 @@
         min-width: 160px;
     }
 }
+
+/* =====================================================
+   SORTIERUNG BESONDERHEITEN
+   ===================================================== */
+
+.anwesenheit-table th.besonderheiten-column.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.anwesenheit-table th.besonderheiten-column.sortable-header:hover {
+    background: rgba(128, 128, 128, 0.1);
+}

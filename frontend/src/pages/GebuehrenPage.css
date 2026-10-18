@@ -1,547 +1,294 @@
 .gebuehren-page {
-    display: flex;
     width: 100%;
     min-width: 0;
-    flex-direction: column;
-    gap: 22px;
-    margin: 0 auto;
-
+    box-sizing: border-box;
     color: var(--text-primary);
 }
 
-/* =====================================================
-   PAGE HEADER - CENTER
-   ===================================================== */
-
-.gebuehren-page .page-header {
-    justify-content: center;
-    text-align: center;
-}
-
-.gebuehren-page .page-header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.gebuehren-page .page-header-content h1,
-.gebuehren-page .page-header-content p {
-    text-align: center;
-}
-
-/* =====================================================
-   MESSAGE
-   ===================================================== */
-
-.gebuehren-message {
-    padding: 12px 14px;
-
-    border:
-            1px solid
-            rgba(90, 158, 62, 0.3);
-
-    border-radius: 8px;
-
-    background:
-            rgba(90, 158, 62, 0.1);
-
-    color: var(--success-text);
-
-    font-size: 14px;
-    font-weight: 500;
-}
-
-/* =====================================================
-   SECTIONS
-   ===================================================== */
+.gebuehren-page .page-header h1 { color: var(--text-heading); }
+.gebuehren-page .page-header p { color: var(--text-muted); }
 
 .gebuehren-section {
-    width: 100%;
     min-width: 0;
-
-    overflow: hidden;
-
+    margin-bottom: 20px;
     border: 1px solid var(--border-color);
     border-radius: 12px;
-
     background: var(--surface-primary);
+    overflow: hidden;
 }
 
 .gebuehren-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: 20px;
-
-    padding: 19px 22px;
-
+    gap: 14px;
+    padding: 18px 20px;
     border-bottom: 1px solid var(--border-color);
-
     background: var(--surface-secondary);
 }
 
 .gebuehren-section-header h2 {
     margin: 0 0 5px;
-
     color: var(--text-heading);
-
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 650;
 }
 
 .gebuehren-section-header p {
     margin: 0;
-
     color: var(--text-muted);
-
-    font-size: 14px;
+    font-size: 13px;
 }
 
-.gebuehren-booking-count {
-    flex-shrink: 0;
-
-    padding: 7px 11px;
-
-    border:
-            1px solid
-            rgba(232, 121, 43, 0.25);
-
-    border-radius: 999px;
-
-    background:
-            rgba(232, 121, 43, 0.1);
-
-    color: var(--accent);
-
-    font-size: 12px;
-    font-weight: 600;
-
-    white-space: nowrap;
-}
-
-/* =====================================================
-   STUDENT SELECT
-   ===================================================== */
-
-.gebuehren-student-selection {
-    padding: 22px;
-}
-
-.student-select {
-    box-sizing: border-box;
-
-    width: min(480px, 100%);
-
-    padding: 10px 12px;
-
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-
-    outline: none;
-
-    background: var(--input-background);
-    color: var(--input-text);
-
-    font-size: 0.9rem;
-
-    transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
-}
-
-.student-select:focus {
-    border-color: var(--accent);
-
-    box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
-}
-
-.student-select option {
-    background: var(--input-background);
-    color: var(--input-text);
-}
-
-/* =====================================================
-   FILTER ROW
-   ===================================================== */
-
-.gebuehren-filter-row {
+.gebuehren-controls {
     display: flex;
-    align-items: flex-end;
-
-    gap: 18px;
-
-    padding: 20px 22px;
-
-    border-bottom: 1px solid var(--border-color);
-
+    align-items: end;
     flex-wrap: wrap;
+    gap: 16px;
+    padding: 18px 20px;
 }
 
 .gebuehren-filter-field {
     display: flex;
-
-    min-width: 170px;
-
     flex-direction: column;
-
     gap: 6px;
+    min-width: 170px;
 }
 
 .gebuehren-filter-field label,
-.erfassung-status-content > span {
+.gebuehren-correction-box label {
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text-secondary);
+}
 
+.gebuehren-filter-field select,
+.gebuehren-toolbar input,
+.gebuehren-money-input input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-background);
+    color: var(--input-text);
+    font-size: 14px;
+    outline: none;
+}
+
+.gebuehren-filter-field select:focus,
+.gebuehren-toolbar input:focus,
+.gebuehren-money-input input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.gebuehren-toolbar input::placeholder { color: var(--input-placeholder); }
+
+.gebuehren-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.gebuehren-tabs button,
+.gebuehren-secondary-button,
+.gebuehren-back-button {
+    padding: 9px 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.gebuehren-tabs button.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232, 121, 43, 0.09);
+}
+
+.gebuehren-primary-button {
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.gebuehren-primary-button:hover:not(:disabled) { background: var(--accent-hover); }
+.gebuehren-secondary-button:hover:not(:disabled),
+.gebuehren-back-button:hover:not(:disabled) { border-color: var(--accent); color: var(--text-heading); }
+.gebuehren-page button:disabled { opacity: .5; cursor: not-allowed; }
+
+.gebuehren-alert {
+    padding: 12px 15px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.gebuehren-alert-error {
+    border: 1px solid var(--error-border);
+    background: var(--error-background);
+    color: var(--error-text);
+}
+
+.gebuehren-alert-success {
+    border: 1px solid rgba(34, 139, 85, .25);
+    background: rgba(34, 139, 85, .08);
+    color: var(--text-primary);
+}
+
+.gebuehren-count {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border: 1px solid rgba(232, 121, 43, .25);
+    border-radius: 999px;
+    background: rgba(232, 121, 43, .1);
+    color: var(--accent);
     font-size: 13px;
     font-weight: 600;
 }
 
-.gebuehren-filter-field select {
-    width: 100%;
-
-    padding: 10px 12px;
-
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-
-    outline: none;
-
-    background: var(--input-background);
-    color: var(--input-text);
-
-    font-size: 0.88rem;
-
-    transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
-}
-
-.gebuehren-filter-field select:focus {
-    border-color: var(--accent);
-
-    box-shadow:
-            0 0 0 3px
-            rgba(232, 121, 43, 0.12);
-}
-
-.gebuehren-filter-field select option {
-    background: var(--input-background);
-    color: var(--input-text);
-}
-
-/* =====================================================
-   STATUS
-   ===================================================== */
-
-.erfassung-status-box {
+.gebuehren-toolbar {
     display: flex;
-    align-items: flex-end;
-
-    gap: 12px;
-
-    margin-left: auto;
-
-    flex-wrap: wrap;
-}
-
-.erfassung-status-content {
-    display: flex;
-    flex-direction: column;
-
-    gap: 6px;
-}
-
-.status-erfasst,
-.status-nicht-erfasst {
-    display: inline-flex;
     align-items: center;
-
-    padding: 7px 11px;
-
-    border-radius: 999px;
-
-    font-size: 12px;
-    font-weight: 700;
-
-    white-space: nowrap;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px 20px;
 }
 
-.status-erfasst {
-    border:
-            1px solid
-            rgba(34, 197, 94, 0.3);
+.gebuehren-toolbar input { max-width: 360px; }
 
-    background:
-            rgba(34, 197, 94, 0.14);
-
-    color: #39975a;
-}
-
-.status-nicht-erfasst {
-    border:
-            1px solid
-            rgba(232, 121, 43, 0.3);
-
-    background:
-            rgba(232, 121, 43, 0.13);
-
-    color: #d86413;
-}
-
-/* bessere Statusfarben im Dark Mode */
-
-[data-theme="dark"] .status-erfasst {
-    color: #86e7a7;
-}
-
-[data-theme="dark"] .status-nicht-erfasst {
-    color: #f29a5b;
-}
-
-.gebuehren-erfasst-button {
-    padding: 10px 14px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: var(--accent);
-    color: #ffffff;
-
-    font-size: 0.84rem;
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-            background-color 0.15s ease;
-}
-
-.gebuehren-erfasst-button:hover {
-    background: var(--accent-hover);
-}
-
-/* =====================================================
-   TABLE SCROLL
-   ===================================================== */
-
-.gebuehren-table-scroll {
-    width: 100%;
-    max-width: 100%;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    padding-bottom: 8px;
-
-    scrollbar-width: thin;
-    scrollbar-color:
-            var(--scrollbar-thumb)
-            var(--scrollbar-track);
-
-    -webkit-overflow-scrolling: touch;
-}
-
-.gebuehren-table-scroll::-webkit-scrollbar {
-    height: 10px;
-}
-
-.gebuehren-table-scroll::-webkit-scrollbar-track {
-    background: var(--scrollbar-track);
-}
-
-.gebuehren-table-scroll::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-
-    background: var(--scrollbar-thumb);
-}
-
-.gebuehren-table-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
-}
-
-/* =====================================================
-   TABLE
-   ===================================================== */
+.gebuehren-table-scroll { width: 100%; overflow-x: auto; }
 
 .gebuehren-table {
     width: 100%;
-
-    min-width: 1000px;
-
+    min-width: 860px;
     border-collapse: collapse;
+    font-size: 13px;
+}
 
-    background: var(--surface-primary);
+.gebuehren-table th,
+.gebuehren-table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
 .gebuehren-table th {
-    padding: 12px 14px;
-
-    border-bottom: 2px solid var(--border-strong);
-
-    background: var(--table-header-background);
-    color: var(--table-header-text);
-
-    font-size: 0.77rem;
-    font-weight: 700;
-
-    text-align: left;
-
-    white-space: nowrap;
-}
-
-.gebuehren-table td {
-    padding: 11px 14px;
-
-    border-bottom: 1px solid var(--table-row-border);
-
+    background: var(--surface-secondary);
     color: var(--text-secondary);
-
-    font-size: 0.88rem;
-
-    vertical-align: middle;
-
-    white-space: nowrap;
+    font-weight: 650;
 }
 
-.gebuehren-table tbody tr {
-    transition:
-            background-color 0.15s ease;
+.gebuehren-table td { color: var(--text-primary); }
+.gebuehren-table tbody tr:hover { background: var(--surface-secondary); }
+.gebuehren-money-strong { font-weight: 700; }
+.gebuehren-tarif-table { min-width: 480px; }
+
+.gebuehren-money-input {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 210px;
 }
 
-.gebuehren-table tbody tr:hover {
-    background: rgba(232, 121, 43, 0.05);
+.gebuehren-money-input span { color: var(--text-secondary); font-weight: 600; }
+
+.gebuehren-hint {
+    padding: 0 20px 16px;
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
-.gebuehren-table tbody tr:last-child td {
-    border-bottom: none;
+.gebuehren-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
 }
 
-/* =====================================================
-   SUMMARY
-   ===================================================== */
+.gebuehren-back-button {
+    padding: 0;
+    border: 0;
+    margin-bottom: 12px;
+    background: transparent;
+    color: var(--accent);
+}
+
+.gebuehren-detail-top {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.gebuehren-status-box,
+.gebuehren-correction-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 17px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--surface-secondary);
+}
+
+.gebuehren-status-box > div { display: flex; align-items: center; gap: 12px; }
+.gebuehren-status-box span { color: var(--text-muted); font-size: 13px; }
+.gebuehren-status-ok { color: #16834a; }
+.gebuehren-status-open { color: var(--accent); }
+.gebuehren-correction-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.gebuehren-correction-box small { color: var(--text-muted); font-size: 12px; }
 
 .gebuehren-summary {
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(190px, 1fr)
-        );
-
-    gap: 14px;
-
-    padding: 22px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 20px;
 }
 
 .gebuehren-summary-card {
     display: flex;
-
-    min-height: 82px;
-
     flex-direction: column;
-
-    justify-content: space-between;
-
-    gap: 8px;
-
+    gap: 9px;
     padding: 16px;
-
     border: 1px solid var(--border-color);
-    border-radius: 10px;
-
+    border-radius: 9px;
     background: var(--surface-secondary);
 }
 
-.gebuehren-summary-card span {
-    color: var(--text-muted);
-
-    font-size: 13px;
-}
-
-.gebuehren-summary-card strong {
-    color: var(--text-heading);
-
-    font-size: 1.3rem;
-}
-
-/* Gesamtbetrag */
-
+.gebuehren-summary-card span { color: var(--text-muted); font-size: 12px; }
+.gebuehren-summary-card strong { color: var(--text-heading); font-size: 19px; }
 .gebuehren-summary-total {
-    border-color:
-            rgba(232, 121, 43, 0.45);
-
-    background:
-            linear-gradient(
-                    145deg,
-                    rgba(232, 121, 43, 0.16),
-                    rgba(232, 121, 43, 0.04)
-            ),
-            var(--surface-secondary);
+    border-color: rgba(232, 121, 43, .35);
+    background: rgba(232, 121, 43, .08);
 }
+.gebuehren-summary-total strong { color: var(--accent); }
 
-.gebuehren-summary-total span {
-    color: var(--accent);
-}
-
-.gebuehren-summary-total strong {
-    color: var(--text-heading);
-}
-
-/* =====================================================
-   EMPTY
-   ===================================================== */
-
-.gebuehren-empty {
-    padding: 40px 22px;
-
-    color: var(--text-muted);
-
-    text-align: center;
-}
-
-/* =====================================================
-   RESPONSIVE
-   ===================================================== */
-
-@media (max-width: 900px) {
-
-    .gebuehren-filter-row {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .gebuehren-filter-field {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .erfassung-status-box {
-        align-items: stretch;
-        flex-direction: column;
-
-        margin-left: 0;
-    }
-
-    .gebuehren-erfasst-button {
-        width: 100%;
-    }
+@media (max-width: 1000px) {
+    .gebuehren-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 760px) {
-
-    .gebuehren-section-header {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .gebuehren-booking-count {
-        align-self: flex-start;
-    }
-
-    .student-select {
-        width: 100%;
-    }
+    .gebuehren-section-header { align-items: flex-start; flex-direction: column; }
+    .gebuehren-controls { align-items: stretch; flex-direction: column; }
+    .gebuehren-tabs { margin-left: 0; }
+    .gebuehren-tabs button { flex: 1; }
+    .gebuehren-toolbar { align-items: stretch; flex-direction: column; }
+    .gebuehren-toolbar input { max-width: none; }
+    .gebuehren-detail-top { grid-template-columns: 1fr; }
+    .gebuehren-summary { grid-template-columns: 1fr; }
 }

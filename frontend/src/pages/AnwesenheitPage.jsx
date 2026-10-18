@@ -1160,6 +1160,27 @@ function AnwesenheitPage() {
 
                             break;
 
+                        /* =====================================
+                           NEU: BESONDERHEITEN SORTIEREN
+
+                           Alphabetisch und numerisch.
+                           Beispiel: 2 vor 10.
+                           ===================================== */
+
+                        case 'besonderheiten':
+
+                            valueA =
+                                String(
+                                    a.besonderheiten ?? ''
+                                ).trim();
+
+                            valueB =
+                                String(
+                                    b.besonderheiten ?? ''
+                                ).trim();
+
+                            break;
+
                         case 'name':
                         default:
 
@@ -1185,11 +1206,21 @@ function AnwesenheitPage() {
 
                     } else {
 
+                        /*
+                         * Numerische Sortierung aktivieren.
+                         *
+                         * "2" wird vor "10" sortiert.
+                         * Groß-/Kleinschreibung wird ignoriert.
+                         */
                         comparison =
                             String(valueA)
                                 .localeCompare(
                                     String(valueB),
-                                    'de'
+                                    'de',
+                                    {
+                                        numeric: true,
+                                        sensitivity: 'base'
+                                    }
                                 );
                     }
 
@@ -2304,8 +2335,30 @@ function AnwesenheitPage() {
 
                                         )}
 
-                                        <th className="besonderheiten-column">
+                                        {/* =====================================
+                                            NEU: SORTIERBARE BESONDERHEITEN
+                                           ===================================== */}
+
+                                        <th
+                                            className="besonderheiten-column sortable-header"
+                                            onClick={() =>
+                                                handleStudentSort(
+                                                    'besonderheiten'
+                                                )
+                                            }
+                                            title="Nach Besonderheiten sortieren"
+                                            aria-sort={
+                                                studentSort.key === 'besonderheiten'
+                                                    ? studentSort.direction === 'asc'
+                                                        ? 'ascending'
+                                                        : 'descending'
+                                                    : 'none'
+                                            }
+                                        >
                                             Besonderheiten
+                                            {getSortSymbol(
+                                                'besonderheiten'
+                                            )}
                                         </th>
 
                                         <th className="status-column">
