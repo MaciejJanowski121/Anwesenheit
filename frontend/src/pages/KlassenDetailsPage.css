@@ -1,0 +1,564 @@
+.klassen-details-page {
+    width: 100%;
+    min-width: 0;
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.klassen-details-page .page-header {
+    position: relative;
+    justify-content: center;
+    text-align: center;
+}
+
+.klassen-details-page .page-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.klassen-details-page .page-header-content h1,
+.klassen-details-page .page-header-content p {
+    text-align: center;
+}
+
+.klassen-details-count {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+
+    padding: 7px 12px;
+
+    border: 1px solid rgba(232, 121, 43, 0.25);
+    border-radius: 999px;
+
+    background: rgba(232, 121, 43, 0.1);
+    color: var(--accent);
+
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* =====================================================
+   MELDUNGEN
+   ===================================================== */
+
+.klassen-details-error-box,
+.klassen-details-success-box {
+    margin-bottom: 18px;
+    padding: 11px 14px;
+
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.klassen-details-error-box {
+    border: 1px solid var(--error-border);
+    background: var(--error-background);
+    color: var(--error-text);
+}
+
+.klassen-details-success-box {
+    border: 1px solid rgba(90, 158, 62, 0.3);
+    background: rgba(90, 158, 62, 0.1);
+    color: var(--success-text);
+}
+
+/* =====================================================
+   INFORMATIONEN
+   ===================================================== */
+
+.klassen-details-info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.klassen-details-info > div {
+    padding: 16px 18px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-details-info span {
+    display: block;
+    margin-bottom: 7px;
+
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.klassen-details-info strong {
+    color: var(--text-heading);
+    font-size: 15px;
+}
+
+/* =====================================================
+   SCHÜLER HINZUFÜGEN
+   ===================================================== */
+
+.klassen-add-students-section {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-add-students-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    padding: 17px 22px;
+
+    border: none;
+
+    background: var(--surface-secondary);
+    color: var(--text-heading);
+
+    font-size: 16px;
+    font-weight: 650;
+
+    cursor: pointer;
+    text-align: left;
+}
+
+.klassen-add-students-toggle:hover {
+    background: var(--surface-hover);
+}
+
+.klassen-add-students-toggle span:last-child {
+    color: var(--accent);
+    font-size: 22px;
+}
+
+.klassen-add-students-content {
+    border-top: 1px solid var(--border-color);
+}
+
+.klassen-add-students-filter {
+    display: grid;
+    grid-template-columns:
+        minmax(250px, 1fr)
+        minmax(180px, 280px);
+
+    gap: 14px;
+    padding: 18px 22px;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.klassen-add-students-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 6px;
+}
+
+.klassen-add-students-field label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.klassen-add-students-field input,
+.klassen-add-students-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-height: 40px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-size: 0.88rem;
+}
+
+.klassen-add-students-field input:focus,
+.klassen-add-students-field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.klassen-add-students-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+    padding: 12px 22px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.klassen-add-students-list-header label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-add-students-list-header span {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.klassen-add-students-section input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.klassen-add-students-list {
+    max-height: 380px;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
+}
+
+.klassen-add-student-row {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 11px 22px;
+
+    border-bottom: 1px solid var(--table-row-border);
+
+    cursor: pointer;
+}
+
+.klassen-add-student-row:hover {
+    background: rgba(232, 121, 43, 0.06);
+}
+
+.klassen-add-student-name {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.klassen-add-student-name strong {
+    color: var(--text-heading);
+    font-size: 13px;
+}
+
+.klassen-add-student-name span {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.klassen-add-students-empty {
+    padding: 28px 22px;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 13px;
+}
+
+.klassen-add-students-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+    padding: 16px 22px;
+
+    border-top: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.klassen-add-students-actions > span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.klassen-add-students-button {
+    min-height: 40px;
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: var(--accent);
+    color: #ffffff;
+
+    font-size: 0.86rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-add-students-button:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.klassen-add-students-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   SCHÜLERTABELLE
+   ===================================================== */
+
+.klassen-details-content {
+    width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-details-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+    padding: 16px 18px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.klassen-details-toolbar input {
+    box-sizing: border-box;
+
+    width: min(460px, 100%);
+    padding: 10px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+}
+
+.klassen-details-toolbar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.klassen-details-toolbar span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.klassen-details-table-scroll {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 8px;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
+}
+
+.klassen-details-table {
+    width: 100%;
+    min-width: 1800px;
+
+    border-collapse: collapse;
+
+    background: var(--surface-primary);
+}
+
+.klassen-details-table th,
+.klassen-details-table td {
+    padding: 11px 13px;
+
+    border-bottom: 1px solid var(--table-row-border);
+
+    text-align: left;
+    white-space: nowrap;
+}
+
+.klassen-details-table th {
+    background: var(--table-header-background);
+    color: var(--table-header-text);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.klassen-details-table th:hover {
+    background: var(--surface-hover);
+}
+
+.klassen-details-table th.klassen-not-sortable {
+    cursor: default;
+}
+
+.klassen-details-table td {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.klassen-details-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.klassen-details-table tbody tr:hover {
+    background: rgba(232, 121, 43, 0.07);
+}
+
+.klassen-details-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.klassen-remove-cell {
+    text-align: center !important;
+}
+
+.klassen-remove-button {
+    padding: 7px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #d94a4a;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-remove-button:hover:not(:disabled) {
+    background: #bd3535;
+}
+
+.klassen-remove-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.klassen-details-empty {
+    padding: 35px !important;
+    color: var(--text-muted) !important;
+    text-align: center !important;
+}
+
+.klassen-details-message {
+    padding: 30px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.klassen-details-error {
+    color: var(--error-text);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+    .klassen-details-info {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .klassen-add-students-filter {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .klassen-details-info {
+        grid-template-columns: 1fr;
+    }
+
+    .klassen-details-page .page-header {
+        flex-direction: column;
+    }
+
+    .klassen-details-count {
+        position: static;
+        transform: none;
+        margin-top: 12px;
+    }
+
+    .klassen-add-students-filter,
+    .klassen-add-students-actions {
+        padding: 16px 18px;
+    }
+
+    .klassen-add-students-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .klassen-add-students-button {
+        width: 100%;
+    }
+
+    .klassen-details-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .klassen-details-toolbar input {
+        width: 100%;
+    }
+}

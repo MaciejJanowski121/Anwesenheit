@@ -149,6 +149,26 @@ public class SecurityConfig {
 
 
                                 /* =========================
+                                   KLASSEN LESEN
+
+                                   ADMIN + ANWENDER
+
+                                   Nur GET erlaubt.
+                                   Änderungen nur durch ADMIN.
+                                   ========================= */
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/klassen",
+                                        "/api/klassen/**"
+                                )
+                                .hasAnyRole(
+                                        "ADMIN",
+                                        "ANWENDER"
+                                )
+
+
+                                /* =========================
                                    RESTLICHE API
 
                                    Nur ADMIN.

@@ -28,12 +28,6 @@ public class Student {
 
     /*
      * Eindeutige fachliche ID aus der Importdatei.
-     *
-     * Diese ID kommt von Matthias bzw. aus dem
-     * Verwaltungssystem und bleibt unabhängig von
-     * unserer internen Datenbank-ID bestehen.
-     *
-     * Sie wird später z. B. für Exporte verwendet.
      */
     @Column(name = "id_kind", unique = true)
     private Long idKind;
@@ -44,7 +38,26 @@ public class Student {
 
     private Integer jahrgang;
 
+    /*
+     * Bisherige Klassenbezeichnung.
+     *
+     * Bleibt während der Migration bestehen,
+     * damit bestehende Funktionen weiterhin
+     * funktionieren.
+     */
     private String klasse;
+
+    /*
+     * Neue relationale Zuordnung zur Klasse.
+     *
+     * Wird zunächst zusätzlich gespeichert.
+     * Die Migration der bestehenden Schüler
+     * erfolgt separat über SQL.
+     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "klasse_id")
+    private Klasse klasseEntity;
 
     private String fotoFreigabe;
 

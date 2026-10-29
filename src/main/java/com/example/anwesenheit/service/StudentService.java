@@ -2,7 +2,9 @@ package com.example.anwesenheit.service;
 
 import com.example.anwesenheit.model.Student;
 import com.example.anwesenheit.repository.StudentRepository;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,19 +12,27 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final KlasseService klasseService;
+
+    /* =====================================================
+       KONSTRUKTOR
+       ===================================================== */
 
     public StudentService(
-            StudentRepository studentRepository
+            StudentRepository studentRepository,
+            KlasseService klasseService
     ) {
-        this.studentRepository =
-                studentRepository;
+        this.studentRepository = studentRepository;
+        this.klasseService = klasseService;
     }
 
     /* =====================================================
        ALLE SCHÜLER
        ===================================================== */
 
+    @Transactional(readOnly = true)
     public List<Student> getAllStudents() {
+
         return studentRepository.findAll();
     }
 
@@ -30,16 +40,17 @@ public class StudentService {
        SCHÜLER NACH ID
        ===================================================== */
 
+    @Transactional(readOnly = true)
     public Student getStudentById(
             Long id
     ) {
+
         return studentRepository
                 .findById(id)
                 .orElseThrow(
-                        () ->
-                                new RuntimeException(
-                                        "Student not found"
-                                )
+                        () -> new RuntimeException(
+                                "Student not found"
+                        )
                 );
     }
 
@@ -47,9 +58,28 @@ public class StudentService {
        SCHÜLER ERSTELLEN
        ===================================================== */
 
+    @Transactional
     public Student createStudent(
             Student student
     ) {
+
+        /*
+         * Klasse automatisch zuordnen.
+         *
+         * KlasseService aktualisiert:
+         *
+         * - student.klasse
+         * - student.klasseEntity
+         *
+         * Falls die Klasse noch nicht existiert,
+         * wird sie automatisch erstellt.
+         */
+
+        klasseService.assignKlasse(
+                student,
+                student.getKlasse()
+        );
+
         return studentRepository.save(
                 student
         );
@@ -59,29 +89,30 @@ public class StudentService {
        SCHÜLER AKTUALISIEREN
        ===================================================== */
 
+    @Transactional
     public Student updateStudent(
             Long id,
             Student updatedStudent
     ) {
-        Student student =
-                studentRepository
-                        .findById(id)
-                        .orElseThrow(
-                                () ->
-                                        new RuntimeException(
-                                                "Student not found"
-                                        )
-                        );
+
+        Student student = studentRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Student not found"
+                        )
+                );
 
         /*
-         * ID_Kind wird hier absichtlich NICHT geändert.
+         * ID_Kind wird absichtlich NICHT geändert.
          *
-         * Die ID_Kind wird beim Excel-Import gesetzt
-         * und dient als dauerhafte fachliche ID des Kindes.
-         *
-         * Eine normale Bearbeitung über die Anwendung
-         * soll diese ID weder ändern noch löschen können.
+         * Diese ID stammt aus dem Excel-Import
+         * und bleibt dauerhaft erhalten.
          */
+
+        /* =================================================
+           ALLGEMEINE INFORMATIONEN
+           ================================================= */
 
         student.setVorname(
                 updatedStudent.getVorname()
@@ -95,7 +126,20 @@ public class StudentService {
                 updatedStudent.getJahrgang()
         );
 
-        student.setKlasse(
+        /*
+         * Klasse aktualisieren.
+         *
+         * Die neue Klasse wird über KlasseService
+         * gesucht oder bei Bedarf erstellt.
+         *
+         * Beide Felder bleiben synchron:
+         *
+         * - klasse (String)
+         * - klasseEntity (ManyToOne)
+         */
+
+        klasseService.assignKlasse(
+                student,
                 updatedStudent.getKlasse()
         );
 
@@ -139,9 +183,21 @@ public class StudentService {
            15:30
            ================================================= */
 
+        /*
+         * Bestehende Funktion bleibt erhalten.
+         *
+         * Später können wir diese Information
+         * vollständig über Besonderheiten
+         * oder Anwesenheitszeiten verwalten.
+         */
+
         student.setGehtUm1530(
                 updatedStudent.getGehtUm1530()
         );
+
+        /* =================================================
+           SPEICHERN
+           ================================================= */
 
         return studentRepository.save(
                 student
@@ -152,9 +208,11 @@ public class StudentService {
        SCHÜLER LÖSCHEN
        ===================================================== */
 
+    @Transactional
     public void deleteStudent(
             Long id
     ) {
+
         studentRepository.deleteById(
                 id
         );

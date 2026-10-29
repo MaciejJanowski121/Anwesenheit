@@ -1,0 +1,581 @@
+.klassen-page {
+    width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.klassen-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 8px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: var(--accent);
+    color: #ffffff;
+
+    font-size: 0.88rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-add-button span {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.klassen-add-button:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.klassen-add-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   STATISTIK
+   ===================================================== */
+
+.klassen-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.klassen-stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 66px;
+    padding: 16px 18px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-stat-card span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.klassen-stat-card strong {
+    color: var(--text-heading);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* =====================================================
+   FEHLER
+   ===================================================== */
+
+.klassen-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+
+    border: 1px solid var(--error-border);
+    border-radius: 8px;
+
+    background: var(--error-background);
+    color: var(--error-text);
+
+    font-size: 14px;
+}
+
+/* =====================================================
+   FILTER
+   ===================================================== */
+
+.klassen-filter-section {
+    margin-bottom: 18px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 17px 20px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.klassen-filter-header h2 {
+    margin: 0 0 4px;
+    color: var(--text-heading);
+    font-size: 18px;
+}
+
+.klassen-filter-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.klassen-filter-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(220px, 1.4fr)
+        repeat(3, minmax(150px, 1fr));
+
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.klassen-filter-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 6px;
+}
+
+.klassen-filter-field label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.klassen-filter-field input {
+    box-sizing: border-box;
+
+    width: 100%;
+    padding: 9px 11px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-size: 0.86rem;
+}
+
+.klassen-filter-field input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.klassen-filter-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.klassen-reset-button {
+    flex-shrink: 0;
+
+    padding: 8px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-reset-button:hover {
+    border-color: var(--accent);
+    color: var(--text-heading);
+}
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.klassen-content {
+    width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.klassen-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+    padding: 16px 18px;
+
+    border-bottom: 1px solid var(--border-color);
+
+    background: var(--surface-secondary);
+}
+
+.klassen-result-count {
+    flex-shrink: 0;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: rgba(232, 121, 43, 0.12);
+    color: #e8792b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =====================================================
+   TABELLE
+   ===================================================== */
+
+.klassen-table-scroll {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 8px;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+            var(--scrollbar-thumb)
+            var(--scrollbar-track);
+}
+
+.klassen-table {
+    width: 100%;
+    min-width: 760px;
+
+    table-layout: fixed;
+    border-collapse: collapse;
+
+    background: var(--surface-primary);
+}
+
+.klassen-table th {
+    padding: 12px 15px;
+
+    border-bottom: 2px solid var(--border-strong);
+
+    background: var(--table-header-background);
+    color: var(--table-header-text);
+
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    text-align: left;
+    white-space: nowrap;
+}
+
+.klassen-table td {
+    padding: 12px 15px;
+
+    border-bottom: 1px solid var(--table-row-border);
+
+    color: var(--text-secondary);
+
+    font-size: 0.88rem;
+
+    vertical-align: middle;
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.klassen-table tbody tr {
+    height: 76px;
+    transition: background-color 0.15s ease;
+}
+
+.klassen-table tbody tr:hover {
+    background: rgba(232, 121, 43, 0.05);
+}
+
+.klassen-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.klassen-table th:nth-child(1),
+.klassen-table td:nth-child(1) {
+    width: 28%;
+}
+
+.klassen-table th:nth-child(2),
+.klassen-table td:nth-child(2) {
+    width: 27%;
+}
+
+.klassen-table th:nth-child(3),
+.klassen-table td:nth-child(3) {
+    width: 27%;
+}
+
+.klassen-actions-header {
+    width: 190px;
+    text-align: center !important;
+}
+
+.klassen-sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.klassen-sortable-header:hover {
+    background: var(--surface-hover);
+}
+
+.klasse-row-clickable {
+    cursor: pointer;
+}
+
+.klasse-row-editing {
+    background: var(--surface-editing);
+}
+
+/* =====================================================
+   KLASSENNAME
+   ===================================================== */
+
+.klasse-name {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+
+    gap: 12px;
+}
+
+.klasse-name-icon {
+    display: grid;
+
+    flex: 0 0 36px;
+
+    width: 36px;
+    height: 36px;
+
+    place-items: center;
+
+    border-radius: 9px;
+
+    background: rgba(232, 121, 43, 0.14);
+    color: #e8792b;
+
+    font-weight: 800;
+}
+
+.klasse-name-content {
+    min-width: 0;
+}
+
+.klasse-name strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: var(--text-heading);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =====================================================
+   EDIT INPUT
+   ===================================================== */
+
+.klasse-edit-input {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 8px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font: inherit;
+}
+
+.klasse-edit-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+/* =====================================================
+   AKTIONEN
+   ===================================================== */
+
+.klassen-action-cell {
+    width: 190px;
+
+    text-align: center;
+    white-space: nowrap;
+
+    overflow: visible !important;
+}
+
+.klassen-edit-button,
+.klassen-delete-button,
+.klassen-save-button,
+.klassen-cancel-button {
+    display: inline-block;
+
+    padding: 7px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.klassen-edit-button + .klassen-delete-button,
+.klassen-save-button + .klassen-cancel-button {
+    margin-left: 8px;
+}
+
+.klassen-edit-button {
+    background: #e8792b;
+}
+
+.klassen-edit-button:hover:not(:disabled) {
+    background: #cf6820;
+}
+
+.klassen-delete-button {
+    background: #d94a4a;
+}
+
+.klassen-delete-button:hover:not(:disabled) {
+    background: #bd3535;
+}
+
+.klassen-save-button {
+    background: #5a9e3e;
+}
+
+.klassen-save-button:hover:not(:disabled) {
+    background: #4a8a30;
+}
+
+.klassen-cancel-button {
+    background: #777777;
+}
+
+.klassen-cancel-button:hover:not(:disabled) {
+    background: #666666;
+}
+
+.klassen-edit-button:disabled,
+.klassen-delete-button:disabled,
+.klassen-save-button:disabled,
+.klassen-cancel-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   LEERE TABELLE
+   ===================================================== */
+
+.klassen-empty-row {
+    padding: 36px !important;
+
+    color: var(--text-muted) !important;
+
+    text-align: center !important;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .klassen-filter-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .klassen-filter-field-wide {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .klassen-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .klassen-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 760px) {
+
+    .klassen-add-button {
+        width: 100%;
+    }
+
+    .klassen-filter-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .klassen-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .klassen-filter-field-wide {
+        grid-column: auto;
+    }
+
+    .klassen-reset-button {
+        width: 100%;
+    }
+}

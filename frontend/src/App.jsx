@@ -22,6 +22,9 @@ import LoginPage from './pages/LoginPage';
 import SchuelerinfosPage from './pages/SchuelerinfosPage';
 import SchuelerinfoDetailsPage from './pages/SchuelerinfoDetailsPage';
 
+import KlassenPage from './pages/KlassenPage';
+import KlassenDetailsPage from './pages/KlassenDetailsPage';
+
 import KursinfosPage from './pages/KursinfosPage';
 import KursinfoDetailsPage from './pages/KursinfoDetailsPage';
 
@@ -33,6 +36,7 @@ import {
 } from './services/authService';
 
 import './App.css';
+
 
 function App() {
 
@@ -285,19 +289,47 @@ function App() {
                     />
 
                     <Route
+                        path="/kursinfos/:id"
+                        element={
+                            <KursinfoDetailsPage />
+                        }
+                    />
+
+                    <Route
                         path="/schuelerinfos"
-                        element={<SchuelerinfosPage />}
+                        element={
+                            <SchuelerinfosPage />
+                        }
                     />
 
                     <Route
                         path="/schuelerinfos/:id"
-                        element={<SchuelerinfoDetailsPage />}
+                        element={
+                            <SchuelerinfoDetailsPage />
+                        }
+                    />
+
+
+                    {/* =====================================
+                        KLASSEN
+                        ADMIN + ANWENDER
+                       ===================================== */}
+
+                    <Route
+                        path="/klassen"
+                        element={
+                            <KlassenPage
+                                isAdmin={isAdmin}
+                            />
+                        }
                     />
 
                     <Route
-                        path="/kursinfos/:id"
+                        path="/klassen/:id"
                         element={
-                            <KursinfoDetailsPage />
+                            <KlassenDetailsPage
+                                isAdmin={isAdmin}
+                            />
                         }
                     />
 

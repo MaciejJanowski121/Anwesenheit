@@ -212,10 +212,8 @@ function MainLayout({
                                 Gesamtübersicht
                             </NavLink>
 
-                            <NavLink
-                                to="/kurse"
-                            >
-                                Kurse
+                            <NavLink to="/kurse">
+                                ANA
                             </NavLink>
 
                         </>
@@ -233,10 +231,8 @@ function MainLayout({
                         Anwesenheit
                     </NavLink>
 
-                    <NavLink
-                        to="/kursinfos"
-                    >
-                        Kursinfos
+                    <NavLink to="/kursinfos">
+                        Infos ANA
                     </NavLink>
 
                     {/* NEU: Schülerinfos für beide Rollen */}
@@ -245,6 +241,10 @@ function MainLayout({
                         to="/schuelerinfos"
                     >
                         Schülerinfos
+                    </NavLink>
+
+                    <NavLink to="/klassen">
+                        Klassen
                     </NavLink>
 
 

@@ -23,17 +23,19 @@ public class ExcelImportService {
     private final StudentRepository studentRepository;
     private final KursRepository kursRepository;
     private final BuchungRepository buchungRepository;
+    private final KlasseService klasseService;
 
     public ExcelImportService(
             StudentRepository studentRepository,
             KursRepository kursRepository,
-            BuchungRepository buchungRepository
+            BuchungRepository buchungRepository,
+            KlasseService klasseService
     ) {
         this.studentRepository = studentRepository;
         this.kursRepository = kursRepository;
         this.buchungRepository = buchungRepository;
+        this.klasseService = klasseService;
     }
-
     /* =====================================================
        SCHÜLER IMPORT
        ===================================================== */
@@ -205,7 +207,8 @@ public class ExcelImportService {
                         jahrgang
                 );
 
-                student.setKlasse(
+                klasseService.assignKlasse(
+                        student,
                         klasse
                 );
 
