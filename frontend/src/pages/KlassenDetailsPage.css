@@ -507,6 +507,37 @@
     color: var(--error-text);
 }
 
+
+/* =====================================================
+ ZURÜCK-BUTTON
+ ===================================================== */
+
+.klassen-details-page .klassen-back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 14px 24px;
+    margin-bottom: 28px;
+
+    background: #ea7c26;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 12px;
+
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            transform 0.2s ease;
+}
+
 /* =====================================================
    RESPONSIVE
    ===================================================== */
@@ -560,5 +591,21 @@
 
     .klassen-details-toolbar input {
         width: 100%;
+    }
+
+
+
+    .klassen-details-page .klassen-back-button:hover {
+        background: #d86b19;
+        transform: translateY(-1px);
+    }
+
+    .klassen-details-page .klassen-back-button:active {
+        transform: translateY(0);
+    }
+
+    .klassen-details-page .klassen-back-button:focus-visible {
+        outline: 3px solid #f5a15f;
+        outline-offset: 3px;
     }
 }

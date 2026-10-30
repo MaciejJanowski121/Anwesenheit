@@ -1,0 +1,368 @@
+/* =====================================================
+   KLASSEN ANWESENHEITSZEITEN
+   LIGHT MODE (STANDARD)
+   ===================================================== */
+
+.klassen-zeiten-section {
+    --zeiten-bg: #ffffff;
+    --zeiten-text: #111827;
+    --zeiten-muted: #6b7280;
+    --zeiten-border: #e5e7eb;
+    --zeiten-header-bg: #f3f4f6;
+    --zeiten-input-bg: #ffffff;
+    --zeiten-input-border: #d1d5db;
+    --zeiten-hover: #f9fafb;
+
+    margin: 24px 0;
+    padding: 24px;
+
+    background: var(--zeiten-bg);
+    color: var(--zeiten-text);
+
+    border: 1px solid var(--zeiten-border);
+    border-radius: 12px;
+
+    transition:
+            background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease;
+}
+
+/* =====================================================
+   DARK MODE
+   ===================================================== */
+
+@media (prefers-color-scheme: dark) {
+
+    .klassen-zeiten-section {
+        --zeiten-bg: #242424;
+        --zeiten-text: #f5f5f5;
+        --zeiten-muted: #a3a3a3;
+        --zeiten-border: #404040;
+        --zeiten-header-bg: #2d2d2d;
+        --zeiten-input-bg: #303030;
+        --zeiten-input-border: #525252;
+        --zeiten-hover: #303030;
+    }
+}
+
+/* Unterstützung für manuell umgeschalteten Dark Mode */
+
+[data-theme="dark"] .klassen-zeiten-section,
+.dark .klassen-zeiten-section,
+body.dark-mode .klassen-zeiten-section {
+    --zeiten-bg: #242424;
+    --zeiten-text: #f5f5f5;
+    --zeiten-muted: #a3a3a3;
+    --zeiten-border: #404040;
+    --zeiten-header-bg: #2d2d2d;
+    --zeiten-input-bg: #303030;
+    --zeiten-input-border: #525252;
+    --zeiten-hover: #303030;
+}
+
+/* Unterstützung für manuell umgeschalteten Light Mode */
+
+[data-theme="light"] .klassen-zeiten-section,
+.light .klassen-zeiten-section,
+body.light-mode .klassen-zeiten-section {
+    --zeiten-bg: #ffffff;
+    --zeiten-text: #111827;
+    --zeiten-muted: #6b7280;
+    --zeiten-border: #e5e7eb;
+    --zeiten-header-bg: #f3f4f6;
+    --zeiten-input-bg: #ffffff;
+    --zeiten-input-border: #d1d5db;
+    --zeiten-hover: #f9fafb;
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.klassen-zeiten-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.klassen-zeiten-header h2 {
+    margin: 0 0 6px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: var(--zeiten-text);
+}
+
+.klassen-zeiten-header p {
+    margin: 0;
+
+    color: var(--zeiten-muted);
+    font-size: 14px;
+}
+
+/* =====================================================
+   JAHRGANG AUSWAHL
+   ===================================================== */
+
+.klassen-zeiten-jahrgang {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.klassen-zeiten-jahrgang label {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: var(--zeiten-text);
+}
+
+.klassen-zeiten-jahrgang select {
+    min-width: 160px;
+
+    padding: 10px 12px;
+
+    background: var(--zeiten-input-bg);
+    color: var(--zeiten-text);
+
+    border: 1px solid var(--zeiten-input-border);
+    border-radius: 8px;
+
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.klassen-zeiten-jahrgang select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 15%);
+}
+
+.klassen-zeiten-jahrgang select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   TABELLE
+   ===================================================== */
+
+.klassen-zeiten-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.klassen-zeiten-table {
+    width: 100%;
+    min-width: 650px;
+
+    border-collapse: collapse;
+
+    color: var(--zeiten-text);
+}
+
+.klassen-zeiten-table th,
+.klassen-zeiten-table td {
+    padding: 14px 12px;
+
+    border-bottom: 1px solid var(--zeiten-border);
+
+    text-align: center;
+    vertical-align: middle;
+
+    color: var(--zeiten-text);
+}
+
+/* Wochentage */
+
+.klassen-zeiten-table thead th {
+    background: var(--zeiten-header-bg);
+
+    color: var(--zeiten-text);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Beginn / Ende */
+
+.klassen-zeiten-table tbody th {
+    text-align: left;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: var(--zeiten-text);
+}
+
+/* Zeilen */
+
+.klassen-zeiten-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.klassen-zeiten-table tbody tr:hover {
+    background: var(--zeiten-hover);
+}
+
+/* =====================================================
+   UHRZEITEN
+   ===================================================== */
+
+.klassen-zeiten-table input[type="time"] {
+    width: 100%;
+    max-width: 135px;
+    min-height: 40px;
+
+    padding: 8px 10px;
+
+    background: var(--zeiten-input-bg);
+    color: var(--zeiten-text);
+
+    border: 1px solid var(--zeiten-input-border);
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-family: inherit;
+
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    .klassen-zeiten-section input[type="time"] {
+        color-scheme: dark;
+    }
+}
+
+[data-theme="dark"] .klassen-zeiten-section input[type="time"],
+.dark .klassen-zeiten-section input[type="time"],
+body.dark-mode .klassen-zeiten-section input[type="time"] {
+    color-scheme: dark;
+}
+
+[data-theme="light"] .klassen-zeiten-section input[type="time"],
+.light .klassen-zeiten-section input[type="time"],
+body.light-mode .klassen-zeiten-section input[type="time"] {
+    color-scheme: light;
+}
+
+.klassen-zeiten-table input[type="time"]:focus {
+    outline: none;
+
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 15%);
+}
+
+.klassen-zeiten-table input[type="time"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Zeiten im Lesemodus */
+
+.klassen-zeiten-table td span {
+    color: var(--zeiten-text);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* =====================================================
+   SPEICHERN
+   ===================================================== */
+
+.klassen-zeiten-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 20px;
+}
+
+.klassen-zeiten-actions button {
+    padding: 11px 22px;
+
+    background: #ea7c26;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.klassen-zeiten-actions button:hover:not(:disabled) {
+    background: #d86b19;
+}
+
+.klassen-zeiten-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   MELDUNGEN
+   ===================================================== */
+
+.klassen-zeiten-error,
+.klassen-zeiten-success {
+    padding: 12px 14px;
+    margin-bottom: 16px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+}
+
+.klassen-zeiten-error {
+    background: #7f1d1d;
+    color: #ffffff;
+}
+
+.klassen-zeiten-success {
+    background: #064e3b;
+    color: #d1fae5;
+}
+
+.klassen-zeiten-empty {
+    color: var(--zeiten-muted);
+    font-size: 14px;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    .klassen-zeiten-section {
+        padding: 16px;
+    }
+
+    .klassen-zeiten-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .klassen-zeiten-jahrgang {
+        width: 100%;
+    }
+
+    .klassen-zeiten-jahrgang select {
+        width: 100%;
+    }
+
+    .klassen-zeiten-table th,
+    .klassen-zeiten-table td {
+        padding: 10px 8px;
+    }
+}

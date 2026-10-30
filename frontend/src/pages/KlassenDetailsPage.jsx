@@ -9,6 +9,9 @@ import {
     useParams
 } from 'react-router-dom';
 
+import KlassenAnwesenheitszeiten
+    from '../components/KlassenAnwesenheitszeiten';
+
 import {
     getKlasse,
     getKlassenSchueler,
@@ -624,9 +627,10 @@ function KlassenDetailsPage({ isAdmin = false }) {
 
             <button
                 type="button"
-                className="back-button"
+                className="klassen-back-button"
                 onClick={() => navigate('/klassen')}
             >
+                <span aria-hidden="true">←</span>
                 Zurück zu den Klassen
             </button>
 
@@ -704,6 +708,15 @@ function KlassenDetailsPage({ isAdmin = false }) {
                 </div>
 
             </section>
+
+            {/* =====================================================
+                ANWESENHEITSZEITEN
+                ===================================================== */}
+
+            <KlassenAnwesenheitszeiten
+                klasseId={id}
+                isAdmin={isAdmin}
+            />
 
             {/* SCHÜLER HINZUFÜGEN */}
 
