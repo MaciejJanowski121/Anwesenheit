@@ -1,0 +1,507 @@
+@import './KursePage.css';
+
+/* =====================================================
+   ANGEBOTE – GRUNDLAYOUT
+   ===================================================== */
+
+.angebote-page {
+    width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+/* =====================================================
+   HEADER BUTTON
+   ===================================================== */
+
+.angebote-add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.angebote-add-button span {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.angebote-add-button:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.angebote-add-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   STATISTIK
+   ===================================================== */
+
+.angebote-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.angebote-stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 66px;
+    padding: 16px 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--surface-primary);
+}
+
+.angebote-stat-card span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.angebote-stat-card strong {
+    color: var(--text-heading);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* =====================================================
+   ERROR
+   ===================================================== */
+
+.angebote-error {
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid var(--error-border);
+    border-radius: 8px;
+    background: var(--error-background);
+    color: var(--error-text);
+    font-size: 14px;
+}
+
+/* =====================================================
+   FILTER
+   ===================================================== */
+
+.angebote-filter-section {
+    margin-bottom: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--surface-primary);
+}
+
+.angebote-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--surface-secondary);
+}
+
+.angebote-filter-header h2 {
+    margin: 0 0 4px;
+    color: var(--text-heading);
+    font-size: 18px;
+}
+
+.angebote-filter-header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.angebote-filter-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.angebote-filter-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.angebote-filter-field label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.angebote-filter-field input,
+.angebote-filter-field select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    outline: none;
+    background: var(--input-background);
+    color: var(--input-text);
+    font-size: 0.86rem;
+}
+
+.angebote-filter-field input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.angebote-filter-field input:focus,
+.angebote-filter-field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+.angebote-reset-button {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.angebote-reset-button:hover {
+    border-color: var(--accent);
+    color: var(--text-heading);
+}
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.angebote-content {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--surface-primary);
+}
+
+.angebote-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--surface-secondary);
+}
+
+.angebote-result-count {
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(232, 121, 43, 0.12);
+    color: #e8792b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.angebote-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.angebote-table {
+    width: 100%;
+    min-width: 1120px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background: var(--surface-primary);
+}
+
+.angebote-table th:nth-child(1),
+.angebote-table td:nth-child(1) {
+    width: 25%;
+}
+
+.angebote-table th:nth-child(2),
+.angebote-table td:nth-child(2) {
+    width: 15%;
+}
+
+.angebote-table th:nth-child(3),
+.angebote-table td:nth-child(3) {
+    width: 17%;
+}
+
+.angebote-table th:nth-child(4),
+.angebote-table td:nth-child(4) {
+    width: 12%;
+}
+
+.angebote-table th:nth-child(5),
+.angebote-table td:nth-child(5) {
+    width: 8%;
+}
+
+.angebote-table th:nth-child(6),
+.angebote-table td:nth-child(6) {
+    width: 8%;
+}
+
+.angebote-table th:nth-child(7),
+.angebote-table td:nth-child(7) {
+    width: 190px;
+}
+
+.angebote-table th {
+    padding: 12px 15px;
+    border-bottom: 2px solid var(--border-strong);
+    background: var(--table-header-background);
+    color: var(--table-header-text);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.angebote-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--table-row-border);
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.angebote-table tbody tr {
+    height: 76px;
+}
+
+.angebote-table tbody tr:hover {
+    background: rgba(232, 121, 43, 0.05);
+}
+
+.angebote-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.angebot-row-clickable {
+    cursor: pointer;
+}
+
+.angebot-row-editing {
+    background: var(--surface-editing);
+}
+
+/* =====================================================
+   ANGEBOTSNAME
+   ===================================================== */
+
+.angebot-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.angebot-name-icon {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(232, 121, 43, 0.14);
+    color: #e8792b;
+    font-weight: 800;
+}
+
+.angebot-name-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.angebot-name strong {
+    display: block;
+    overflow: hidden;
+    color: var(--text-heading);
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+}
+
+.angebot-name small {
+    display: block;
+    margin-top: 4px;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+}
+
+.angebot-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    border-radius: 999px;
+    background: rgba(20, 184, 166, 0.14);
+    color: #268e84;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .angebot-badge {
+    color: #72d8cf;
+}
+
+/* =====================================================
+   EDIT INPUTS
+   ===================================================== */
+
+.angebot-edit-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    outline: none;
+    background: var(--input-background);
+    color: var(--input-text);
+    font: inherit;
+}
+
+.angebot-edit-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(232, 121, 43, 0.12);
+}
+
+/* =====================================================
+   ACTIONS
+   ===================================================== */
+
+.angebote-actions-header {
+    text-align: center !important;
+}
+
+.angebote-action-cell {
+    min-width: 190px;
+    overflow: visible !important;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.angebote-edit-button,
+.angebote-delete-button,
+.angebote-save-button,
+.angebote-cancel-button {
+    display: inline-block;
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.angebote-edit-button + .angebote-delete-button,
+.angebote-save-button + .angebote-cancel-button {
+    margin-left: 8px;
+}
+
+.angebote-edit-button {
+    background: #e8792b;
+}
+
+.angebote-delete-button {
+    background: #d94a4a;
+}
+
+.angebote-save-button {
+    background: #5a9e3e;
+}
+
+.angebote-cancel-button {
+    background: #777;
+}
+
+.angebote-edit-button:disabled,
+.angebote-delete-button:disabled,
+.angebote-save-button:disabled,
+.angebote-cancel-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.angebote-sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.angebote-sortable-header:hover {
+    background: var(--surface-hover);
+}
+
+.angebote-empty-row {
+    padding: 36px !important;
+    color: var(--text-muted) !important;
+    text-align: center !important;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+    .angebote-table {
+        min-width: 1120px;
+    }
+}
+
+@media (max-width: 900px) {
+    .angebote-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .angebote-filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .angebote-add-button {
+        width: 100%;
+    }
+
+    .angebote-filter-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .angebote-reset-button {
+        width: 100%;
+    }
+}

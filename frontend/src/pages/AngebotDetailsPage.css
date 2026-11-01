@@ -1,0 +1,254 @@
+/* =====================================================
+   ANGEBOT DETAILS
+   ===================================================== */
+
+.angebot-details-page {
+    width: 100%;
+    min-width: 0;
+}
+
+/* =====================================================
+   ANGEBOTSINFORMATIONEN
+   ===================================================== */
+
+.angebot-info {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* =====================================================
+   STATISTIK
+   ===================================================== */
+
+.angebot-statistik {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+.angebot-statistik > div {
+    padding: 18px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: var(--surface-primary);
+
+    text-align: center;
+}
+
+.angebot-statistik span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.angebot-statistik strong {
+    color: var(--accent);
+
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* =====================================================
+   MESSAGES
+   ===================================================== */
+
+.angebot-message {
+    margin: 0 0 20px;
+}
+
+/* =====================================================
+   ANWESENHEIT DATUM
+   ===================================================== */
+
+.angebot-datum-section {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 22px;
+
+    padding: 18px 22px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+}
+
+.angebot-datum-section h2 {
+    margin: 0 0 6px;
+
+    color: var(--text-heading);
+
+    font-size: 18px;
+}
+
+.angebot-datum-section p {
+    margin: 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.angebot-datum-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    min-width: 190px;
+}
+
+.angebot-datum-field label {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.angebot-datum-field input {
+    min-height: 40px;
+
+    box-sizing: border-box;
+
+    padding: 9px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    color-scheme: normal;
+}
+
+[data-theme='dark'] .angebot-datum-field input {
+    color-scheme: dark;
+}
+
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+.angebot-status-select {
+    min-width: 145px;
+
+    padding: 8px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.angebot-status-select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* =====================================================
+   REMOVE BUTTON
+   ===================================================== */
+
+.angebot-remove-button {
+    padding: 8px 12px;
+
+    border: 1px solid var(--error-border);
+    border-radius: 7px;
+
+    background: var(--error-background);
+    color: var(--error-text);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.angebot-remove-button:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+.angebot-remove-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .angebot-info {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+
+    .angebot-info {
+        grid-template-columns: 1fr;
+    }
+
+    .angebot-statistik {
+        grid-template-columns: 1fr;
+    }
+
+    .angebot-datum-section {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .angebot-datum-field {
+        width: 100%;
+    }
+}
+
+.angebot-back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 14px 24px;
+    margin-bottom: 24px;
+
+    background: #f58220;
+    color: #ffffff;
+
+    border: none;
+    border-radius: 13px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.angebot-back-button:hover {
+    background: #e87313;
+}
+
+.angebot-back-button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}

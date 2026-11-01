@@ -35,14 +35,6 @@ const NAVIGATION = [
             {
                 label: 'Gesamtübersicht',
                 path: '/gesamtuebersicht'
-            },
-            {
-                label: 'Zuschüsse',
-                path: '/zuschuesse'
-            },
-            {
-                label: 'Gebühren',
-                path: '/gebuehren'
             }
         ]
     },
@@ -67,9 +59,18 @@ const NAVIGATION = [
     },
     {
         id: 'betreuung',
-        label: 'ANA & Betreuung',
+        label: 'Angebote & ANA',
         icon: '▦',
         items: [
+            {
+                label: 'Angebote',
+                path: '/angebote',
+                adminOnly: true
+            },
+            {
+                label: 'Infos Angebote',
+                path: '/angebotinfos'
+            },
             {
                 label: 'ANA',
                 path: '/kurse',
@@ -78,6 +79,22 @@ const NAVIGATION = [
             {
                 label: 'Infos ANA',
                 path: '/kursinfos'
+            }
+        ]
+    },
+    {
+        id: 'finanzen',
+        label: 'Finanzen',
+        icon: '€',
+        adminOnly: true,
+        items: [
+            {
+                label: 'Zuschüsse',
+                path: '/zuschuesse'
+            },
+            {
+                label: 'Gebühren',
+                path: '/gebuehren'
             }
         ]
     },
@@ -113,6 +130,10 @@ function isPathActive(currentPath, targetPath) {
         currentPath.startsWith(`${targetPath}/`)
     );
 }
+
+/* =====================================================
+   MAIN LAYOUT
+   ===================================================== */
 
 function MainLayout({ user, onLogout }) {
 
@@ -154,7 +175,12 @@ function MainLayout({ user, onLogout }) {
        ===================================================== */
 
     const [openMenu, setOpenMenu] = useState(null);
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    /* =====================================================
+       SICHTBARE NAVIGATION
+       ===================================================== */
 
     const visibleNavigation = NAVIGATION
         .filter(group => !group.adminOnly || isAdmin)
@@ -165,11 +191,12 @@ function MainLayout({ user, onLogout }) {
             )
         }))
         .filter(group =>
-            group.path || (group.items && group.items.length > 0)
+            group.path ||
+            (group.items && group.items.length > 0)
         );
 
     /* =====================================================
-       MENÜ SCHLIESSEN
+       MENÜ BEI SEITENWECHSEL SCHLIESSEN
        ===================================================== */
 
     useEffect(() => {
@@ -177,7 +204,12 @@ function MainLayout({ user, onLogout }) {
         setMobileMenuOpen(false);
     }, [location.pathname]);
 
+    /* =====================================================
+       MENÜ BEI KLICK AUSSERHALB / ESC SCHLIESSEN
+       ===================================================== */
+
     useEffect(() => {
+
         const handleOutsideClick = event => {
             if (
                 navigationRef.current &&
@@ -216,6 +248,7 @@ function MainLayout({ user, onLogout }) {
                 handleEscape
             );
         };
+
     }, []);
 
     /* =====================================================
@@ -241,6 +274,10 @@ function MainLayout({ user, onLogout }) {
                     isPathActive(location.pathname, item.path)
                 );
 
+            /* =================================================
+               DIREKTER NAVIGATIONSLINK
+               ================================================= */
+
             if (group.path) {
                 return (
                     <NavLink
@@ -248,14 +285,19 @@ function MainLayout({ user, onLogout }) {
                         to={group.path}
                         end={group.path === '/'}
                         className={({ isActive }) =>
-                            `nav-main-link ${isActive ? 'active' : ''}`
+                            `nav-main-link ${
+                                isActive ? 'active' : ''
+                            }`
                         }
                         onClick={() => {
                             setOpenMenu(null);
                             setMobileMenuOpen(false);
                         }}
                     >
-                        <span className="nav-item-icon" aria-hidden="true">
+                        <span
+                            className="nav-item-icon"
+                            aria-hidden="true"
+                        >
                             {group.icon}
                         </span>
 
@@ -264,22 +306,27 @@ function MainLayout({ user, onLogout }) {
                 );
             }
 
+            /* =================================================
+               DROPDOWN NAVIGATION
+               ================================================= */
+
             const expanded = openMenu === group.id;
 
             return (
                 <div
                     key={group.id}
-                    className={`nav-dropdown ${expanded ? 'open' : ''}`}
+                    className={`nav-dropdown ${
+                        expanded ? 'open' : ''
+                    }`}
                 >
                     <button
                         type="button"
-                        className={
-                            `nav-dropdown-trigger ${
-                                groupActive ? 'active' : ''
-                            }`
-                        }
+                        className={`nav-dropdown-trigger ${
+                            groupActive ? 'active' : ''
+                        }`}
                         aria-expanded={expanded}
                         aria-controls={`nav-menu-${group.id}`}
+                        aria-haspopup="true"
                         onClick={() => toggleMenu(group.id)}
                     >
                         <span
@@ -337,9 +384,14 @@ function MainLayout({ user, onLogout }) {
     return (
         <div className="app-layout">
 
+            {/* =================================================
+                HEADER
+                ================================================= */}
+
             <header className="app-header">
 
                 <div className="header-brand">
+
                     <img
                         src={logo}
                         alt="Montessori Logo"
@@ -349,18 +401,23 @@ function MainLayout({ user, onLogout }) {
                     <h1 className="header-title">
                         Anwesenheitsliste
                     </h1>
+
                 </div>
 
                 <div className="header-actions">
 
                     <div className="header-user">
-                        <div>{user?.username}</div>
+
+                        <div>
+                            {user?.username}
+                        </div>
 
                         <div className="header-user-role">
                             {isAdmin
                                 ? 'Administrator'
                                 : 'Anwender'}
                         </div>
+
                     </div>
 
                     <button
@@ -396,12 +453,17 @@ function MainLayout({ user, onLogout }) {
 
             </header>
 
-            {/* NAVIGATION */}
+            {/* =================================================
+                NAVIGATION
+                ================================================= */}
 
             <div
                 className="main-nav-wrapper"
                 ref={navigationRef}
             >
+
+                {/* MOBILE MENU BUTTON */}
+
                 <button
                     type="button"
                     className="mobile-nav-toggle"
@@ -419,6 +481,8 @@ function MainLayout({ user, onLogout }) {
                     <span>Menü</span>
                 </button>
 
+                {/* MAIN NAVIGATION */}
+
                 <nav
                     id="main-navigation"
                     className={`main-nav ${
@@ -428,9 +492,12 @@ function MainLayout({ user, onLogout }) {
                 >
                     {renderNavigation()}
                 </nav>
+
             </div>
 
-            {/* HAUPTINHALT */}
+            {/* =================================================
+                MAIN CONTENT
+                ================================================= */}
 
             <main className="app-main">
                 <div className="app-content">

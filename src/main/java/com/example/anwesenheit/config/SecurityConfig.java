@@ -95,6 +95,29 @@ public class SecurityConfig {
 
 
                                 /* =========================
+                                   ANGEBOTE LESEN
+
+                                   ADMIN + ANWENDER
+                                   Nur GET erlaubt.
+                                   Änderungen bleiben ADMIN vorbehalten.
+                                   ========================= */
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/angebote",
+                                        "/api/angebote/**",
+                                        "/api/angebot-teilnahmen",
+                                        "/api/angebot-teilnahmen/**",
+                                        "/api/angebot-anwesenheiten",
+                                        "/api/angebot-anwesenheiten/**"
+                                )
+                                .hasAnyRole(
+                                        "ADMIN",
+                                        "ANWENDER"
+                                )
+
+
+                                /* =========================
                                    KURSE LESEN
 
                                    ADMIN + ANWENDER

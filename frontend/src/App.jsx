@@ -9,6 +9,8 @@ import {
 
 import MainLayout from './components/MainLayout';
 
+import AngebotDetailsPage from './pages/AngebotDetailsPage';
+import AngebotePage from './pages/AngebotePage';
 import HomePage from './pages/HomePage';
 import GesamtuebersichtPage from './pages/GesamtuebersichtPage';
 import KursePage from './pages/KursePage';
@@ -217,6 +219,20 @@ function App() {
                             />
 
                             <Route
+                                path="/angebote/:id"
+                                element={
+                                    <AngebotDetailsPage />
+                                }
+                            />
+
+                            <Route
+                                path="/angebote"
+                                element={
+                                    <AngebotePage />
+                                }
+                            />
+
+                            <Route
                                 path="/kurse"
                                 element={
                                     <KursePage />
@@ -273,6 +289,23 @@ function App() {
                     {/* =====================================
                         ADMIN + ANWENDER
                        ===================================== */}
+
+                    <Route
+                        path="/angebotinfos"
+                        element={
+                            <AngebotePage
+                                readOnly
+                                basePath="/angebotinfos"
+                            />
+                        }
+                    />
+
+                    <Route
+                        path="/angebotinfos/:id"
+                        element={
+                            <AngebotDetailsPage readOnly />
+                        }
+                    />
 
                     <Route
                         path="/anwesenheit"
