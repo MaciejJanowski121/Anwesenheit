@@ -16,6 +16,10 @@ import {
     getBuchungenByStudent
 } from '../services/buchungService';
 
+import {
+    getTeilnahmenByStudent
+} from '../services/angebotTeilnahmeService';
+
 import './SchuelerinfosPage.css';
 
 
@@ -30,13 +34,14 @@ function SchuelerinfoDetailsPage() {
 
     const [student, setStudent] = useState(null);
     const [buchungen, setBuchungen] = useState([]);
+    const [angebote, setAngebote] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
 
     /* =====================================================
-       SCHÜLER UND KURSBUCHUNGEN LADEN
+       SCHÜLER, ANA UND ANGEBOTE LADEN
        ===================================================== */
 
     useEffect(() => {
@@ -52,12 +57,15 @@ function SchuelerinfoDetailsPage() {
 
                 const [
                     studentData,
-                    buchungenData
+                    buchungenData,
+                    angeboteData
                 ] = await Promise.all([
 
                     getSchuelerinfoById(id),
 
-                    getBuchungenByStudent(id)
+                    getBuchungenByStudent(id),
+
+                    getTeilnahmenByStudent(id)
 
                 ]);
 
@@ -70,6 +78,12 @@ function SchuelerinfoDetailsPage() {
                 setBuchungen(
                     Array.isArray(buchungenData)
                         ? buchungenData
+                        : []
+                );
+
+                setAngebote(
+                    Array.isArray(angeboteData)
+                        ? angeboteData
                         : []
                 );
 
@@ -344,7 +358,7 @@ function SchuelerinfoDetailsPage() {
 
 
             {/* =========================================
-                GEBUCHTE KURSE
+                ANA
                ========================================= */}
 
             <section className="schuelerinfos-detail-section">
@@ -352,7 +366,7 @@ function SchuelerinfoDetailsPage() {
                 <div className="schuelerinfos-kurse-header">
 
                     <h2>
-                        Gebuchte Kurse
+                        ANA
                     </h2>
 
                     <span className="schuelerinfos-kurse-count">
@@ -371,7 +385,7 @@ function SchuelerinfoDetailsPage() {
 
 
                 {/* =====================================
-                    KURSTABELLE
+                    ANA-TABELLE
                    ===================================== */}
 
                 {buchungen.length > 0 ? (
@@ -442,6 +456,135 @@ function SchuelerinfoDetailsPage() {
                     <p className="schuelerinfos-kurse-empty">
 
                         Noch keine Kursbuchungen vorhanden.
+
+                    </p>
+
+                )}
+
+            </section>
+
+
+            {/* =========================================
+                ANGEBOTE
+               ========================================= */}
+
+            <section className="schuelerinfos-detail-section">
+
+                <div className="schuelerinfos-kurse-header">
+
+                    <h2>
+                        Angebote
+                    </h2>
+
+                    <span className="schuelerinfos-kurse-count">
+
+                        {angebote.length}
+
+                        {' '}
+
+                        {angebote.length === 1
+                            ? 'Angebot'
+                            : 'Angebote'}
+
+                    </span>
+
+                </div>
+
+
+                {/* =====================================
+                    ANGEBOTE-TABELLE
+                   ===================================== */}
+
+                {angebote.length > 0 ? (
+
+                    <div className="schuelerinfos-kurse-scroll">
+
+                        <table className="schuelerinfos-kurse-table">
+
+                            <thead>
+
+                            <tr>
+
+                                <th>Angebot</th>
+
+                                <th>Angebotsart</th>
+
+                                <th>Angebotsleitung</th>
+
+                                <th>Wochentag</th>
+
+                                <th>Beginn</th>
+
+                                <th>Ende</th>
+
+                            </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                            {angebote.map((teilnahme) => {
+
+                                const angebot = teilnahme.angebot;
+
+                                return (
+
+                                    <tr key={teilnahme.id}>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.name
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.angebotsart
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.angebotsleitung
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.wochentag
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.beginn
+                                            )}
+                                        </td>
+
+                                        <td>
+                                            {formatValue(
+                                                angebot?.ende
+                                            )}
+                                        </td>
+
+                                    </tr>
+
+                                );
+
+                            })}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                ) : (
+
+                    <p className="schuelerinfos-kurse-empty">
+
+                        Noch keine Angebote zugeordnet.
 
                     </p>
 

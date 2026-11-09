@@ -7,7 +7,9 @@ import {
     getStudentById
 } from '../services/studentService';
 
-import { getKurse } from '../services/kursService';
+import {
+    getKurse
+} from '../services/kursService';
 
 import {
     getBuchungenByStudent,
@@ -20,20 +22,53 @@ import {
     getAnwesenheitenByStudent
 } from '../services/anwesenheitService';
 
+import {
+    getAngebote
+} from '../services/angebotService';
+
+import {
+    getTeilnahmenByStudent,
+    addStudentToAngebot,
+    deleteAngebotTeilnahme,
+    updateAngebotTeilnahmeBesonderheiten
+} from '../services/angebotTeilnahmeService';
+
 import './StudentDetailsPage.css';
+
 
 function StudentDetailsPage() {
 
     const { id } = useParams();
     const navigate = useNavigate();
 
+    /* =====================================================
+       SCHÜLER
+       ===================================================== */
+
     const [student, setStudent] = useState(null);
+
+    /* =====================================================
+       ANA
+       ===================================================== */
+
     const [buchungen, setBuchungen] = useState([]);
     const [kurse, setKurse] = useState([]);
     const [anwesenheiten, setAnwesenheiten] = useState([]);
 
+    /* =====================================================
+       ANGEBOTE
+       ===================================================== */
+
+    const [angebote, setAngebote] = useState([]);
+    const [angebotTeilnahmen, setAngebotTeilnahmen] = useState([]);
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
 
     /* =====================================================
        SCHÜLERDETAILS LADEN
@@ -41,49 +76,102 @@ function StudentDetailsPage() {
 
     useEffect(() => {
 
-        setLoading(true);
+        let active = true;
 
-        Promise.all([
-            getStudentById(id),
-            getBuchungenByStudent(id),
-            getKurse(),
-            getAnwesenheitenByStudent(id)
-        ])
-            .then(([
-                       studentData,
-                       buchungenData,
-                       kurseData,
-                       anwesenheitenData
-                   ]) => {
+        const loadStudentDetails = async () => {
+
+            try {
+
+                setLoading(true);
+                setError('');
+
+                const [
+                    studentData,
+                    buchungenData,
+                    kurseData,
+                    anwesenheitenData,
+                    angeboteData,
+                    teilnahmenData
+                ] = await Promise.all([
+
+                    getStudentById(id),
+                    getBuchungenByStudent(id),
+                    getKurse(),
+                    getAnwesenheitenByStudent(id),
+                    getAngebote(),
+                    getTeilnahmenByStudent(id)
+
+                ]);
+
+                if (!active) {
+                    return;
+                }
 
                 setStudent(studentData);
-                setBuchungen(buchungenData);
-                setKurse(kurseData);
-                setAnwesenheiten(anwesenheitenData);
 
-                setError('');
-            })
-            .catch((error) => {
+                setBuchungen(
+                    Array.isArray(buchungenData)
+                        ? buchungenData
+                        : []
+                );
+
+                setKurse(
+                    Array.isArray(kurseData)
+                        ? kurseData
+                        : []
+                );
+
+                setAnwesenheiten(
+                    Array.isArray(anwesenheitenData)
+                        ? anwesenheitenData
+                        : []
+                );
+
+                setAngebote(
+                    Array.isArray(angeboteData)
+                        ? angeboteData
+                        : []
+                );
+
+                setAngebotTeilnahmen(
+                    Array.isArray(teilnahmenData)
+                        ? teilnahmenData
+                        : []
+                );
+
+            } catch (error) {
 
                 console.error(
                     'Fehler beim Laden der Schülerdetails:',
                     error
                 );
 
-                setError(
-                    'Schüler konnte nicht geladen werden.'
-                );
-            })
-            .finally(() => {
+                if (active) {
 
-                setLoading(false);
-            });
+                    setError(
+                        'Schüler konnte nicht geladen werden.'
+                    );
+                }
+
+            } finally {
+
+                if (active) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadStudentDetails();
+
+        return () => {
+            active = false;
+        };
 
     }, [id]);
 
 
     /* =====================================================
-       KURS ZUWEISEN
+       ANA – KURS ZUWEISEN
        ===================================================== */
 
     const handleAssignKurs = async (kursId) => {
@@ -92,16 +180,17 @@ function StudentDetailsPage() {
 
             setError('');
 
-            const newBuchung =
-                await createBuchung(
-                    id,
-                    kursId
-                );
+            const newBuchung = await createBuchung(
+                id,
+                kursId
+            );
 
             setBuchungen((previous) => [
                 ...previous,
                 newBuchung
             ]);
+
+            return newBuchung;
 
         } catch (error) {
 
@@ -113,12 +202,14 @@ function StudentDetailsPage() {
             setError(
                 'Kurs konnte nicht zugewiesen werden.'
             );
+
+            throw error;
         }
     };
 
 
     /* =====================================================
-       BUCHUNG LÖSCHEN
+       ANA – BUCHUNG LÖSCHEN
        ===================================================== */
 
     const handleDeleteBuchung = async (buchungId) => {
@@ -127,9 +218,7 @@ function StudentDetailsPage() {
 
             setError('');
 
-            await deleteBuchung(
-                buchungId
-            );
+            await deleteBuchung(buchungId);
 
             setBuchungen((previous) =>
                 previous.filter(
@@ -153,14 +242,7 @@ function StudentDetailsPage() {
 
 
     /* =====================================================
-       BESONDERHEITEN AKTUALISIEREN
-
-       Besonderheiten gehören zur Buchung:
-       Schüler + Kurs.
-
-       Die Information "Geht um 15:30 Uhr"
-       wird künftig ebenfalls individuell
-       über Besonderheiten verwaltet.
+       ANA – BESONDERHEITEN AKTUALISIEREN
        ===================================================== */
 
     const handleUpdateBesonderheiten = async (
@@ -206,29 +288,181 @@ function StudentDetailsPage() {
 
 
     /* =====================================================
+       ANGEBOTE – ANGEBOT ZUWEISEN
+       ===================================================== */
+
+    const handleAssignAngebot = async (angebotId) => {
+
+        try {
+
+            setError('');
+
+            /*
+             * WICHTIG:
+             *
+             * angebotTeilnahmeService.js erwartet:
+             *
+             * addStudentToAngebot(angebotId, studentId)
+             *
+             * Deshalb zuerst angebotId,
+             * danach die Schüler-ID.
+             */
+
+            await addStudentToAngebot(
+                angebotId,
+                id
+            );
+
+            /*
+             * Nach dem Hinzufügen werden die
+             * Angebotsbuchungen neu geladen.
+             *
+             * Dadurch enthält die Liste alle
+             * aktuellen Daten aus der Datenbank.
+             */
+
+            const updatedTeilnahmen =
+                await getTeilnahmenByStudent(id);
+
+            setAngebotTeilnahmen(
+                Array.isArray(updatedTeilnahmen)
+                    ? updatedTeilnahmen
+                    : []
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Fehler beim Zuweisen des Angebots:',
+                error
+            );
+
+            setError(
+                'Angebot konnte nicht zugewiesen werden.'
+            );
+
+            throw error;
+        }
+    };
+
+
+    /* =====================================================
+       ANGEBOTE – BUCHUNG ENTFERNEN
+       ===================================================== */
+
+    const handleDeleteAngebotTeilnahme = async (
+        teilnahmeId
+    ) => {
+
+        try {
+
+            setError('');
+
+            await deleteAngebotTeilnahme(
+                teilnahmeId
+            );
+
+            setAngebotTeilnahmen((previous) =>
+                previous.filter(
+                    (teilnahme) =>
+                        teilnahme.id !== teilnahmeId
+                )
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Fehler beim Entfernen des Angebots:',
+                error
+            );
+
+            setError(
+                'Angebot konnte nicht entfernt werden.'
+            );
+        }
+    };
+
+
+    /* =====================================================
+       ANGEBOTE – BESONDERHEITEN AKTUALISIEREN
+       ===================================================== */
+
+    const handleUpdateAngebotBesonderheiten = async (
+        teilnahmeId,
+        besonderheiten
+    ) => {
+
+        try {
+
+            setError('');
+
+            /*
+             * Die Funktion heißt im Service:
+             *
+             * updateAngebotTeilnahmeBesonderheiten
+             */
+
+            const updatedTeilnahme =
+                await updateAngebotTeilnahmeBesonderheiten(
+                    teilnahmeId,
+                    besonderheiten
+                );
+
+            setAngebotTeilnahmen((previous) =>
+                previous.map(
+                    (teilnahme) =>
+                        teilnahme.id === teilnahmeId
+                            ? updatedTeilnahme
+                            : teilnahme
+                )
+            );
+
+            return updatedTeilnahme;
+
+        } catch (error) {
+
+            console.error(
+                'Besonderheiten des Angebots konnten nicht gespeichert werden:',
+                error
+            );
+
+            setError(
+                'Besonderheiten des Angebots konnten nicht gespeichert werden.'
+            );
+
+            throw error;
+        }
+    };
+
+
+    /* =====================================================
        LADEN
        ===================================================== */
 
     if (loading) {
 
         return (
+
             <p className="details-message">
                 Schüler wird geladen...
             </p>
+
         );
     }
 
 
     /* =====================================================
-       FEHLER
+       FEHLER BEIM LADEN
        ===================================================== */
 
-    if (error) {
+    if (error && !student) {
 
         return (
+
             <p className="details-message error">
                 {error}
             </p>
+
         );
     }
 
@@ -240,9 +474,11 @@ function StudentDetailsPage() {
     if (!student) {
 
         return (
+
             <p className="details-message error">
                 Schüler nicht gefunden.
             </p>
+
         );
     }
 
@@ -255,9 +491,30 @@ function StudentDetailsPage() {
 
         <div className="student-details-page">
 
+            {/* =========================================
+                FEHLERMELDUNG
+               ========================================= */}
+
+            {error && (
+
+                <p className="details-message error">
+                    {error}
+                </p>
+
+            )}
+
+
+            {/* =========================================
+                SCHÜLERDETAILS
+               ========================================= */}
+
             <StudentDetailView
 
                 student={student}
+
+                /* =====================================
+                   ANA
+                   ===================================== */
 
                 buchungen={buchungen}
 
@@ -277,9 +534,36 @@ function StudentDetailsPage() {
                     handleUpdateBesonderheiten
                 }
 
+
+                /* =====================================
+                   ANGEBOTE
+                   ===================================== */
+
+                angebote={angebote}
+
+                angebotTeilnahmen={angebotTeilnahmen}
+
+                onAssignAngebot={
+                    handleAssignAngebot
+                }
+
+                onDeleteAngebotTeilnahme={
+                    handleDeleteAngebotTeilnahme
+                }
+
+                onUpdateAngebotBesonderheiten={
+                    handleUpdateAngebotBesonderheiten
+                }
+
+
+                /* =====================================
+                   ZURÜCK
+                   ===================================== */
+
                 onClose={() =>
                     navigate('/gesamtuebersicht')
                 }
+
             />
 
         </div>
