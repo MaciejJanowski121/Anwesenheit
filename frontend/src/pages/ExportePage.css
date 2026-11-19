@@ -1,0 +1,712 @@
+/* =====================================================
+   EXPORTE PAGE
+   ===================================================== */
+
+.exporte-page {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+
+    color: var(--text-primary);
+}
+
+
+/* =====================================================
+   INFORMATION
+   ===================================================== */
+
+.export-information {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 16px;
+
+    padding: 20px 22px;
+
+    background: var(--surface-primary);
+
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+}
+
+.export-information-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    background: var(--surface-secondary);
+
+    color: var(--accent);
+
+    font-size: 23px;
+}
+
+.export-information strong {
+    color: var(--text-heading);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.export-information p {
+    margin: 7px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* =====================================================
+   EXPORT SECTION
+   ===================================================== */
+
+.export-section {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    min-width: 0;
+}
+
+.export-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+}
+
+.export-section-header h2 {
+    margin: 0;
+
+    color: var(--text-heading);
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.export-section-header p {
+    margin: 6px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.export-section-count {
+    flex-shrink: 0;
+
+    padding: 7px 12px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.export-section-count.pdf {
+    background: rgba(220, 38, 38, 0.12);
+
+    color: #dc2626;
+}
+
+.export-section-count.excel {
+    background: rgba(22, 163, 74, 0.12);
+
+    color: #16a34a;
+}
+
+
+/* =====================================================
+   EXPORT GRID
+   ===================================================== */
+
+.export-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+
+    align-items: stretch;
+}
+
+
+/* =====================================================
+   EXPORT CARD
+   ===================================================== */
+
+.export-card {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    padding: 24px;
+
+    gap: 18px;
+
+    background: var(--surface-primary);
+
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--border-color);
+    border-radius: 12px;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.export-card-pdf {
+    border-top-color: #dc2626;
+}
+
+.export-card-excel {
+    border-top-color: #16a34a;
+}
+
+.export-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =====================================================
+   CARD HEADER
+   ===================================================== */
+
+.export-card-header {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+}
+
+.export-card-title {
+    min-width: 0;
+}
+
+.export-card-title h3 {
+    margin: 0 0 6px;
+
+    color: var(--text-heading);
+
+    font-size: 19px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+.export-format-label {
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* =====================================================
+   FILE ICON
+   ===================================================== */
+
+.export-file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 54px;
+    height: 62px;
+
+    border: 1px solid transparent;
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    letter-spacing: 0.3px;
+}
+
+.export-file-icon.pdf {
+    background: rgba(220, 38, 38, 0.10);
+
+    border-color: rgba(220, 38, 38, 0.20);
+
+    color: #dc2626;
+}
+
+.export-file-icon.excel {
+    background: rgba(22, 163, 74, 0.10);
+
+    border-color: rgba(22, 163, 74, 0.20);
+
+    color: #16a34a;
+}
+
+
+/* =====================================================
+   CARD DESCRIPTION
+   ===================================================== */
+
+.export-card-description {
+    margin: 0;
+
+    min-height: 44px;
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+
+/* =====================================================
+   CARD FIELDS
+   ===================================================== */
+
+.export-card-fields {
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+    min-width: 0;
+}
+
+.export-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    min-width: 0;
+}
+
+.export-field label {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.export-field input,
+.export-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 43px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--input-background);
+
+    color: var(--input-text);
+
+    font-family: inherit;
+    font-size: 14px;
+
+    transition: border-color 0.15s ease;
+}
+
+.export-field input:hover:not(:disabled),
+.export-field select:hover:not(:disabled) {
+    border-color: var(--accent);
+}
+
+.export-field input:focus,
+.export-field select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.export-field input:disabled,
+.export-field select:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+.export-field-hint {
+    color: var(--text-muted);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   DATE GRID
+   ===================================================== */
+
+.export-date-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+/* =====================================================
+   STATIC INFORMATION
+   ===================================================== */
+
+.export-static-info {
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+
+    min-height: 43px;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--surface-secondary);
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   CARD FOOTER
+   ===================================================== */
+
+.export-card-footer {
+    display: flex;
+    flex-direction: column;
+
+    margin-top: auto;
+
+    padding-top: 18px;
+
+    border-top: 1px solid var(--border-color);
+}
+
+
+/* =====================================================
+   DOWNLOAD BUTTON
+   ===================================================== */
+
+.export-download-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 100%;
+    min-height: 44px;
+
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.export-download-button span {
+    font-size: 19px;
+    line-height: 1;
+}
+
+.export-download-button.pdf {
+    background: #dc2626;
+}
+
+.export-download-button.pdf:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.export-download-button.excel {
+    background: #15803d;
+}
+
+.export-download-button.excel:hover:not(:disabled) {
+    background: #166534;
+}
+
+.export-download-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.export-download-button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   MESSAGES
+   ===================================================== */
+
+.export-message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    padding: 13px 15px;
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    overflow-wrap: anywhere;
+}
+
+.export-message.error {
+    background: rgba(220, 38, 38, 0.08);
+
+    border-color: rgba(220, 38, 38, 0.30);
+
+    color: var(--error-text, #dc2626);
+}
+
+.export-message.success {
+    background: rgba(22, 163, 74, 0.08);
+
+    border-color: rgba(22, 163, 74, 0.30);
+
+    color: #15803d;
+}
+
+
+/* =====================================================
+   RETRY BUTTON
+   ===================================================== */
+
+.export-retry-button {
+    flex-shrink: 0;
+
+    padding: 8px 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    background: var(--surface-primary);
+
+    color: var(--text-primary);
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.export-retry-button:hover {
+    background: var(--surface-hover);
+}
+
+
+/* =====================================================
+   DATENSCHUTZ
+   ===================================================== */
+
+.export-privacy-information {
+    padding: 18px 22px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+
+    background: var(--surface-secondary);
+}
+
+.export-privacy-information strong {
+    color: var(--text-heading);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.export-privacy-information p {
+    margin: 8px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* =====================================================
+   DARK THEME
+   ===================================================== */
+
+[data-theme="dark"] .export-file-icon.pdf,
+[data-theme="dark"] .export-section-count.pdf {
+    color: #f87171;
+}
+
+[data-theme="dark"] .export-file-icon.excel,
+[data-theme="dark"] .export-section-count.excel {
+    color: #4ade80;
+}
+
+[data-theme="dark"] .export-message.success {
+    color: #4ade80;
+}
+
+[data-theme="dark"] .export-message.error {
+    color: #f87171;
+}
+
+[data-theme="dark"] .export-field input,
+[data-theme="dark"] .export-field select {
+    color-scheme: dark;
+}
+
+[data-theme="light"] .export-field input,
+[data-theme="light"] .export-field select {
+    color-scheme: light;
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLET
+   ===================================================== */
+
+@media (max-width: 1000px) {
+
+    .export-grid {
+        gap: 14px;
+    }
+
+    .export-card {
+        padding: 20px;
+    }
+
+    .export-card-title h3 {
+        font-size: 17px;
+    }
+
+    .export-date-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
+@media (max-width: 760px) {
+
+    .exporte-page {
+        gap: 20px;
+    }
+
+    .export-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .export-card {
+        padding: 18px;
+
+        gap: 16px;
+    }
+
+    .export-card-description {
+        min-height: 0;
+    }
+
+    .export-section-header h2 {
+        font-size: 20px;
+    }
+
+    .export-information {
+        padding: 16px;
+    }
+
+    .export-date-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .export-card-footer {
+        padding-top: 16px;
+    }
+
+    .export-privacy-information {
+        padding: 16px;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE - SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 420px) {
+
+    .export-date-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .export-card-header {
+        gap: 12px;
+    }
+
+    .export-file-icon {
+        width: 46px;
+        height: 54px;
+
+        font-size: 12px;
+    }
+
+    .export-section-header {
+        align-items: flex-start;
+    }
+
+    .export-section-count {
+        padding: 6px 9px;
+    }
+
+    .export-information-icon {
+        display: none;
+    }
+}

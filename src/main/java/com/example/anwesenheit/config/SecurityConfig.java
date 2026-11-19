@@ -14,12 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 
+
 @Configuration
 public class SecurityConfig {
-
-    /* =====================================================
-       SECURITY
-       ===================================================== */
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -28,211 +25,237 @@ public class SecurityConfig {
 
         http
 
-                /* =========================================
-                   CSRF
-                   ========================================= */
+                .csrf(csrf -> csrf.disable())
 
-                .csrf(
-                        csrf ->
-                                csrf.disable()
+                .cors(cors -> {})
+
+                .authorizeHttpRequests(auth -> auth
+
+                        /* LOGIN */
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login"
+                        )
+                        .permitAll()
+
+
+                        /* AUTH */
+
+                        .requestMatchers(
+                                "/api/auth/me",
+                                "/api/auth/logout"
+                        )
+                        .authenticated()
+
+
+                        /* EXPORTE */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/exporte/abwesenheit",
+                                "/api/exporte/ana-buchungen",
+                                "/api/exporte/angebot-buchungen",
+                                "/api/exporte/schueler-buchungen",
+                                "/api/exporte/anwesenheitsverlauf",
+                                "/api/exporte/anwesenheitszeiten",
+                                "/api/exporte/ana-archiv"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* ANWESENHEITSZEITEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/anwesenheitszeiten",
+                                "/api/anwesenheitszeiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* GRUPPENANWESENHEIT */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/gruppen-anwesenheit",
+                                "/api/gruppen-anwesenheit/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* TAGESANWESENHEIT LÖSCHEN */
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/tages-anwesenheiten/**"
+                        )
+                        .hasRole("ADMIN")
+
+
+                        /* TAGESANWESENHEIT LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/tages-anwesenheiten",
+                                "/api/tages-anwesenheiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* TAGESANWESENHEIT SPEICHERN */
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/tages-anwesenheiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* TAGESANWESENHEIT ÄNDERN */
+
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/tages-anwesenheiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* =================================================
+                           HISTORISCHES ANA-ANWESENHEITSARCHIV
+
+                           Nur lesender Zugriff.
+                           ================================================= */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/anwesenheiten",
+                                "/api/anwesenheiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* =================================================
+                           HISTORISCHE ANA-DATEN SCHÜTZEN
+
+                           Keine Änderungen oder Löschungen
+                           über die bisherige Anwesenheits-API.
+                           ================================================= */
+
+                        .requestMatchers(
+                                "/api/anwesenheiten",
+                                "/api/anwesenheiten/**"
+                        )
+                        .denyAll()
+
+
+                        /* ANGEBOTE LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/angebote",
+                                "/api/angebote/**",
+                                "/api/angebot-teilnahmen",
+                                "/api/angebot-teilnahmen/**",
+                                "/api/angebot-anwesenheiten",
+                                "/api/angebot-anwesenheiten/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* KURSE LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/kurse",
+                                "/api/kurse/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* BUCHUNGEN LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/buchungen",
+                                "/api/buchungen/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* SCHÜLERINFOS LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/schuelerinfos",
+                                "/api/schuelerinfos/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* KLASSEN LESEN */
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/klassen",
+                                "/api/klassen/**"
+                        )
+                        .hasAnyRole(
+                                "ADMIN",
+                                "ANWENDER"
+                        )
+
+
+                        /* RESTLICHE API */
+
+                        .requestMatchers(
+                                "/api/**"
+                        )
+                        .hasRole("ADMIN")
+
+
+                        /* ALLES ANDERE */
+
+                        .anyRequest()
+                        .authenticated()
                 )
 
-                /* =========================================
-                   CORS
-                   ========================================= */
+                .formLogin(form -> form.disable())
 
-                .cors(
-                        cors -> {
-                        }
-                )
-
-                /* =========================================
-                   ZUGRIFFSRECHTE
-                   ========================================= */
-
-                .authorizeHttpRequests(
-                        auth -> auth
-
-                                /* =========================
-                                   LOGIN
-
-                                   Ohne Anmeldung erlaubt.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.POST,
-                                        "/api/auth/login"
-                                )
-                                .permitAll()
-
-
-                                /* =========================
-                                   AUTH
-
-                                   Nur angemeldete Benutzer.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        "/api/auth/me",
-                                        "/api/auth/logout"
-                                )
-                                .authenticated()
-
-
-                                /* =========================
-                                   ANWESENHEIT
-
-                                   ADMIN + ANWENDER
-                                   ========================= */
-
-                                .requestMatchers(
-                                        "/api/anwesenheiten/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   ANGEBOTE LESEN
-
-                                   ADMIN + ANWENDER
-                                   Nur GET erlaubt.
-                                   Änderungen bleiben ADMIN vorbehalten.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/api/angebote",
-                                        "/api/angebote/**",
-                                        "/api/angebot-teilnahmen",
-                                        "/api/angebot-teilnahmen/**",
-                                        "/api/angebot-anwesenheiten",
-                                        "/api/angebot-anwesenheiten/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   KURSE LESEN
-
-                                   ADMIN + ANWENDER
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/api/kurse",
-                                        "/api/kurse/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   BUCHUNGEN LESEN
-
-                                   ADMIN + ANWENDER
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/api/buchungen",
-                                        "/api/buchungen/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   SCHÜLERINFOS LESEN
-
-                                   ADMIN + ANWENDER
-
-                                   Nur GET erlaubt.
-                                   Keine Änderungen durch ANWENDER.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/api/schuelerinfos",
-                                        "/api/schuelerinfos/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   KLASSEN LESEN
-
-                                   ADMIN + ANWENDER
-
-                                   Nur GET erlaubt.
-                                   Änderungen nur durch ADMIN.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        HttpMethod.GET,
-                                        "/api/klassen",
-                                        "/api/klassen/**"
-                                )
-                                .hasAnyRole(
-                                        "ADMIN",
-                                        "ANWENDER"
-                                )
-
-
-                                /* =========================
-                                   RESTLICHE API
-
-                                   Nur ADMIN.
-                                   ========================= */
-
-                                .requestMatchers(
-                                        "/api/**"
-                                )
-                                .hasRole(
-                                        "ADMIN"
-                                )
-
-
-                                /* =========================
-                                   ALLES ANDERE
-                                   ========================= */
-
-                                .anyRequest()
-                                .authenticated()
-                )
-
-                /* =========================================
-                   KEIN SPRING FORM LOGIN
-
-                   Wir verwenden unseren eigenen
-                   /api/auth/login Endpoint.
-                   ========================================= */
-
-                .formLogin(
-                        form ->
-                                form.disable()
-                )
-
-                /* =========================================
-                   KEIN HTTP BASIC
-                   ========================================= */
-
-                .httpBasic(
-                        basic ->
-                                basic.disable()
-                );
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
@@ -251,9 +274,6 @@ public class SecurityConfig {
 
     /* =====================================================
        AUTHENTICATION MANAGER
-
-       Wird vom AuthController für
-       Benutzername + Passwort benötigt.
        ===================================================== */
 
     @Bean
@@ -261,7 +281,6 @@ public class SecurityConfig {
             AuthenticationConfiguration configuration
     ) throws Exception {
 
-        return configuration
-                .getAuthenticationManager();
+        return configuration.getAuthenticationManager();
     }
 }

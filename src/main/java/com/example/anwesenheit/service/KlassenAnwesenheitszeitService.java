@@ -113,8 +113,18 @@ public class KlassenAnwesenheitszeitService {
         }
 
         for (ZeitDto zeit : zeiten) {
-            if (zeit.beginn() != null && zeit.ende() != null &&
+
+            if ((zeit.beginn() == null) != (zeit.ende() == null)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Beginn und Ende müssen gemeinsam angegeben werden."
+                );
+            }
+
+            if (zeit.beginn() != null &&
+                    zeit.ende() != null &&
                     !zeit.beginn().isBefore(zeit.ende())) {
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Beginn muss vor Ende liegen."

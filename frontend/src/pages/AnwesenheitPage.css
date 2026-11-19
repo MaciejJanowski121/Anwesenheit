@@ -1366,3 +1366,788 @@
 .anwesenheit-table th.besonderheiten-column.sortable-header:hover {
     background: rgba(128, 128, 128, 0.1);
 }
+
+/* =====================================================
+   TAGESANWESENHEIT
+   ===================================================== */
+
+.anwesenheit-daily-table {
+    min-width: 2050px;
+}
+
+/* =====================================================
+   SCHÜLERAUSWAHL
+   ===================================================== */
+
+.anwesenheit-selection-column {
+    width: 50px;
+    min-width: 50px;
+
+    text-align: center !important;
+}
+
+.anwesenheit-row-selected > td {
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+}
+
+.anwesenheit-row-selected > td:first-child {
+    box-shadow: inset 4px 0 0 var(--accent) !important;
+}
+
+/* =====================================================
+   NAME
+   ===================================================== */
+
+.anwesenheit-name-column {
+    min-width: 190px;
+}
+
+.anwesenheit-name-cell {
+    min-width: 190px;
+
+    color: var(--text-heading) !important;
+
+    font-weight: 600;
+}
+
+/* =====================================================
+   SORTIERUNG
+   ===================================================== */
+
+.anwesenheit-sort-button {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+    color: inherit;
+
+    font: inherit;
+    font-weight: inherit;
+
+    cursor: pointer;
+}
+
+.anwesenheit-sort-icon {
+    color: var(--accent);
+    font-size: 10px;
+}
+
+/* =====================================================
+   ANGEBOTE UND ANA
+   ===================================================== */
+
+.anwesenheit-gruppen-column {
+    min-width: 220px;
+}
+
+.anwesenheit-gruppen-cell {
+    min-width: 220px;
+    max-width: 320px;
+
+    white-space: normal !important;
+}
+
+.anwesenheit-gruppen-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.anwesenheit-gruppe {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.anwesenheit-gruppe-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.anwesenheit-gruppe-badge.angebot {
+    background: rgba(59, 130, 246, 0.16);
+    color: var(--text-primary);
+}
+
+.anwesenheit-gruppe-badge.ana {
+    background: rgba(232, 121, 43, 0.20);
+    color: var(--accent);
+}
+
+.anwesenheit-gruppe-name {
+    font-size: 13px;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+.anwesenheit-muted {
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   ANWESENHEITSSTATUS
+   ===================================================== */
+
+.anwesenheit-present-checkbox {
+    accent-color: #4f9d45;
+}
+
+.anwesenheit-absent-checkbox {
+    accent-color: #dc4545;
+}
+
+.anwesenheit-ana-checkbox {
+    accent-color: var(--accent);
+}
+
+.attendance-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* =====================================================
+   ABWESENHEITSZEITEN
+   ===================================================== */
+
+.anwesenheit-time-column,
+.anwesenheit-time-cell {
+    min-width: 120px;
+
+    text-align: center !important;
+}
+
+.anwesenheit-time-select {
+    box-sizing: border-box;
+
+    width: 105px;
+    min-height: 36px;
+
+    padding: 7px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-family: inherit;
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.anwesenheit-time-select:focus {
+    border-color: var(--accent);
+}
+
+.anwesenheit-time-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.anwesenheit-time-select option {
+    background: var(--input-background);
+    color: var(--input-text);
+}
+
+/* =====================================================
+   GRUND ABWESENHEIT
+   ===================================================== */
+
+.anwesenheit-grund-column,
+.anwesenheit-grund-cell {
+    min-width: 240px;
+}
+
+.anwesenheit-grund-input {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-width: 220px;
+
+    padding: 8px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.anwesenheit-grund-input:focus {
+    border-color: var(--accent);
+}
+
+.anwesenheit-grund-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+.anwesenheit-grund-counter {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+    text-align: right;
+}
+
+/* =====================================================
+   ANA ANWESENHEITSKONTROLLE
+   ===================================================== */
+
+.anwesenheit-ana-kontrolle-column {
+    min-width: 165px;
+
+    text-align: center !important;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   BEMERKUNG
+   ===================================================== */
+
+.anwesenheit-bemerkung-column,
+.anwesenheit-bemerkung-cell {
+    min-width: 260px;
+}
+
+/* =====================================================
+   UNGESPEICHERTE ÄNDERUNGEN
+   ===================================================== */
+
+.anwesenheit-actions {
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+}
+
+.anwesenheit-unsaved-count {
+    color: var(--text-muted);
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* =====================================================
+   WEITERE KLASSENFARBEN
+   ===================================================== */
+
+.anwesenheit-table tbody tr.klasse-sirius > td {
+    background-color: rgba(0, 172, 193, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-cassiopeia > td {
+    background-color: rgba(156, 39, 176, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-pegasus > td {
+    background-color: rgba(63, 81, 181, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-ph-nix > td,
+.anwesenheit-table tbody tr.klasse-phoenix > td {
+    background-color: rgba(255, 87, 34, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-taurus > td {
+    background-color: rgba(0, 150, 136, 0.16);
+}
+
+.anwesenheit-table tbody tr.klasse-perseus > td {
+    background-color: rgba(96, 125, 139, 0.16);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 760px) {
+
+    .anwesenheit-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .anwesenheit-unsaved-count {
+        text-align: center;
+    }
+
+    .anwesenheit-daily-table {
+        min-width: 2050px;
+    }
+}
+
+/* =====================================================
+   SAMMELERFASSUNG
+   ===================================================== */
+
+.anwesenheit-sammel-section {
+    margin: 20px 22px;
+    padding: 20px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: var(--surface-secondary);
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.anwesenheit-sammel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+}
+
+.anwesenheit-sammel-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.anwesenheit-sammel-heading h3 {
+    margin: 0;
+
+    color: var(--text-heading);
+
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.anwesenheit-sammel-count {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 11px;
+
+    border: 1px solid rgba(232, 121, 43, 0.25);
+    border-radius: 999px;
+
+    background: rgba(232, 121, 43, 0.12);
+    color: var(--accent);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.anwesenheit-sammel-toggle {
+    padding: 7px 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: var(--text-muted);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.anwesenheit-sammel-toggle:hover {
+    background: var(--surface-hover);
+    color: var(--text-heading);
+}
+
+/* =====================================================
+   SCHÜLERAUSWAHL
+   ===================================================== */
+
+.anwesenheit-sammel-selection {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+.anwesenheit-sammel-select-button,
+.anwesenheit-sammel-clear-button,
+.anwesenheit-sammel-reset-button {
+    min-height: 36px;
+
+    padding: 8px 13px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--surface-primary);
+    color: var(--text-primary);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            border-color 0.15s ease;
+}
+
+.anwesenheit-sammel-select-button:hover:not(:disabled),
+.anwesenheit-sammel-clear-button:hover:not(:disabled),
+.anwesenheit-sammel-reset-button:hover:not(:disabled) {
+    border-color: var(--accent);
+
+    background: var(--surface-hover);
+}
+
+.anwesenheit-sammel-select-button:disabled,
+.anwesenheit-sammel-clear-button:disabled,
+.anwesenheit-sammel-reset-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   HINWEISE
+   ===================================================== */
+
+.anwesenheit-sammel-hint {
+    margin: 14px 0 18px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.anwesenheit-sammel-warning {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+
+    border: 1px solid rgba(232, 121, 43, 0.3);
+    border-radius: 7px;
+
+    background: rgba(232, 121, 43, 0.10);
+    color: var(--text-primary);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =====================================================
+   FORMULAR
+   ===================================================== */
+
+.anwesenheit-sammel-form {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.anwesenheit-sammel-field {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    gap: 7px;
+}
+
+.anwesenheit-sammel-field label {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.anwesenheit-sammel-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-height: 40px;
+
+    padding: 9px 11px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: var(--input-background);
+    color: var(--input-text);
+
+    font-family: inherit;
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.anwesenheit-sammel-field select:focus {
+    border-color: var(--accent);
+
+    box-shadow:
+            0 0 0 3px
+            rgba(232, 121, 43, 0.12);
+}
+
+.anwesenheit-sammel-field select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.anwesenheit-sammel-field select option {
+    background: var(--input-background);
+    color: var(--input-text);
+}
+
+/* =====================================================
+   AKTIONEN
+   ===================================================== */
+
+.anwesenheit-sammel-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+/* =====================================================
+   RESPONSIVE - TABLET
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .anwesenheit-sammel-form {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+   ===================================================== */
+
+@media (max-width: 760px) {
+
+    .anwesenheit-sammel-section {
+        margin: 16px 18px;
+        padding: 16px;
+    }
+
+    .anwesenheit-sammel-header {
+        align-items: flex-start;
+    }
+
+    .anwesenheit-sammel-heading {
+        flex-direction: column;
+        align-items: flex-start;
+
+        gap: 8px;
+    }
+
+    .anwesenheit-sammel-form {
+        grid-template-columns: 1fr;
+    }
+
+    .anwesenheit-sammel-selection {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .anwesenheit-sammel-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .anwesenheit-sammel-actions button {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   TAGESANWESENHEIT VERLAUF
+   ===================================================== */
+
+.anwesenheit-daily-history-table {
+    min-width: 2000px;
+}
+
+.anwesenheit-history-period {
+    padding: 16px 22px;
+
+    color: var(--text-secondary);
+
+    font-size: 13px;
+}
+
+.anwesenheit-history-period strong {
+    color: var(--text-heading);
+}
+
+.anwesenheit-history-period p {
+    margin: 6px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+/* =====================================================
+   VERLAUF STATISTIK
+   ===================================================== */
+
+.anwesenheit-history-statistik {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    padding: 0 22px 22px;
+}
+
+.anwesenheit-statistik-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 18px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+
+    background: var(--surface-secondary);
+}
+
+.anwesenheit-statistik-card span {
+    color: var(--text-muted);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.anwesenheit-statistik-card strong {
+    color: var(--text-heading);
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.anwesenheit-statistik-card.present {
+    border-left: 4px solid #4f9d45;
+}
+
+.anwesenheit-statistik-card.absent {
+    border-left: 4px solid #dc4545;
+}
+
+.anwesenheit-statistik-card.partial {
+    border-left: 4px solid var(--accent);
+}
+
+/* =====================================================
+   GRUPPEN
+   ===================================================== */
+
+.anwesenheit-history-gruppe {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 6px;
+}
+
+.anwesenheit-history-gruppe:last-child {
+    margin-bottom: 0;
+}
+
+/* =====================================================
+   VERLAUF TEXTFELDER
+   ===================================================== */
+
+.anwesenheit-daily-history-table
+.anwesenheit-grund-cell,
+
+.anwesenheit-daily-history-table
+.anwesenheit-bemerkung-cell {
+
+    max-width: 350px;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.anwesenheit-action-cell button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .anwesenheit-history-statistik {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+
+    .anwesenheit-history-statistik {
+        grid-template-columns: 1fr;
+
+        padding: 0 18px 18px;
+    }
+
+    .anwesenheit-history-period {
+        padding: 16px 18px;
+    }
+}

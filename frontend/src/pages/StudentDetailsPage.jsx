@@ -19,8 +19,8 @@ import {
 } from '../services/buchungService';
 
 import {
-    getAnwesenheitenByStudent
-} from '../services/anwesenheitService';
+    getTagesAnwesenheitenByStudent
+} from '../services/tagesAnwesenheitService';
 
 import {
     getAngebote
@@ -53,6 +53,11 @@ function StudentDetailsPage() {
 
     const [buchungen, setBuchungen] = useState([]);
     const [kurse, setKurse] = useState([]);
+
+    /* =====================================================
+       TAGESANWESENHEIT
+       ===================================================== */
+
     const [anwesenheiten, setAnwesenheiten] = useState([]);
 
     /* =====================================================
@@ -84,6 +89,7 @@ function StudentDetailsPage() {
 
                 setLoading(true);
                 setError('');
+                setStudent(null);
 
                 const [
                     studentData,
@@ -97,7 +103,7 @@ function StudentDetailsPage() {
                     getStudentById(id),
                     getBuchungenByStudent(id),
                     getKurse(),
-                    getAnwesenheitenByStudent(id),
+                    getTagesAnwesenheitenByStudent(id),
                     getAngebote(),
                     getTeilnahmenByStudent(id)
 
@@ -297,29 +303,10 @@ function StudentDetailsPage() {
 
             setError('');
 
-            /*
-             * WICHTIG:
-             *
-             * angebotTeilnahmeService.js erwartet:
-             *
-             * addStudentToAngebot(angebotId, studentId)
-             *
-             * Deshalb zuerst angebotId,
-             * danach die Schüler-ID.
-             */
-
             await addStudentToAngebot(
                 angebotId,
                 id
             );
-
-            /*
-             * Nach dem Hinzufügen werden die
-             * Angebotsbuchungen neu geladen.
-             *
-             * Dadurch enthält die Liste alle
-             * aktuellen Daten aus der Datenbank.
-             */
 
             const updatedTeilnahmen =
                 await getTeilnahmenByStudent(id);
@@ -395,12 +382,6 @@ function StudentDetailsPage() {
         try {
 
             setError('');
-
-            /*
-             * Die Funktion heißt im Service:
-             *
-             * updateAngebotTeilnahmeBesonderheiten
-             */
 
             const updatedTeilnahme =
                 await updateAngebotTeilnahmeBesonderheiten(
@@ -491,10 +472,6 @@ function StudentDetailsPage() {
 
         <div className="student-details-page">
 
-            {/* =========================================
-                FEHLERMELDUNG
-               ========================================= */}
-
             {error && (
 
                 <p className="details-message error">
@@ -503,18 +480,9 @@ function StudentDetailsPage() {
 
             )}
 
-
-            {/* =========================================
-                SCHÜLERDETAILS
-               ========================================= */}
-
             <StudentDetailView
 
                 student={student}
-
-                /* =====================================
-                   ANA
-                   ===================================== */
 
                 buchungen={buchungen}
 
@@ -534,11 +502,6 @@ function StudentDetailsPage() {
                     handleUpdateBesonderheiten
                 }
 
-
-                /* =====================================
-                   ANGEBOTE
-                   ===================================== */
-
                 angebote={angebote}
 
                 angebotTeilnahmen={angebotTeilnahmen}
@@ -554,11 +517,6 @@ function StudentDetailsPage() {
                 onUpdateAngebotBesonderheiten={
                     handleUpdateAngebotBesonderheiten
                 }
-
-
-                /* =====================================
-                   ZURÜCK
-                   ===================================== */
 
                 onClose={() =>
                     navigate('/gesamtuebersicht')

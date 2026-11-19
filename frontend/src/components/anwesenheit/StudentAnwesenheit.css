@@ -1,0 +1,444 @@
+/* =====================================================
+   STUDENT ANWESENHEIT
+   ===================================================== */
+
+.student-anwesenheit {
+    min-width: 0;
+
+    padding: 22px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    background: var(--surface-primary);
+
+    color: var(--text-primary);
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.student-anwesenheit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+}
+
+.student-anwesenheit-header h3 {
+    margin: 0;
+
+    color: var(--text-heading);
+
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.student-anwesenheit-header p {
+    margin: 7px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   FILTER
+   ===================================================== */
+
+.student-anwesenheit-filter {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+}
+
+.student-anwesenheit-field {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+
+    gap: 8px;
+
+    min-width: 170px;
+}
+
+.student-anwesenheit-field label {
+    color: var(--text-secondary);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.student-anwesenheit-field input,
+.student-anwesenheit-field select {
+    box-sizing: border-box;
+
+    width: 100%;
+    min-height: 42px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--input-background);
+
+    color: var(--input-text);
+
+    font-size: 14px;
+}
+
+.student-anwesenheit-field input:focus,
+.student-anwesenheit-field select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.student-anwesenheit-reset {
+    padding: 10px 15px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+
+    background: var(--surface-secondary);
+
+    color: var(--text-primary);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.student-anwesenheit-reset:hover {
+    background: var(--surface-hover);
+}
+
+
+/* =====================================================
+   STATISTIK
+   ===================================================== */
+
+.student-anwesenheit-statistik {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+}
+
+.student-anwesenheit-card {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 16px;
+
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--border-color);
+    border-radius: 8px;
+
+    background: var(--surface-secondary);
+}
+
+.student-anwesenheit-card span {
+    color: var(--text-secondary);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.student-anwesenheit-card strong {
+    color: var(--text-heading);
+
+    font-size: 29px;
+    font-weight: 700;
+}
+
+.student-anwesenheit-card.present {
+    border-left-color: #16a34a;
+}
+
+.student-anwesenheit-card.present strong {
+    color: #16a34a;
+}
+
+.student-anwesenheit-card.absent {
+    border-left-color: #dc2626;
+}
+
+.student-anwesenheit-card.absent strong {
+    color: #dc2626;
+}
+
+.student-anwesenheit-card.partial {
+    border-left-color: #d97706;
+}
+
+.student-anwesenheit-card.partial strong {
+    color: #d97706;
+}
+
+.student-anwesenheit-card.unchecked {
+    border-left-color: #64748b;
+}
+
+
+/* =====================================================
+   COUNT
+   ===================================================== */
+
+.student-anwesenheit-count {
+    margin-bottom: 12px;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+}
+
+.student-anwesenheit-count strong {
+    color: var(--text-primary);
+}
+
+
+/* =====================================================
+   TABLE
+   ===================================================== */
+
+.student-anwesenheit-table-scroll {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.student-anwesenheit-table {
+    width: 100%;
+    min-width: 1050px;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+.student-anwesenheit-table th {
+    padding: 14px 16px;
+
+    background: var(--table-header-background);
+
+    color: var(--table-header-text);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid var(--border-color);
+}
+
+.student-anwesenheit-table td {
+    padding: 14px 16px;
+
+    border-bottom: 1px solid var(--table-row-border);
+
+    color: var(--text-primary);
+}
+
+.student-anwesenheit-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.student-anwesenheit-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.student-anwesenheit-date,
+.student-anwesenheit-time {
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+}
+
+.student-anwesenheit-date {
+    font-weight: 600;
+}
+
+.student-anwesenheit-note {
+    min-width: 160px;
+    max-width: 300px;
+
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =====================================================
+   STATUS BADGES
+   ===================================================== */
+
+.student-anwesenheit-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.student-anwesenheit-status.anwesend {
+    background: rgba(22, 163, 74, 0.12);
+
+    color: #16a34a;
+}
+
+.student-anwesenheit-status.fehlt {
+    background: rgba(220, 38, 38, 0.12);
+
+    color: #dc2626;
+}
+
+.student-anwesenheit-status.teilweise {
+    background: rgba(217, 119, 6, 0.12);
+
+    color: #d97706;
+}
+
+.student-anwesenheit-status.ungeprueft {
+    background: var(--surface-secondary);
+
+    color: var(--text-muted);
+}
+
+
+/* =====================================================
+   ANA KONTROLLE
+   ===================================================== */
+
+.student-anwesenheit-check {
+    white-space: nowrap;
+}
+
+.student-ana-checked {
+    color: #16a34a;
+
+    font-weight: 600;
+}
+
+.student-ana-unchecked {
+    color: var(--text-muted);
+}
+
+
+/* =====================================================
+   EMPTY / ERROR / HINWEIS
+   ===================================================== */
+
+.student-anwesenheit-empty {
+    margin: 0;
+
+    padding: 28px 16px;
+
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+
+    color: var(--text-muted);
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+.student-anwesenheit-error {
+    margin-bottom: 18px;
+
+    padding: 12px 16px;
+
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    border-radius: 7px;
+
+    background: rgba(220, 38, 38, 0.08);
+
+    color: var(--error-text, #dc2626);
+
+    font-size: 13px;
+}
+
+.student-anwesenheit-hint {
+    margin: 18px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+    .student-anwesenheit-statistik {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+
+    .student-anwesenheit {
+        padding: 16px;
+    }
+
+    .student-anwesenheit-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .student-anwesenheit-filter {
+        flex-direction: column;
+    }
+
+    .student-anwesenheit-field {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .student-anwesenheit-statistik {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+
+    .student-anwesenheit-statistik {
+        grid-template-columns: 1fr;
+    }
+}

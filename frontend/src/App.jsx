@@ -15,6 +15,7 @@ import HomePage from './pages/HomePage';
 import GesamtuebersichtPage from './pages/GesamtuebersichtPage';
 import KursePage from './pages/KursePage';
 import AnwesenheitPage from './pages/AnwesenheitPage';
+import AnwesenheitszeitenPage from './pages/AnwesenheitszeitenPage';
 import ImportPage from './pages/ImportPage';
 import StudentDetailsPage from './pages/StudentDetailsPage';
 import GebuehrenPage from './pages/GebuehrenPage';
@@ -32,6 +33,8 @@ import KursinfoDetailsPage from './pages/KursinfoDetailsPage';
 
 import BenutzerPage from './pages/BenutzerPage';
 
+import ExportePage from './pages/ExportePage';
+
 import {
     getCurrentUser,
     logout
@@ -42,12 +45,8 @@ import './App.css';
 
 function App() {
 
-    const [user, setUser] =
-        useState(null);
-
-    const [authLoading, setAuthLoading] =
-        useState(true);
-
+    const [user, setUser] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
 
     /* =====================================================
        SESSION PRÜFEN
@@ -55,34 +54,28 @@ function App() {
 
     useEffect(() => {
 
-        const checkAuthentication =
-            async () => {
+        const checkAuthentication = async () => {
 
-                try {
+            try {
 
-                    const currentUser =
-                        await getCurrentUser();
+                const currentUser = await getCurrentUser();
 
-                    setUser(
-                        currentUser
-                    );
+                setUser(currentUser);
 
-                } catch (error) {
+            } catch (error) {
 
-                    console.error(
-                        'Benutzer konnte nicht geprüft werden:',
-                        error
-                    );
+                console.error(
+                    'Benutzer konnte nicht geprüft werden:',
+                    error
+                );
 
-                    setUser(null);
+                setUser(null);
 
-                } finally {
+            } finally {
 
-                    setAuthLoading(
-                        false
-                    );
-                }
-            };
+                setAuthLoading(false);
+            }
+        };
 
         checkAuthentication();
 
@@ -93,13 +86,8 @@ function App() {
        LOGIN
        ===================================================== */
 
-    const handleLogin = (
-        loggedInUser
-    ) => {
-
-        setUser(
-            loggedInUser
-        );
+    const handleLogin = loggedInUser => {
+        setUser(loggedInUser);
     };
 
 
@@ -107,25 +95,24 @@ function App() {
        LOGOUT
        ===================================================== */
 
-    const handleLogout =
-        async () => {
+    const handleLogout = async () => {
 
-            try {
+        try {
 
-                await logout();
+            await logout();
 
-            } catch (error) {
+        } catch (error) {
 
-                console.error(
-                    'Fehler beim Abmelden:',
-                    error
-                );
+            console.error(
+                'Fehler beim Abmelden:',
+                error
+            );
 
-            } finally {
+        } finally {
 
-                setUser(null);
-            }
-        };
+            setUser(null);
+        }
+    };
 
 
     /* =====================================================
@@ -135,7 +122,6 @@ function App() {
     if (authLoading) {
 
         return (
-
             <div
                 style={{
                     minHeight: '100vh',
@@ -157,12 +143,7 @@ function App() {
     if (!user) {
 
         return (
-
-            <LoginPage
-                onLogin={
-                    handleLogin
-                }
-            />
+            <LoginPage onLogin={handleLogin} />
         );
     }
 
@@ -171,8 +152,7 @@ function App() {
        ROLLE
        ===================================================== */
 
-    const isAdmin =
-        user.role === 'ADMIN';
+    const isAdmin = user.role === 'ADMIN';
 
 
     /* =====================================================
@@ -189,9 +169,7 @@ function App() {
                     element={
                         <MainLayout
                             user={user}
-                            onLogout={
-                                handleLogout
-                            }
+                            onLogout={handleLogout}
                         />
                     }
                 >
@@ -206,79 +184,57 @@ function App() {
 
                             <Route
                                 path="/"
-                                element={
-                                    <HomePage />
-                                }
+                                element={<HomePage />}
                             />
 
                             <Route
                                 path="/gesamtuebersicht"
-                                element={
-                                    <GesamtuebersichtPage />
-                                }
+                                element={<GesamtuebersichtPage />}
                             />
 
                             <Route
                                 path="/angebote/:id"
-                                element={
-                                    <AngebotDetailsPage />
-                                }
+                                element={<AngebotDetailsPage />}
                             />
 
                             <Route
                                 path="/angebote"
-                                element={
-                                    <AngebotePage />
-                                }
+                                element={<AngebotePage />}
                             />
 
                             <Route
                                 path="/kurse"
-                                element={
-                                    <KursePage />
-                                }
+                                element={<KursePage />}
                             />
 
                             <Route
                                 path="/kurse/:id"
-                                element={
-                                    <KursDetailsPage />
-                                }
+                                element={<KursDetailsPage />}
                             />
 
                             <Route
                                 path="/gebuehren"
-                                element={
-                                    <GebuehrenPage />
-                                }
+                                element={<GebuehrenPage />}
                             />
 
                             <Route
                                 path="/import"
-                                element={
-                                    <ImportPage />
-                                }
+                                element={<ImportPage />}
                             />
 
                             <Route
                                 path="/students/:id"
-                                element={
-                                    <StudentDetailsPage />
-                                }
+                                element={<StudentDetailsPage />}
                             />
 
                             <Route
                                 path="/zuschuesse"
-                                element={
-                                    <ZuschuessePage />
-                                }
+                                element={<ZuschuessePage />}
                             />
 
                             <Route
                                 path="/benutzer"
-                                element={
-                                    <BenutzerPage />
-                                }
+                                element={<BenutzerPage />}
                             />
 
                         </>
@@ -307,62 +263,87 @@ function App() {
                         }
                     />
 
+
+                    {/* =====================================
+                        ANWESENHEIT
+                       ===================================== */}
+
                     <Route
                         path="/anwesenheit"
                         element={
-                            <AnwesenheitPage />
-                        }
-                    />
-
-                    <Route
-                        path="/kursinfos"
-                        element={
-                            <KursinfosPage />
-                        }
-                    />
-
-                    <Route
-                        path="/kursinfos/:id"
-                        element={
-                            <KursinfoDetailsPage />
-                        }
-                    />
-
-                    <Route
-                        path="/schuelerinfos"
-                        element={
-                            <SchuelerinfosPage />
-                        }
-                    />
-
-                    <Route
-                        path="/schuelerinfos/:id"
-                        element={
-                            <SchuelerinfoDetailsPage />
+                            <AnwesenheitPage
+                                isAdmin={isAdmin}
+                            />
                         }
                     />
 
 
                     {/* =====================================
-                        KLASSEN
+                        ANWESENHEITSZEITEN
+                       ===================================== */}
+
+                    <Route
+                        path="/anwesenheitszeiten"
+                        element={<AnwesenheitszeitenPage />}
+                    />
+
+
+                    {/* =====================================
+                        EXPORTE
                         ADMIN + ANWENDER
+                       ===================================== */}
+
+                    <Route
+                        path="/exporte"
+                        element={<ExportePage />}
+                    />
+
+
+                    {/* =====================================
+                        ANA INFORMATIONEN
+                       ===================================== */}
+
+                    <Route
+                        path="/kursinfos"
+                        element={<KursinfosPage />}
+                    />
+
+                    <Route
+                        path="/kursinfos/:id"
+                        element={<KursinfoDetailsPage />}
+                    />
+
+
+                    {/* =====================================
+                        SCHÜLERINFORMATIONEN
+                       ===================================== */}
+
+                    <Route
+                        path="/schuelerinfos"
+                        element={<SchuelerinfosPage />}
+                    />
+
+                    <Route
+                        path="/schuelerinfos/:id"
+                        element={<SchuelerinfoDetailsPage />}
+                    />
+
+
+                    {/* =====================================
+                        KLASSEN
                        ===================================== */}
 
                     <Route
                         path="/klassen"
                         element={
-                            <KlassenPage
-                                isAdmin={isAdmin}
-                            />
+                            <KlassenPage isAdmin={isAdmin} />
                         }
                     />
 
                     <Route
                         path="/klassen/:id"
                         element={
-                            <KlassenDetailsPage
-                                isAdmin={isAdmin}
-                            />
+                            <KlassenDetailsPage isAdmin={isAdmin} />
                         }
                     />
 

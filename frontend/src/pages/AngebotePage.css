@@ -501,7 +501,340 @@
         flex-direction: column;
     }
 
-    .angebote-reset-button {
+    .angebote-reset-button {/* =====================================================
+   ANWESENHEITSSTATISTIK
+   ===================================================== */
+
+        .angebot-statistik-column {
+            min-width: 115px;
+            text-align: center !important;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .angebot-statistik-cell {
+            text-align: center !important;
+        }
+
+        .angebot-statistik-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 40px;
+
+            padding: 6px 12px;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        .angebot-statistik-anwesend,
+        .angebot-status-anwesend {
+            color: #22c55e;
+
+            background: rgba(34, 197, 94, 0.12);
+
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .angebot-statistik-fehlend,
+        .angebot-status-fehlend {
+            color: #ef4444;
+
+            background: rgba(239, 68, 68, 0.12);
+
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .angebot-statistik-teilweise,
+        .angebot-status-teilweise {
+            color: #f59e0b;
+
+            background: rgba(245, 158, 11, 0.12);
+
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .angebot-status-ungeprueft {
+            color: var(--text-secondary, #94a3b8);
+
+            background: rgba(148, 163, 184, 0.12);
+
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        .angebot-statistik-muted {
+            color: var(--text-muted, #94a3b8);
+        }
+
+
+        /* =====================================================
+           GESAMTSTATISTIK
+           ===================================================== */
+
+        .angebot-statistik-text-anwesend {
+            color: #22c55e !important;
+        }
+
+        .angebot-statistik-text-fehlend {
+            color: #ef4444 !important;
+        }
+
+        .angebot-statistik-text-teilweise {
+            color: #f59e0b !important;
+        }
+
+        .angebot-statistik-hinweis {
+            margin-top: -6px;
+            margin-bottom: 20px;
+
+            padding: 10px 14px;
+
+            color: var(--text-secondary, #94a3b8);
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           TAGESSTATUS
+           ===================================================== */
+
+        .angebot-tagesstatus {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 6px 12px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           DATUM UND AKTIONEN
+           ===================================================== */
+
+        .angebot-datum-actions {
+            display: flex;
+
+            align-items: flex-end;
+
+            flex-wrap: wrap;
+
+            gap: 12px;
+        }
+
+        .angebot-refresh-button,
+        .angebot-attendance-button {
+            min-height: 40px;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                    background 0.2s ease,
+                    border-color 0.2s ease;
+
+            white-space: nowrap;
+        }
+
+        .angebot-refresh-button {
+            color: var(--text-primary, #e2e8f0);
+
+            background: var(--surface-secondary, #1e293b);
+
+            border: 1px solid
+            var(--border-color, #334155);
+        }
+
+        .angebot-refresh-button:hover:not(:disabled) {
+            background: var(--surface-hover, #334155);
+        }
+
+        .angebot-refresh-button:disabled {
+            opacity: 0.5;
+
+            cursor: not-allowed;
+        }
+
+        .angebot-attendance-button {
+            color: #ffffff;
+
+            background: var(--accent, #2563eb);
+
+            border: 1px solid
+            var(--accent, #2563eb);
+        }
+
+        .angebot-attendance-button:hover {
+            background: var(--accent-hover, #1d4ed8);
+        }
+
+
+        /* =====================================================
+           HINWEISE
+           ===================================================== */
+
+        .angebot-attendance-hinweis {
+            padding: 12px 16px;
+
+            margin-bottom: 16px;
+
+            border-radius: 8px;
+
+            color: var(--text-secondary, #94a3b8);
+
+            background: var(--surface-secondary, #1e293b);
+
+            border: 1px solid
+            var(--border-color, #334155);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+        .angebot-attendance-error {
+            padding: 12px 16px;
+
+            margin-bottom: 16px;
+
+            border-radius: 8px;
+
+            color: var(--error-text, #ef4444);
+
+            background: rgba(239, 68, 68, 0.08);
+
+            border: 1px solid rgba(239, 68, 68, 0.25);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           SCHÜLERLINK
+           ===================================================== */
+
+        .angebot-student-link {
+            padding: 0;
+
+            border: none;
+
+            background: transparent;
+
+            color: inherit;
+
+            font: inherit;
+
+            font-weight: 600;
+
+            text-align: left;
+
+            cursor: pointer;
+        }
+
+        .angebot-student-link:hover,
+        .angebot-student-link:focus-visible {
+            color: var(--accent, #3b82f6);
+
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           TABELLE
+           ===================================================== */
+
+        .angebot-student-table {
+            min-width: 2450px;
+        }
+
+        .angebot-student-table th {
+            white-space: nowrap;
+        }
+
+        .angebot-attendance-text {
+            min-width: 160px;
+
+            max-width: 280px;
+
+            white-space: normal !important;
+
+            overflow-wrap: anywhere;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           LIGHT MODE
+           ===================================================== */
+
+        [data-theme="light"] .angebot-statistik-anwesend,
+        [data-theme="light"] .angebot-status-anwesend,
+        [data-theme="light"] .angebot-statistik-text-anwesend {
+            color: #15803d !important;
+        }
+
+        [data-theme="light"] .angebot-statistik-fehlend,
+        [data-theme="light"] .angebot-status-fehlend,
+        [data-theme="light"] .angebot-statistik-text-fehlend {
+            color: #b91c1c !important;
+        }
+
+        [data-theme="light"] .angebot-statistik-teilweise,
+        [data-theme="light"] .angebot-status-teilweise,
+        [data-theme="light"] .angebot-statistik-text-teilweise {
+            color: #b45309 !important;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 768px) {
+
+            .angebot-datum-actions {
+                width: 100%;
+
+                align-items: stretch;
+
+                flex-direction: column;
+            }
+
+            .angebot-datum-field {
+                width: 100%;
+            }
+
+            .angebot-refresh-button,
+            .angebot-attendance-button {
+                width: 100%;
+            }
+        }
         width: 100%;
     }
 }
+

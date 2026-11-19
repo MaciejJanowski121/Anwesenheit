@@ -3,6 +3,9 @@ import React, {
     useState
 } from 'react';
 
+import StudentAnaArchiv
+    from '../components/anwesenheit/StudentAnaArchiv';
+
 import {
     useNavigate,
     useParams
@@ -20,6 +23,13 @@ import {
     getTeilnahmenByStudent
 } from '../services/angebotTeilnahmeService';
 
+import {
+    getTagesAnwesenheitenByStudent
+} from '../services/tagesAnwesenheitService';
+
+import StudentAnwesenheit
+    from '../components/anwesenheit/StudentAnwesenheit';
+
 import './SchuelerinfosPage.css';
 
 
@@ -33,15 +43,20 @@ function SchuelerinfoDetailsPage() {
        ===================================================== */
 
     const [student, setStudent] = useState(null);
+
     const [buchungen, setBuchungen] = useState([]);
+
     const [angebote, setAngebote] = useState([]);
 
+    const [anwesenheiten, setAnwesenheiten] = useState([]);
+
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState('');
 
 
     /* =====================================================
-       SCHÜLER, ANA UND ANGEBOTE LADEN
+       SCHÜLER, ANA, ANGEBOTE UND ANWESENHEIT LADEN
        ===================================================== */
 
     useEffect(() => {
@@ -54,18 +69,22 @@ function SchuelerinfoDetailsPage() {
 
                 setLoading(true);
                 setError('');
+                setStudent(null);
 
                 const [
                     studentData,
                     buchungenData,
-                    angeboteData
+                    angeboteData,
+                    anwesenheitenData
                 ] = await Promise.all([
 
                     getSchuelerinfoById(id),
 
                     getBuchungenByStudent(id),
 
-                    getTeilnahmenByStudent(id)
+                    getTeilnahmenByStudent(id),
+
+                    getTagesAnwesenheitenByStudent(id)
 
                 ]);
 
@@ -73,7 +92,16 @@ function SchuelerinfoDetailsPage() {
                     return;
                 }
 
+                /* =========================================
+                   SCHÜLER
+                   ========================================= */
+
                 setStudent(studentData);
+
+
+                /* =========================================
+                   ANA
+                   ========================================= */
 
                 setBuchungen(
                     Array.isArray(buchungenData)
@@ -81,9 +109,25 @@ function SchuelerinfoDetailsPage() {
                         : []
                 );
 
+
+                /* =========================================
+                   ANGEBOTE
+                   ========================================= */
+
                 setAngebote(
                     Array.isArray(angeboteData)
                         ? angeboteData
+                        : []
+                );
+
+
+                /* =========================================
+                   TAGESANWESENHEIT
+                   ========================================= */
+
+                setAnwesenheiten(
+                    Array.isArray(anwesenheitenData)
+                        ? anwesenheitenData
                         : []
                 );
 
@@ -104,6 +148,7 @@ function SchuelerinfoDetailsPage() {
             } finally {
 
                 if (active) {
+
                     setLoading(false);
                 }
             }
@@ -112,6 +157,7 @@ function SchuelerinfoDetailsPage() {
         loadStudent();
 
         return () => {
+
             active = false;
         };
 
@@ -129,6 +175,7 @@ function SchuelerinfoDetailsPage() {
             value === undefined ||
             value === ''
         ) {
+
             return '–';
         }
 
@@ -170,7 +217,9 @@ function SchuelerinfoDetailsPage() {
 
             <div className="schuelerinfos-page">
 
-                <p>Schüler wird geladen...</p>
+                <p>
+                    Schüler wird geladen...
+                </p>
 
             </div>
         );
@@ -188,7 +237,9 @@ function SchuelerinfoDetailsPage() {
             <div className="schuelerinfos-page">
 
                 <div className="schuelerinfos-error">
+
                     {error}
+
                 </div>
 
             </div>
@@ -202,7 +253,17 @@ function SchuelerinfoDetailsPage() {
 
     if (!student) {
 
-        return <p>Schüler nicht gefunden.</p>;
+        return (
+
+            <div className="schuelerinfos-page">
+
+                <p>
+                    Schüler nicht gefunden.
+                </p>
+
+            </div>
+
+        );
     }
 
 
@@ -226,7 +287,9 @@ function SchuelerinfoDetailsPage() {
                     navigate('/schuelerinfos')
                 }
             >
+
                 ← Zurück zu Schülerinfos
+
             </button>
 
 
@@ -239,11 +302,15 @@ function SchuelerinfoDetailsPage() {
                 <div className="page-header-content">
 
                     <h1>
+
                         {student.vorname} {student.nachname}
+
                     </h1>
 
                     <p>
+
                         Schülerdetails
+
                     </p>
 
                 </div>
@@ -258,7 +325,9 @@ function SchuelerinfoDetailsPage() {
             <section className="schuelerinfos-detail-section">
 
                 <h2>
+
                     Allgemeine Informationen
+
                 </h2>
 
                 <div className="schuelerinfos-details-grid">
@@ -300,7 +369,9 @@ function SchuelerinfoDetailsPage() {
             <section className="schuelerinfos-detail-section">
 
                 <h2>
+
                     Kontakt 1
+
                 </h2>
 
                 <div className="schuelerinfos-details-grid">
@@ -332,7 +403,9 @@ function SchuelerinfoDetailsPage() {
             <section className="schuelerinfos-detail-section">
 
                 <h2>
+
                     Kontakt 2
+
                 </h2>
 
                 <div className="schuelerinfos-details-grid">
@@ -366,7 +439,9 @@ function SchuelerinfoDetailsPage() {
                 <div className="schuelerinfos-kurse-header">
 
                     <h2>
+
                         ANA
+
                     </h2>
 
                     <span className="schuelerinfos-kurse-count">
@@ -418,27 +493,35 @@ function SchuelerinfoDetailsPage() {
                                 <tr key={buchung.id}>
 
                                     <td>
+
                                         {formatValue(
                                             buchung.kurs?.name
                                         )}
+
                                     </td>
 
                                     <td>
+
                                         {formatValue(
                                             buchung.kurs?.kursleitung
                                         )}
+
                                     </td>
 
                                     <td>
+
                                         {formatValue(
                                             buchung.kurs?.wochentag
                                         )}
+
                                     </td>
 
                                     <td>
+
                                         {formatValue(
                                             buchung.kurs?.uhrzeit
                                         )}
+
                                     </td>
 
                                 </tr>
@@ -473,7 +556,9 @@ function SchuelerinfoDetailsPage() {
                 <div className="schuelerinfos-kurse-header">
 
                     <h2>
+
                         Angebote
+
                     </h2>
 
                     <span className="schuelerinfos-kurse-count">
@@ -526,46 +611,59 @@ function SchuelerinfoDetailsPage() {
 
                             {angebote.map((teilnahme) => {
 
-                                const angebot = teilnahme.angebot;
+                                const angebot =
+                                    teilnahme.angebot;
 
                                 return (
 
                                     <tr key={teilnahme.id}>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.name
                                             )}
+
                                         </td>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.angebotsart
                                             )}
+
                                         </td>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.angebotsleitung
                                             )}
+
                                         </td>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.wochentag
                                             )}
+
                                         </td>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.beginn
                                             )}
+
                                         </td>
 
                                         <td>
+
                                             {formatValue(
                                                 angebot?.ende
                                             )}
+
                                         </td>
 
                                     </tr>
@@ -591,6 +689,27 @@ function SchuelerinfoDetailsPage() {
                 )}
 
             </section>
+
+
+            {/* =========================================
+                TAGESANWESENHEIT
+
+                Zentrale Anwesenheitsübersicht.
+
+                ADMIN + ANWENDER können die
+                gespeicherten Tagesanwesenheiten
+                einsehen.
+               ========================================= */}
+
+            <StudentAnwesenheit
+                key={`tagesanwesenheit-${student.id}`}
+                anwesenheiten={anwesenheiten}
+            />
+
+            <StudentAnaArchiv
+                key={`ana-archiv-${student.id}`}
+                studentId={student.id}
+            />
 
         </div>
     );

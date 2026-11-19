@@ -22,106 +22,402 @@ import {
 } from '../services/angebotTeilnahmeService';
 
 import {
-    getAnwesenheitenByAngebot,
-    saveAngebotAnwesenheit
-} from '../services/angebotAnwesenheitService';
+    getAngebotAnwesenheitStatistik
+} from '../services/gruppenAnwesenheitService';
+
+import {
+    getTagesAnwesenheitenByDatum
+} from '../services/tagesAnwesenheitService';
 
 import {
     getStudents
 } from '../services/studentService';
 
+import {
+    getToday,
+    formatDatum,
+    formatTime,
+    matchesWochentag
+} from '../components/anwesenheit/AnwesenheitUtils';
+
 import './KursDetailsPage.css';
 import './AngebotDetailsPage.css';
 
 
-const today = () => {
-    const date = new Date();
+/* =====================================================
+   TABELLENSPALTEN
+   ===================================================== */
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+const STUDENT_COLUMNS = [
+    { key: 'nachname', label: 'Nachname' },
+    { key: 'vorname', label: 'Vorname' },
+    { key: 'jahrgang', label: 'Jahrgang' },
+    { key: 'klasse', label: 'Klasse' },
+    { key: 'fotoFreigabe', label: 'Fotofreigabe' },
+    { key: 'besonderheiten', label: 'Besonderheiten' }
+];
 
-    return `${year}-${month}-${day}`;
-};
-
-
-const STATUS_OPTIONS = [
+const STATISTIK_COLUMNS = [
+    { key: 'anzahlAnwesend', label: 'Anwesend' },
+    { key: 'anzahlFehlend', label: 'Fehlend' },
     {
-        value: 'ANWESEND',
-        label: 'Anwesend'
-    },
-    {
-        value: 'ENTSCHULDIGT',
-        label: 'Entschuldigt'
-    },
-    {
-        value: 'FEHLT',
-        label: 'Fehlt'
+        key: 'anzahlTeilweiseAbwesend',
+        label: 'Teilweise abwesend'
     }
 ];
 
+const CONTACT_COLUMNS = [
+    { key: 'email1', label: 'Email 1' },
+    { key: 'telefon1', label: 'Telefon 1' },
+    { key: 'mobil1', label: 'Mobil 1' },
+    { key: 'email2', label: 'Email 2' },
+    { key: 'telefon2', label: 'Telefon 2' },
+    { key: 'mobil2', label: 'Mobil 2' }
+];
+
+const NUMERIC_COLUMNS = [
+    'jahrgang',
+    'anzahlAnwesend',
+    'anzahlFehlend',
+    'anzahlTeilweiseAbwesend'
+];
+
+
+/* =====================================================
+   HILFSMETHODEN
+   ===================================================== */
+
+const formatValue = value => {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ''
+    ) {
+        return '–';
+    }
+
+    return value;
+};
+
+
+const timeToMinutes = value => {
+
+    if (typeof value !== 'string') {
+        return null;
+    }
+
+    const match = value.trim().match(
+        /^(\d{1,2}):(\d{2})(?::\d{2})?$/
+    );
+
+    if (!match) {
+        return null;
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+
+    if (
+        hours < 0 ||
+        hours > 23 ||
+        minutes < 0 ||
+        minutes > 59
+    ) {
+        return null;
+    }
+
+    return hours * 60 + minutes;
+};
+
+
+/* =====================================================
+   ANWESENHEITSSTATUS WÄHREND DES ANGEBOTS
+
+   Die Tagesanwesenheit wird mit Beginn und Ende
+   des Angebots verglichen.
+   ===================================================== */
+
+const getAngebotStatus = (anwesenheit, angebot) => {
+
+    const beginn = timeToMinutes(angebot?.beginn);
+    const ende = timeToMinutes(angebot?.ende);
+
+    if (
+        beginn === null ||
+        ende === null ||
+        beginn >= ende
+    ) {
+        return 'ZEITEN_FEHLEN';
+    }
+
+    if (!anwesenheit) {
+        return 'UNGEPRUEFT';
+    }
+
+    if (anwesenheit.status === 'FEHLT') {
+        return 'FEHLT';
+    }
+
+    const abwesendAb =
+        timeToMinutes(anwesenheit.abwesendAb);
+
+    const abwesendBis =
+        timeToMinutes(anwesenheit.abwesendBis);
+
+    if (
+        abwesendAb !== null ||
+        abwesendBis !== null
+    ) {
+
+        const abwesenheitBeginn =
+            abwesendAb ?? 0;
+
+        const abwesenheitEnde =
+            abwesendBis ?? 1440;
+
+        const ueberschneidungBeginn =
+            Math.max(beginn, abwesenheitBeginn);
+
+        const ueberschneidungEnde =
+            Math.min(ende, abwesenheitEnde);
+
+        const abwesendeMinuten = Math.max(
+            0,
+            ueberschneidungEnde -
+            ueberschneidungBeginn
+        );
+
+        const angebotDauer = ende - beginn;
+
+        if (abwesendeMinuten >= angebotDauer) {
+            return 'FEHLT';
+        }
+
+        if (abwesendeMinuten > 0) {
+            return 'TEILWEISE';
+        }
+    }
+
+    if (anwesenheit.status === 'ANWESEND') {
+        return 'ANWESEND';
+    }
+
+    return 'UNGEPRUEFT';
+};
+
+
+const STATUS_CONFIG = {
+
+    ANWESEND: {
+        label: 'Anwesend',
+        className: 'angebot-status-anwesend'
+    },
+
+    FEHLT: {
+        label: 'Fehlt',
+        className: 'angebot-status-fehlend'
+    },
+
+    TEILWEISE: {
+        label: 'Teilweise abwesend',
+        className: 'angebot-status-teilweise'
+    },
+
+    UNGEPRUEFT: {
+        label: 'Ungeprüft',
+        className: 'angebot-status-ungeprueft'
+    },
+
+    ZEITEN_FEHLEN: {
+        label: 'Zeiten fehlen',
+        className: 'angebot-status-ungeprueft'
+    }
+};
+
+
+/* =====================================================
+   ANGEBOT DETAILS PAGE
+   ===================================================== */
 
 function AngebotDetailsPage({ readOnly = false }) {
 
     const { id } = useParams();
     const navigate = useNavigate();
 
+
     /* =====================================================
        GRUNDDATEN
        ===================================================== */
 
     const [angebot, setAngebot] = useState(null);
+
     const [teilnahmen, setTeilnahmen] = useState([]);
+
     const [allStudents, setAllStudents] = useState([]);
-    const [anwesenheiten, setAnwesenheiten] = useState([]);
 
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState('');
+
     const [message, setMessage] = useState('');
+
+
+    /* =====================================================
+       ANWESENHEITSSTATISTIK
+       ===================================================== */
+
+    const [statistik, setStatistik] = useState([]);
+
+    const [statistikLoading, setStatistikLoading] =
+        useState(true);
+
+    const [statistikError, setStatistikError] =
+        useState('');
+
+
+    /* =====================================================
+       TAGESANWESENHEIT
+       ===================================================== */
+
+    const [selectedDate, setSelectedDate] =
+        useState(getToday);
+
+    const [tagesAnwesenheiten, setTagesAnwesenheiten] =
+        useState([]);
+
+    const [attendanceLoading, setAttendanceLoading] =
+        useState(true);
+
+    const [attendanceError, setAttendanceError] =
+        useState('');
+
+    const [attendanceReload, setAttendanceReload] =
+        useState(0);
+
 
     /* =====================================================
        FILTER / SORTIERUNG
        ===================================================== */
 
     const [filter, setFilter] = useState('');
-    const [sortKey, setSortKey] = useState('nachname');
-    const [sortDirection, setSortDirection] = useState('asc');
+
+    const [sortKey, setSortKey] =
+        useState('nachname');
+
+    const [sortDirection, setSortDirection] =
+        useState('asc');
+
 
     /* =====================================================
        JAHRGANG
        ===================================================== */
 
-    const [selectedJahrgang, setSelectedJahrgang] = useState('');
-    const [jahrgangLoading, setJahrgangLoading] = useState(false);
+    const [selectedJahrgang, setSelectedJahrgang] =
+        useState('');
+
+    const [jahrgangLoading, setJahrgangLoading] =
+        useState(false);
+
 
     /* =====================================================
        SCHÜLER HINZUFÜGEN
        ===================================================== */
 
-    const [addStudentsOpen, setAddStudentsOpen] = useState(false);
-    const [addStudentSearch, setAddStudentSearch] = useState('');
-    const [addStudentJahrgang, setAddStudentJahrgang] = useState('');
-    const [selectedStudentIds, setSelectedStudentIds] = useState([]);
-    const [addStudentsLoading, setAddStudentsLoading] = useState(false);
+    const [addStudentsOpen, setAddStudentsOpen] =
+        useState(false);
+
+    const [addStudentSearch, setAddStudentSearch] =
+        useState('');
+
+    const [addStudentJahrgang, setAddStudentJahrgang] =
+        useState('');
+
+    const [selectedStudentIds, setSelectedStudentIds] =
+        useState([]);
+
+    const [addStudentsLoading, setAddStudentsLoading] =
+        useState(false);
+
 
     /* =====================================================
-       ANWESENHEIT
+       SCHÜLER ENTFERNEN
        ===================================================== */
 
-    const [selectedDate, setSelectedDate] = useState(today);
-    const [savingStudentId, setSavingStudentId] = useState(null);
-    const [deletingTeilnahmeId, setDeletingTeilnahmeId] = useState(null);
+    const [deletingTeilnahmeId, setDeletingTeilnahmeId] =
+        useState(null);
+
+    const mutationLoading =
+        jahrgangLoading ||
+        addStudentsLoading ||
+        deletingTeilnahmeId !== null;
+
 
     /* =====================================================
-       DATEN LADEN
+       STATISTIK LADEN
        ===================================================== */
 
-    const loadData = useCallback(async (showLoading = true) => {
+    const loadStatistik = useCallback(async () => {
+
+        try {
+
+            setStatistikLoading(true);
+            setStatistikError('');
+            setStatistik([]);
+
+            const data =
+                await getAngebotAnwesenheitStatistik(id);
+
+            if (!Array.isArray(data)) {
+
+                throw new Error(
+                    'Ungültige Anwesenheitsstatistik.'
+                );
+            }
+
+            setStatistik(data);
+
+        } catch (err) {
+
+            console.error(
+                'Angebotsstatistik konnte nicht geladen werden:',
+                err
+            );
+
+            const detail =
+                err.response?.data?.detail ||
+                err.response?.data?.message;
+
+            setStatistikError(
+                typeof detail === 'string'
+                    ? detail
+                    : 'Die Anwesenheitsstatistik konnte nicht geladen werden. Bitte prüfen Sie die Angebotszeiten.'
+            );
+
+        } finally {
+
+            setStatistikLoading(false);
+        }
+
+    }, [id]);
+
+
+    /* =====================================================
+       GRUNDDATEN LADEN
+       ===================================================== */
+
+    const loadData = useCallback(async (
+        showLoading = true
+    ) => {
 
         try {
 
             if (showLoading) {
+
                 setLoading(true);
+                setAngebot(null);
+                setTeilnahmen([]);
+                setStatistik([]);
             }
 
             setError('');
@@ -129,13 +425,17 @@ function AngebotDetailsPage({ readOnly = false }) {
             const [
                 angebotData,
                 teilnahmenData,
-                studentsData,
-                anwesenheitenData
+                studentsData
             ] = await Promise.all([
+
                 getAngebotById(id),
+
                 getTeilnahmenByAngebot(id),
-                readOnly ? Promise.resolve([]) : getStudents(),
-                getAnwesenheitenByAngebot(id)
+
+                readOnly
+                    ? Promise.resolve([])
+                    : getStudents()
+
             ]);
 
             setAngebot(angebotData);
@@ -152,11 +452,7 @@ function AngebotDetailsPage({ readOnly = false }) {
                     : []
             );
 
-            setAnwesenheiten(
-                Array.isArray(anwesenheitenData)
-                    ? anwesenheitenData
-                    : []
-            );
+            await loadStatistik();
 
         } catch (err) {
 
@@ -176,12 +472,166 @@ function AngebotDetailsPage({ readOnly = false }) {
             }
         }
 
-    }, [id, readOnly]);
+    }, [
+        id,
+        readOnly,
+        loadStatistik
+    ]);
 
 
     useEffect(() => {
+
+        setSelectedStudentIds([]);
+        setSelectedJahrgang('');
+        setMessage('');
+
         loadData();
+
     }, [loadData]);
+
+
+    /* =====================================================
+       TAGESANWESENHEIT LADEN
+       ===================================================== */
+
+    useEffect(() => {
+
+        let active = true;
+
+        const loadAttendance = async () => {
+
+            setTagesAnwesenheiten([]);
+            setAttendanceError('');
+
+            if (!selectedDate) {
+
+                setAttendanceLoading(false);
+                return;
+            }
+
+            try {
+
+                setAttendanceLoading(true);
+
+                const data =
+                    await getTagesAnwesenheitenByDatum(
+                        selectedDate
+                    );
+
+                if (!active) {
+                    return;
+                }
+
+                if (!Array.isArray(data)) {
+
+                    throw new Error(
+                        'Ungültige Tagesanwesenheiten.'
+                    );
+                }
+
+                setTagesAnwesenheiten(data);
+
+            } catch (err) {
+
+                if (!active) {
+                    return;
+                }
+
+                console.error(
+                    'Tagesanwesenheit konnte nicht geladen werden:',
+                    err
+                );
+
+                setAttendanceError(
+                    'Die Tagesanwesenheit konnte nicht geladen werden.'
+                );
+
+            } finally {
+
+                if (active) {
+                    setAttendanceLoading(false);
+                }
+            }
+        };
+
+        loadAttendance();
+
+        return () => {
+            active = false;
+        };
+
+    }, [
+        selectedDate,
+        attendanceReload
+    ]);
+
+
+    /* =====================================================
+       STATISTIK NACH SCHÜLER-ID
+       ===================================================== */
+
+    const statistikMap = useMemo(() => {
+
+        return new Map(
+
+            statistik.map(eintrag => [
+
+                String(eintrag.studentId),
+
+                eintrag
+
+            ])
+        );
+
+    }, [statistik]);
+
+
+    /* =====================================================
+       TAGESANWESENHEIT NACH SCHÜLER-ID
+       ===================================================== */
+
+    const attendanceByStudent = useMemo(() => {
+
+        const result = new Map();
+
+        tagesAnwesenheiten.forEach(eintrag => {
+
+            if (eintrag.student?.id != null) {
+
+                result.set(
+                    String(eintrag.student.id),
+                    eintrag
+                );
+            }
+        });
+
+        return result;
+
+    }, [tagesAnwesenheiten]);
+
+
+    /* =====================================================
+       ANGEBOT FINDET AM GEWÄHLTEN TAG STATT
+       ===================================================== */
+
+    const angebotFindetStatt = useMemo(() => {
+
+        if (
+            !angebot?.wochentag ||
+            !selectedDate
+        ) {
+            return false;
+        }
+
+        return matchesWochentag(
+            angebot.wochentag,
+            selectedDate
+        );
+
+    }, [
+        angebot,
+        selectedDate
+    ]);
 
 
     /* =====================================================
@@ -191,36 +641,114 @@ function AngebotDetailsPage({ readOnly = false }) {
     const students = useMemo(() => {
 
         return teilnahmen
-            .filter(teilnahme => teilnahme.student)
+
+            .filter(teilnahme =>
+                teilnahme.student != null
+            )
+
             .map(teilnahme => {
 
                 const student = teilnahme.student;
 
-                const studentAnwesenheiten = anwesenheiten.filter(
-                    eintrag =>
-                        Number(eintrag.student?.id) === Number(student.id)
-                );
+                const studentStatistik =
+                    statistikMap.get(
+                        String(student.id)
+                    );
 
                 return {
+
                     ...student,
 
-                    teilnahmeId: teilnahme.id,
+                    teilnahmeId:
+                    teilnahme.id,
 
-                    anzahlAnwesend: studentAnwesenheiten.filter(
-                        eintrag => eintrag.status === 'ANWESEND'
-                    ).length,
+                    besonderheiten:
+                        teilnahme.besonderheiten ?? '',
 
-                    anzahlEntschuldigt: studentAnwesenheiten.filter(
-                        eintrag => eintrag.status === 'ENTSCHULDIGT'
-                    ).length,
+                    anzahlAnwesend:
+                        studentStatistik?.anzahlAnwesend ?? null,
 
-                    anzahlFehlend: studentAnwesenheiten.filter(
-                        eintrag => eintrag.status === 'FEHLT'
-                    ).length
+                    anzahlFehlend:
+                        studentStatistik?.anzahlFehlend ?? null,
+
+                    anzahlTeilweiseAbwesend:
+                        studentStatistik?.anzahlTeilweiseAbwesend ?? null
                 };
             });
 
-    }, [teilnahmen, anwesenheiten]);
+    }, [
+        teilnahmen,
+        statistikMap
+    ]);
+
+
+    /* =====================================================
+       GESAMTSTATISTIK
+       ===================================================== */
+
+    const gesamtStatistik = useMemo(() => {
+
+        if (
+            statistikLoading ||
+            statistikError
+        ) {
+
+            return {
+                anwesend: null,
+                fehlend: null,
+                teilweise: null
+            };
+        }
+
+        if (
+            students.some(student =>
+
+                student.anzahlAnwesend == null ||
+
+                student.anzahlFehlend == null ||
+
+                student.anzahlTeilweiseAbwesend == null
+
+            )
+        ) {
+
+            return {
+                anwesend: null,
+                fehlend: null,
+                teilweise: null
+            };
+        }
+
+        return students.reduce(
+
+            (result, student) => ({
+
+                anwesend:
+                    result.anwesend +
+                    Number(student.anzahlAnwesend),
+
+                fehlend:
+                    result.fehlend +
+                    Number(student.anzahlFehlend),
+
+                teilweise:
+                    result.teilweise +
+                    Number(student.anzahlTeilweiseAbwesend)
+
+            }),
+
+            {
+                anwesend: 0,
+                fehlend: 0,
+                teilweise: 0
+            }
+        );
+
+    }, [
+        students,
+        statistikLoading,
+        statistikError
+    ]);
 
 
     /* =====================================================
@@ -230,16 +758,25 @@ function AngebotDetailsPage({ readOnly = false }) {
     const jahrgaenge = useMemo(() => {
 
         return [
+
             ...new Set(
+
                 allStudents
-                    .map(student => student.jahrgang)
+
+                    .map(student =>
+                        student.jahrgang
+                    )
+
                     .filter(value =>
                         value !== null &&
                         value !== undefined &&
                         value !== ''
                     )
             )
-        ].sort((a, b) => Number(a) - Number(b));
+
+        ].sort((a, b) =>
+            Number(a) - Number(b)
+        );
 
     }, [allStudents]);
 
@@ -249,13 +786,19 @@ function AngebotDetailsPage({ readOnly = false }) {
        ===================================================== */
 
     const handleAddJahrgang = async () => {
-        if (readOnly) return;
-        if (!selectedJahrgang) {
+
+        if (
+            readOnly ||
+            mutationLoading ||
+            !selectedJahrgang
+        ) {
             return;
         }
 
         const confirmed = window.confirm(
+
             `Möchten Sie alle Schüler des Jahrgangs ${selectedJahrgang} dem Angebot „${angebot.name}“ zuordnen?`
+
         );
 
         if (!confirmed) {
@@ -268,16 +811,18 @@ function AngebotDetailsPage({ readOnly = false }) {
             setError('');
             setMessage('');
 
-            const result = await addJahrgangToAngebot(
-                id,
-                selectedJahrgang
-            );
+            const result =
+                await addJahrgangToAngebot(
+                    id,
+                    selectedJahrgang
+                );
 
             setMessage(
                 `${result?.hinzugefuegt ?? 0} Schüler wurden hinzugefügt.`
             );
 
             setSelectedJahrgang('');
+            setSelectedStudentIds([]);
 
             await loadData(false);
 
@@ -297,31 +842,52 @@ function AngebotDetailsPage({ readOnly = false }) {
 
 
     /* =====================================================
-       VERFÜGBARE SCHÜLER
+       BEREITS ZUGEORDNETE SCHÜLER
        ===================================================== */
 
     const bookedStudentIds = useMemo(() => {
 
         return new Set(
-            students.map(student => Number(student.id))
+
+            students.map(student =>
+                String(student.id)
+            )
         );
 
     }, [students]);
 
 
+    /* =====================================================
+       VERFÜGBARE SCHÜLER
+       ===================================================== */
+
     const availableStudents = useMemo(() => {
 
-        const search = addStudentSearch.trim().toLowerCase();
+        const search = addStudentSearch
+
+            .trim()
+
+            .toLocaleLowerCase('de');
 
         return allStudents
+
             .filter(student =>
-                !bookedStudentIds.has(Number(student.id))
+
+                !bookedStudentIds.has(
+                    String(student.id)
+                )
+
             )
+
             .filter(student => {
 
                 if (
+
                     addStudentJahrgang &&
-                    String(student.jahrgang) !== String(addStudentJahrgang)
+
+                    String(student.jahrgang) !==
+                    String(addStudentJahrgang)
+
                 ) {
                     return false;
                 }
@@ -331,42 +897,70 @@ function AngebotDetailsPage({ readOnly = false }) {
                 }
 
                 return [
+
                     student.nachname,
+
                     student.vorname,
+
+                    `${student.nachname ?? ''} ${student.vorname ?? ''}`,
+
                     student.klasse,
+
                     student.jahrgang
+
                 ].some(value =>
+
                     String(value ?? '')
-                        .toLowerCase()
+
+                        .toLocaleLowerCase('de')
+
                         .includes(search)
+
                 );
             })
+
             .sort((a, b) => {
 
-                const lastNameCompare = String(
+                const comparison = String(
+
                     a.nachname ?? ''
+
                 ).localeCompare(
+
                     String(b.nachname ?? ''),
+
                     'de'
+
                 );
 
-                if (lastNameCompare !== 0) {
-                    return lastNameCompare;
+                if (comparison !== 0) {
+
+                    return comparison;
                 }
 
                 return String(
+
                     a.vorname ?? ''
+
                 ).localeCompare(
+
                     String(b.vorname ?? ''),
+
                     'de'
+
                 );
             });
 
     }, [
+
         allStudents,
+
         bookedStudentIds,
+
         addStudentSearch,
+
         addStudentJahrgang
+
     ]);
 
 
@@ -376,47 +970,77 @@ function AngebotDetailsPage({ readOnly = false }) {
 
     const handleStudentSelection = studentId => {
 
-        setSelectedStudentIds(previous => {
+        setSelectedStudentIds(previous =>
 
-            if (previous.includes(studentId)) {
-                return previous.filter(id => id !== studentId);
-            }
+            previous.includes(studentId)
 
-            return [...previous, studentId];
-        });
+                ? previous.filter(id =>
+                    id !== studentId
+                )
+
+                : [...previous, studentId]
+
+        );
     };
 
 
     const handleSelectAllVisible = () => {
 
-        const visibleIds = availableStudents.map(student => student.id);
+        const visibleIds =
+            availableStudents.map(
+                student => student.id
+            );
 
         const allSelected =
+
             visibleIds.length > 0 &&
+
             visibleIds.every(studentId =>
-                selectedStudentIds.includes(studentId)
+
+                selectedStudentIds.includes(
+                    studentId
+                )
+
             );
 
         if (allSelected) {
 
             setSelectedStudentIds(previous =>
+
                 previous.filter(studentId =>
-                    !visibleIds.includes(studentId)
+
+                    !visibleIds.includes(
+                        studentId
+                    )
+
                 )
             );
 
         } else {
 
             setSelectedStudentIds(previous => [
-                ...new Set([...previous, ...visibleIds])
+
+                ...new Set([
+                    ...previous,
+                    ...visibleIds
+                ])
+
             ]);
         }
     };
 
 
+    /* =====================================================
+       AUSGEWÄHLTE SCHÜLER HINZUFÜGEN
+       ===================================================== */
+
     const handleAddSelectedStudents = async () => {
-        if (readOnly) return;
-        if (selectedStudentIds.length === 0) {
+
+        if (
+            readOnly ||
+            mutationLoading ||
+            selectedStudentIds.length === 0
+        ) {
             return;
         }
 
@@ -426,10 +1050,11 @@ function AngebotDetailsPage({ readOnly = false }) {
             setError('');
             setMessage('');
 
-            const result = await addStudentsToAngebot(
-                id,
-                selectedStudentIds
-            );
+            const result =
+                await addStudentsToAngebot(
+                    id,
+                    selectedStudentIds
+                );
 
             setMessage(
                 `${result?.hinzugefuegt ?? 0} Schüler wurden hinzugefügt.`
@@ -459,9 +1084,20 @@ function AngebotDetailsPage({ readOnly = false }) {
        ===================================================== */
 
     const handleRemoveStudent = async student => {
-        if (readOnly) return;
+
+        if (
+            readOnly ||
+            mutationLoading
+        ) {
+            return;
+        }
+
         const confirmed = window.confirm(
-            `Möchten Sie ${student.vorname} ${student.nachname} wirklich aus diesem Angebot entfernen?`
+
+            `Möchten Sie ${student.vorname} ${student.nachname} wirklich aus diesem Angebot entfernen?\n\n` +
+
+            'Die zentrale Tagesanwesenheit des Schülers bleibt erhalten.'
+
         );
 
         if (!confirmed) {
@@ -470,11 +1106,16 @@ function AngebotDetailsPage({ readOnly = false }) {
 
         try {
 
-            setDeletingTeilnahmeId(student.teilnahmeId);
+            setDeletingTeilnahmeId(
+                student.teilnahmeId
+            );
+
             setError('');
             setMessage('');
 
-            await deleteAngebotTeilnahme(student.teilnahmeId);
+            await deleteAngebotTeilnahme(
+                student.teilnahmeId
+            );
 
             setMessage(
                 `${student.vorname} ${student.nachname} wurde entfernt.`
@@ -498,101 +1139,68 @@ function AngebotDetailsPage({ readOnly = false }) {
 
 
     /* =====================================================
-       ANWESENHEIT SPEICHERN
-       ===================================================== */
-
-    const handleSaveAnwesenheit = async (studentId, status) => {
-        if (readOnly) return;
-        try {
-
-            setSavingStudentId(studentId);
-            setError('');
-            setMessage('');
-
-            await saveAngebotAnwesenheit(
-                id,
-                studentId,
-                selectedDate,
-                status
-            );
-
-            setMessage('Anwesenheit wurde gespeichert.');
-
-            await loadData(false);
-
-        } catch (err) {
-
-            console.error(err);
-
-            setError(
-                'Die Anwesenheit konnte nicht gespeichert werden.'
-            );
-
-        } finally {
-
-            setSavingStudentId(null);
-        }
-    };
-
-
-    /* =====================================================
-       ANWESENHEIT AM GEWÄHLTEN TAG
-       ===================================================== */
-
-    const attendanceByStudent = useMemo(() => {
-
-        const result = new Map();
-
-        anwesenheiten
-            .filter(eintrag => eintrag.datum === selectedDate)
-            .forEach(eintrag => {
-
-                if (eintrag.student?.id != null) {
-                    result.set(
-                        Number(eintrag.student.id),
-                        eintrag.status
-                    );
-                }
-            });
-
-        return result;
-
-    }, [anwesenheiten, selectedDate]);
-
-
-    /* =====================================================
        FILTER
        ===================================================== */
 
     const filteredStudents = useMemo(() => {
 
-        const search = filter.trim().toLowerCase();
+        const search = filter
+
+            .trim()
+
+            .toLocaleLowerCase('de');
 
         if (!search) {
             return students;
         }
 
         return students.filter(student =>
+
             [
+
                 student.nachname,
+
                 student.vorname,
+
+                `${student.nachname ?? ''} ${student.vorname ?? ''}`,
+
+                `${student.vorname ?? ''} ${student.nachname ?? ''}`,
+
                 student.jahrgang,
+
                 student.klasse,
+
                 student.fotoFreigabe,
+
+                student.besonderheiten,
+
                 student.email1,
+
                 student.telefon1,
+
                 student.mobil1,
+
                 student.email2,
+
                 student.telefon2,
+
                 student.mobil2
+
             ].some(value =>
+
                 String(value ?? '')
-                    .toLowerCase()
+
+                    .toLocaleLowerCase('de')
+
                     .includes(search)
+
             )
         );
 
-    }, [students, filter]);
+    }, [
+        students,
+        filter
+    ]);
 
 
     /* =====================================================
@@ -604,42 +1212,85 @@ function AngebotDetailsPage({ readOnly = false }) {
         return [...filteredStudents].sort((a, b) => {
 
             const valueA = a[sortKey];
+
             const valueB = b[sortKey];
 
-            const numericKeys = [
-                'jahrgang',
-                'anzahlAnwesend',
-                'anzahlEntschuldigt',
-                'anzahlFehlend'
-            ];
+            let result;
 
-            if (numericKeys.includes(sortKey)) {
+            if (NUMERIC_COLUMNS.includes(sortKey)) {
 
-                const numberA = Number(valueA) || 0;
-                const numberB = Number(valueB) || 0;
+                if (
+                    valueA == null &&
+                    valueB == null
+                ) {
+                    return 0;
+                }
 
-                return sortDirection === 'asc'
-                    ? numberA - numberB
-                    : numberB - numberA;
+                if (valueA == null) {
+                    return 1;
+                }
+
+                if (valueB == null) {
+                    return -1;
+                }
+
+                result =
+                    Number(valueA) -
+                    Number(valueB);
+
+            } else {
+
+                result = String(
+
+                    valueA ?? ''
+
+                ).localeCompare(
+
+                    String(valueB ?? ''),
+
+                    'de',
+
+                    {
+                        sensitivity: 'base'
+                    }
+
+                );
             }
 
-            const comparison = String(
-                valueA ?? ''
-            ).localeCompare(
-                String(valueB ?? ''),
-                'de',
-                { sensitivity: 'base' }
-            );
+            if (
+                result === 0 &&
+                sortKey === 'nachname'
+            ) {
+
+                result = String(
+
+                    a.vorname ?? ''
+
+                ).localeCompare(
+
+                    String(b.vorname ?? ''),
+
+                    'de'
+
+                );
+            }
 
             return sortDirection === 'asc'
-                ? comparison
-                : -comparison;
+
+                ? result
+
+                : -result;
+
         });
 
     }, [
+
         filteredStudents,
+
         sortKey,
+
         sortDirection
+
     ]);
 
 
@@ -648,7 +1299,13 @@ function AngebotDetailsPage({ readOnly = false }) {
         if (sortKey === key) {
 
             setSortDirection(previous =>
-                previous === 'asc' ? 'desc' : 'asc'
+
+                previous === 'asc'
+
+                    ? 'desc'
+
+                    : 'asc'
+
             );
 
         } else {
@@ -665,31 +1322,208 @@ function AngebotDetailsPage({ readOnly = false }) {
             return '';
         }
 
-        return sortDirection === 'asc' ? ' ▲' : ' ▼';
+        return sortDirection === 'asc'
+
+            ? ' ▲'
+
+            : ' ▼';
     };
 
 
     /* =====================================================
-       GESAMTSTATISTIK
+       SCHÜLER ÖFFNEN
        ===================================================== */
 
-    const statistik = useMemo(() => {
+    const handleStudentOpen = student => {
 
-        return {
-            anwesend: anwesenheiten.filter(
-                eintrag => eintrag.status === 'ANWESEND'
-            ).length,
+        navigate(
 
-            entschuldigt: anwesenheiten.filter(
-                eintrag => eintrag.status === 'ENTSCHULDIGT'
-            ).length,
+            readOnly
 
-            fehlend: anwesenheiten.filter(
-                eintrag => eintrag.status === 'FEHLT'
-            ).length
-        };
+                ? `/schuelerinfos/${student.id}`
 
-    }, [anwesenheiten]);
+                : `/students/${student.id}`
+
+        );
+    };
+
+
+    /* =====================================================
+       STATISTIKZELLE
+       ===================================================== */
+
+    const renderStatistikCell = (student, key) => {
+
+        if (statistikLoading) {
+
+            return (
+                <span className="angebot-statistik-muted">
+                    ...
+                </span>
+            );
+        }
+
+        const value = student[key];
+
+        if (value == null) {
+
+            return (
+                <span className="angebot-statistik-muted">
+                    –
+                </span>
+            );
+        }
+
+        const className = {
+
+            anzahlAnwesend:
+                'angebot-statistik-anwesend',
+
+            anzahlFehlend:
+                'angebot-statistik-fehlend',
+
+            anzahlTeilweiseAbwesend:
+                'angebot-statistik-teilweise'
+
+        }[key];
+
+        return (
+
+            <span
+                className={
+                    `angebot-statistik-badge ${className}`
+                }
+            >
+
+                {value}
+
+            </span>
+        );
+    };
+
+
+    /* =====================================================
+       TAGESSTATUS DARSTELLEN
+       ===================================================== */
+
+    const renderAttendanceStatus = student => {
+
+        if (
+            !selectedDate ||
+            !angebotFindetStatt
+        ) {
+
+            return (
+                <span className="angebot-statistik-muted">
+                    –
+                </span>
+            );
+        }
+
+        if (attendanceLoading) {
+
+            return (
+                <span className="angebot-statistik-muted">
+                    ...
+                </span>
+            );
+        }
+
+        if (attendanceError) {
+
+            return (
+                <span className="angebot-statistik-muted">
+                    –
+                </span>
+            );
+        }
+
+        const anwesenheit =
+            attendanceByStudent.get(
+                String(student.id)
+            );
+
+        const status = getAngebotStatus(
+            anwesenheit,
+            angebot
+        );
+
+        const config = STATUS_CONFIG[status];
+
+        return (
+
+            <span
+                className={
+                    `angebot-tagesstatus ${config.className}`
+                }
+            >
+
+                {config.label}
+
+            </span>
+        );
+    };
+
+
+    /* =====================================================
+       TAGESANWESENHEIT FELD
+       ===================================================== */
+
+    const getAttendanceField = (
+        student,
+        field
+    ) => {
+
+        if (
+
+            !angebotFindetStatt ||
+
+            attendanceLoading ||
+
+            attendanceError
+
+        ) {
+            return '–';
+        }
+
+        const anwesenheit =
+            attendanceByStudent.get(
+                String(student.id)
+            );
+
+        const value = anwesenheit?.[field];
+
+        if (
+            field === 'abwesendAb' ||
+            field === 'abwesendBis'
+        ) {
+
+            return value
+
+                ? formatTime(value)
+
+                : '–';
+        }
+
+        return formatValue(value);
+    };
+
+
+    /* =====================================================
+       TABELLENSPALTEN
+       ===================================================== */
+
+    const columnCount =
+
+        STUDENT_COLUMNS.length +
+
+        STATISTIK_COLUMNS.length +
+
+        CONTACT_COLUMNS.length +
+
+        5 +
+
+        (readOnly ? 0 : 1);
 
 
     /* =====================================================
@@ -699,17 +1533,24 @@ function AngebotDetailsPage({ readOnly = false }) {
     if (loading) {
 
         return (
+
             <div className="kurs-details-message">
+
                 Angebot wird geladen...
+
             </div>
         );
     }
 
+
     if (!angebot) {
 
         return (
+
             <div className="kurs-details-message kurs-details-error">
+
                 {error || 'Angebot nicht gefunden.'}
+
             </div>
         );
     }
@@ -723,14 +1564,39 @@ function AngebotDetailsPage({ readOnly = false }) {
 
         <div className="kurs-details-page angebot-details-page">
 
+
+            {/* =========================================
+                ZURÜCK
+               ========================================= */}
+
             <button
                 type="button"
                 className="angebot-back-button"
-                onClick={() => navigate('/angebote')}
+                onClick={() =>
+
+                    navigate(
+
+                        readOnly
+
+                            ? '/angebotinfos'
+
+                            : '/angebote'
+
+                    )
+
+                }
             >
+
                 <span aria-hidden="true">←</span>
+
                 Zurück zu den Angeboten
+
             </button>
+
+
+            {/* =========================================
+                HEADER
+               ========================================= */}
 
             <header className="page-header">
 
@@ -739,388 +1605,708 @@ function AngebotDetailsPage({ readOnly = false }) {
                     <h1>{angebot.name}</h1>
 
                     <p>
+
                         {angebot.wochentag || '–'}
 
                         {angebot.beginn
                             ? ` · ${angebot.beginn}`
                             : ''}
 
+                        {angebot.ende
+                            ? ` – ${angebot.ende}`
+                            : ''}
+
                         {angebot.angebotsleitung
                             ? ` · ${angebot.angebotsleitung}`
                             : ''}
+
                     </p>
 
                 </div>
 
                 <span className="kurs-details-count">
+
                     {students.length} Schüler
+
                 </span>
 
             </header>
 
+
+            {/* =========================================
+                FEHLER UND ERFOLG
+               ========================================= */}
+
             {error && (
-                <div className="kurs-details-error-box">
+
+                <div
+                    className="kurs-details-error-box"
+                    role="alert"
+                >
+
                     {error}
+
                 </div>
+
             )}
+
 
             {message && (
+
                 <div className="kurs-jahrgang-message angebot-message">
+
                     {message}
+
                 </div>
+
             )}
 
-            {/* =================================================
+
+            {/* =========================================
                 ANGEBOTSINFORMATIONEN
-               ================================================= */}
+               ========================================= */}
 
             <section className="kurs-details-info angebot-info">
 
                 <div>
+
                     <span>Angebotsart</span>
-                    <strong>{angebot.angebotsart || '–'}</strong>
+
+                    <strong>
+                        {formatValue(angebot.angebotsart)}
+                    </strong>
+
                 </div>
 
                 <div>
+
                     <span>Wochentag</span>
-                    <strong>{angebot.wochentag || '–'}</strong>
+
+                    <strong>
+                        {formatValue(angebot.wochentag)}
+                    </strong>
+
                 </div>
 
                 <div>
+
                     <span>Beginn</span>
-                    <strong>{angebot.beginn || '–'}</strong>
+
+                    <strong>
+                        {formatValue(angebot.beginn)}
+                    </strong>
+
                 </div>
 
                 <div>
+
                     <span>Ende</span>
-                    <strong>{angebot.ende || '–'}</strong>
+
+                    <strong>
+                        {formatValue(angebot.ende)}
+                    </strong>
+
                 </div>
 
                 <div>
+
                     <span>Angebotsleitung</span>
-                    <strong>{angebot.angebotsleitung || '–'}</strong>
+
+                    <strong>
+                        {formatValue(angebot.angebotsleitung)}
+                    </strong>
+
                 </div>
 
             </section>
 
-            {/* =================================================
-                STATISTIK
-               ================================================= */}
+
+            {/* =========================================
+                GESAMTSTATISTIK
+               ========================================= */}
 
             <section className="angebot-statistik">
 
                 <div>
+
                     <span>Anwesend</span>
-                    <strong>{statistik.anwesend}</strong>
+
+                    <strong className="angebot-statistik-text-anwesend">
+
+                        {statistikLoading
+
+                            ? '...'
+
+                            : gesamtStatistik.anwesend ?? '–'}
+
+                    </strong>
+
                 </div>
 
                 <div>
-                    <span>Entschuldigt</span>
-                    <strong>{statistik.entschuldigt}</strong>
-                </div>
 
-                <div>
                     <span>Fehlend</span>
-                    <strong>{statistik.fehlend}</strong>
+
+                    <strong className="angebot-statistik-text-fehlend">
+
+                        {statistikLoading
+
+                            ? '...'
+
+                            : gesamtStatistik.fehlend ?? '–'}
+
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>Teilweise abwesend</span>
+
+                    <strong className="angebot-statistik-text-teilweise">
+
+                        {statistikLoading
+
+                            ? '...'
+
+                            : gesamtStatistik.teilweise ?? '–'}
+
+                    </strong>
+
                 </div>
 
             </section>
 
-            {/* =================================================
-                JAHRGANG HINZUFÜGEN
-               ================================================= */}
 
-            {!readOnly && (
-            <section className="kurs-jahrgang-section">
+            <div className="angebot-statistik-hinweis">
 
-                <div className="kurs-jahrgang-header">
+                Die Statistik zeigt die Summe der erfassten
+                Teilnahmen aller aktuell zugeordneten Schüler.
+                Berücksichtigt werden der Wochentag sowie
+                Beginn und Ende des Angebots.
 
-                    <div>
-                        <h2>Jahrgang zuordnen</h2>
+            </div>
 
-                        <p>
-                            Alle Schüler eines Jahrgangs diesem Angebot zuordnen.
-                        </p>
-                    </div>
 
-                </div>
+            {statistikError && (
 
-                <div className="kurs-jahrgang-content">
-
-                    <div className="kurs-jahrgang-field">
-
-                        <label htmlFor="angebot-jahrgang">
-                            Jahrgang
-                        </label>
-
-                        <select
-                            id="angebot-jahrgang"
-                            value={selectedJahrgang}
-                            onChange={event =>
-                                setSelectedJahrgang(event.target.value)
-                            }
-                        >
-
-                            <option value="">
-                                Jahrgang auswählen...
-                            </option>
-
-                            {jahrgaenge.map(jahrgang => (
-                                <option
-                                    key={jahrgang}
-                                    value={jahrgang}
-                                >
-                                    {jahrgang}
-                                </option>
-                            ))}
-
-                        </select>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        className="kurs-jahrgang-button"
-                        disabled={
-                            !selectedJahrgang ||
-                            jahrgangLoading
-                        }
-                        onClick={handleAddJahrgang}
-                    >
-                        {jahrgangLoading
-                            ? 'Wird hinzugefügt...'
-                            : 'Jahrgang hinzufügen'}
-                    </button>
-
-                </div>
-
-            </section>
-            )}
-
-            {/* =================================================
-                SCHÜLER HINZUFÜGEN
-               ================================================= */}
-
-            {!readOnly && (
-            <section className="kurs-add-students-section">
-
-                <button
-                    type="button"
-                    className="kurs-add-students-toggle"
-                    onClick={() =>
-                        setAddStudentsOpen(previous => !previous)
-                    }
+                <div
+                    className="angebot-attendance-error"
+                    role="alert"
                 >
 
-                    <span>Schüler/-innen hinzufügen</span>
+                    {statistikError}
 
-                    <span>
-                        {addStudentsOpen ? '−' : '+'}
-                    </span>
+                </div>
 
-                </button>
+            )}
 
-                {addStudentsOpen && (
 
-                    <div className="kurs-add-students-content">
+            {/* =========================================
+                JAHRGANG HINZUFÜGEN
+               ========================================= */}
 
-                        <div className="kurs-add-students-filter">
+            {!readOnly && (
 
-                            <div className="kurs-add-students-field">
+                <section className="kurs-jahrgang-section">
 
-                                <label htmlFor="angebot-student-search">
-                                    Suche
-                                </label>
+                    <div className="kurs-jahrgang-header">
 
-                                <input
-                                    id="angebot-student-search"
-                                    type="text"
-                                    placeholder="Nachname oder Vorname..."
-                                    value={addStudentSearch}
-                                    onChange={event =>
-                                        setAddStudentSearch(event.target.value)
-                                    }
-                                />
+                        <div>
 
-                            </div>
+                            <h2>Jahrgang zuordnen</h2>
 
-                            <div className="kurs-add-students-field">
+                            <p>
 
-                                <label htmlFor="angebot-student-jahrgang">
-                                    Jahrgang
-                                </label>
+                                Alle Schüler eines Jahrgangs
+                                diesem Angebot zuordnen.
 
-                                <select
-                                    id="angebot-student-jahrgang"
-                                    value={addStudentJahrgang}
-                                    onChange={event =>
-                                        setAddStudentJahrgang(event.target.value)
-                                    }
-                                >
-
-                                    <option value="">
-                                        Alle Jahrgänge
-                                    </option>
-
-                                    {jahrgaenge.map(jahrgang => (
-                                        <option
-                                            key={jahrgang}
-                                            value={jahrgang}
-                                        >
-                                            {jahrgang}
-                                        </option>
-                                    ))}
-
-                                </select>
-
-                            </div>
+                            </p>
 
                         </div>
 
-                        <div className="kurs-add-students-list-header">
+                    </div>
 
-                            <label>
 
-                                <input
-                                    type="checkbox"
-                                    checked={
-                                        availableStudents.length > 0 &&
-                                        availableStudents.every(student =>
-                                            selectedStudentIds.includes(student.id)
-                                        )
-                                    }
-                                    onChange={handleSelectAllVisible}
-                                />
+                    <div className="kurs-jahrgang-content">
 
-                                Alle sichtbaren auswählen
+                        <div className="kurs-jahrgang-field">
+
+                            <label htmlFor="angebot-jahrgang">
+
+                                Jahrgang
 
                             </label>
 
-                            <span>
-                                {availableStudents.length} verfügbar
-                            </span>
+                            <select
+                                id="angebot-jahrgang"
+                                value={selectedJahrgang}
+                                disabled={mutationLoading}
+                                onChange={event =>
 
-                        </div>
+                                    setSelectedJahrgang(
+                                        event.target.value
+                                    )
 
-                        <div className="kurs-add-students-list">
+                                }
+                            >
 
-                            {availableStudents.length === 0 ? (
+                                <option value="">
 
-                                <div className="kurs-add-students-empty">
-                                    Keine passenden Schüler verfügbar.
-                                </div>
+                                    Jahrgang auswählen...
 
-                            ) : (
+                                </option>
 
-                                availableStudents.map(student => (
+                                {jahrgaenge.map(jahrgang => (
 
-                                    <label
-                                        key={student.id}
-                                        className="kurs-add-student-row"
+                                    <option
+                                        key={jahrgang}
+                                        value={jahrgang}
                                     >
 
-                                        <input
-                                            type="checkbox"
-                                            checked={
-                                                selectedStudentIds.includes(student.id)
-                                            }
-                                            onChange={() =>
-                                                handleStudentSelection(student.id)
-                                            }
-                                        />
+                                        {jahrgang}
 
-                                        <div className="kurs-add-student-name">
+                                    </option>
 
-                                            <strong>
-                                                {student.nachname || '–'},{' '}
-                                                {student.vorname || '–'}
-                                            </strong>
+                                ))}
 
-                                            <span>
-                                                Jahrgang {student.jahrgang ?? '–'}
-                                                {' · '}
-                                                Klasse {student.klasse || '–'}
-                                            </span>
-
-                                        </div>
-
-                                    </label>
-
-                                ))
-
-                            )}
+                            </select>
 
                         </div>
 
-                        <div className="kurs-add-students-actions">
+                        <button
+                            type="button"
+                            className="kurs-jahrgang-button"
+                            disabled={
+                                !selectedJahrgang ||
+                                mutationLoading
+                            }
+                            onClick={handleAddJahrgang}
+                        >
 
-                            <span>
-                                {selectedStudentIds.length} ausgewählt
-                            </span>
+                            {jahrgangLoading
 
-                            <button
-                                type="button"
-                                className="kurs-add-students-button"
-                                disabled={
-                                    selectedStudentIds.length === 0 ||
-                                    addStudentsLoading
-                                }
-                                onClick={handleAddSelectedStudents}
-                            >
-                                {addStudentsLoading
-                                    ? 'Wird hinzugefügt...'
-                                    : 'Ausgewählte Schüler hinzufügen'}
-                            </button>
+                                ? 'Wird hinzugefügt...'
 
-                        </div>
+                                : 'Jahrgang hinzufügen'}
+
+                        </button>
 
                     </div>
 
-                )}
+                </section>
 
-            </section>
             )}
 
-            {/* =================================================
-                ANWESENHEITSDATUM
-               ================================================= */}
+
+            {/* =========================================
+                SCHÜLER HINZUFÜGEN
+               ========================================= */}
+
+            {!readOnly && (
+
+                <section className="kurs-add-students-section">
+
+                    <button
+                        type="button"
+                        className="kurs-add-students-toggle"
+                        onClick={() =>
+
+                            setAddStudentsOpen(
+                                previous => !previous
+                            )
+
+                        }
+                    >
+
+                        <span>
+
+                            Schüler/-innen hinzufügen
+
+                        </span>
+
+                        <span>
+
+                            {addStudentsOpen ? '−' : '+'}
+
+                        </span>
+
+                    </button>
+
+
+                    {addStudentsOpen && (
+
+                        <div className="kurs-add-students-content">
+
+
+                            <div className="kurs-add-students-filter">
+
+                                <div className="kurs-add-students-field">
+
+                                    <label htmlFor="angebot-student-search">
+
+                                        Suche
+
+                                    </label>
+
+                                    <input
+                                        id="angebot-student-search"
+                                        type="text"
+                                        placeholder="Name, Klasse oder Jahrgang..."
+                                        value={addStudentSearch}
+                                        onChange={event =>
+
+                                            setAddStudentSearch(
+                                                event.target.value
+                                            )
+
+                                        }
+                                    />
+
+                                </div>
+
+
+                                <div className="kurs-add-students-field">
+
+                                    <label htmlFor="angebot-student-jahrgang">
+
+                                        Jahrgang
+
+                                    </label>
+
+                                    <select
+                                        id="angebot-student-jahrgang"
+                                        value={addStudentJahrgang}
+                                        onChange={event =>
+
+                                            setAddStudentJahrgang(
+                                                event.target.value
+                                            )
+
+                                        }
+                                    >
+
+                                        <option value="">
+
+                                            Alle Jahrgänge
+
+                                        </option>
+
+                                        {jahrgaenge.map(jahrgang => (
+
+                                            <option
+                                                key={jahrgang}
+                                                value={jahrgang}
+                                            >
+
+                                                {jahrgang}
+
+                                            </option>
+
+                                        ))}
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <div className="kurs-add-students-list-header">
+
+                                <label>
+
+                                    <input
+                                        type="checkbox"
+                                        disabled={mutationLoading}
+                                        checked={
+
+                                            availableStudents.length > 0 &&
+
+                                            availableStudents.every(student =>
+
+                                                selectedStudentIds.includes(
+                                                    student.id
+                                                )
+
+                                            )
+
+                                        }
+                                        onChange={handleSelectAllVisible}
+                                    />
+
+                                    Alle sichtbaren auswählen
+
+                                </label>
+
+                                <span>
+
+                                    {availableStudents.length} verfügbar
+
+                                </span>
+
+                            </div>
+
+
+                            <div className="kurs-add-students-list">
+
+                                {availableStudents.length === 0 ? (
+
+                                    <div className="kurs-add-students-empty">
+
+                                        Keine passenden Schüler verfügbar.
+
+                                    </div>
+
+                                ) : (
+
+                                    availableStudents.map(student => (
+
+                                        <label
+                                            key={student.id}
+                                            className="kurs-add-student-row"
+                                        >
+
+                                            <input
+                                                type="checkbox"
+                                                disabled={mutationLoading}
+                                                checked={
+
+                                                    selectedStudentIds.includes(
+                                                        student.id
+                                                    )
+
+                                                }
+                                                onChange={() =>
+
+                                                    handleStudentSelection(
+                                                        student.id
+                                                    )
+
+                                                }
+                                            />
+
+                                            <div className="kurs-add-student-name">
+
+                                                <strong>
+
+                                                    {student.nachname || '–'},{' '}
+
+                                                    {student.vorname || '–'}
+
+                                                </strong>
+
+                                                <span>
+
+                                                    Jahrgang{' '}
+
+                                                    {student.jahrgang ?? '–'}
+
+                                                    {' · '}
+
+                                                    Klasse{' '}
+
+                                                    {student.klasse || '–'}
+
+                                                </span>
+
+                                            </div>
+
+                                        </label>
+
+                                    ))
+
+                                )}
+
+                            </div>
+
+
+                            <div className="kurs-add-students-actions">
+
+                                <span>
+
+                                    {selectedStudentIds.length} ausgewählt
+
+                                </span>
+
+                                <button
+                                    type="button"
+                                    className="kurs-add-students-button"
+                                    disabled={
+
+                                        selectedStudentIds.length === 0 ||
+
+                                        mutationLoading
+
+                                    }
+                                    onClick={handleAddSelectedStudents}
+                                >
+
+                                    {addStudentsLoading
+
+                                        ? 'Wird hinzugefügt...'
+
+                                        : 'Ausgewählte Schüler hinzufügen'}
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    )}
+
+                </section>
+
+            )}
+
+
+            {/* =========================================
+                TAGESANWESENHEIT
+               ========================================= */}
 
             <section className="angebot-datum-section">
 
                 <div>
 
-                    <h2>{readOnly ? 'Anwesenheit ansehen' : 'Anwesenheit erfassen'}</h2>
+                    <h2>
+
+                        Anwesenheit ansehen
+
+                    </h2>
 
                     <p>
-                        {readOnly
-                            ? 'Datum auswählen und erfasste Anwesenheit in der Schülerliste ansehen.'
-                            : 'Datum auswählen und Anwesenheit direkt in der Schülerliste speichern.'}
+
+                        Die Anwesenheit wird aus der zentralen
+                        Tagesanwesenheit übernommen und für
+                        die Dauer dieses Angebots ausgewertet.
+
                     </p>
 
                 </div>
 
-                <div className="angebot-datum-field">
 
-                    <label htmlFor="angebot-datum">
-                        Datum
-                    </label>
+                <div className="angebot-datum-actions">
 
-                    <input
-                        id="angebot-datum"
-                        type="date"
-                        value={selectedDate}
-                        onChange={event =>
-                            setSelectedDate(event.target.value)
+                    <div className="angebot-datum-field">
+
+                        <label htmlFor="angebot-datum">
+
+                            Datum
+
+                        </label>
+
+                        <input
+                            id="angebot-datum"
+                            type="date"
+                            value={selectedDate}
+                            onChange={event =>
+
+                                setSelectedDate(
+                                    event.target.value
+                                )
+
+                            }
+                        />
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        className="angebot-refresh-button"
+                        disabled={
+                            attendanceLoading ||
+                            statistikLoading ||
+                            mutationLoading ||
+                            !selectedDate
                         }
-                    />
+                        onClick={() => {
+
+                            setAttendanceReload(
+                                previous => previous + 1
+                            );
+
+                            loadStatistik();
+                        }}
+                    >
+
+                        Aktualisieren
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        className="angebot-attendance-button"
+                        onClick={() =>
+
+                            navigate('/anwesenheit')
+
+                        }
+                    >
+
+                        Zur Anwesenheitserfassung
+
+                    </button>
 
                 </div>
 
             </section>
 
-            {/* =================================================
+
+            {/* =========================================
+                HINWEISE
+               ========================================= */}
+
+            {!selectedDate && (
+
+                <div className="angebot-attendance-hinweis">
+
+                    Bitte wählen Sie ein Datum aus.
+
+                </div>
+
+            )}
+
+
+            {selectedDate && !angebotFindetStatt && (
+
+                <div className="angebot-attendance-hinweis">
+
+                    Dieses Angebot findet am gewählten
+                    Datum nicht statt.
+
+                    Regulärer Wochentag:{' '}
+
+                    <strong>
+
+                        {angebot.wochentag || '–'}
+
+                    </strong>
+
+                </div>
+
+            )}
+
+
+            {attendanceError && (
+
+                <div
+                    className="angebot-attendance-error"
+                    role="alert"
+                >
+
+                    {attendanceError}
+
+                </div>
+
+            )}
+
+
+            {/* =========================================
                 TEILNEHMERLISTE
-               ================================================= */}
+               ========================================= */}
 
             <section className="kurs-details-content">
 
@@ -1129,161 +2315,337 @@ function AngebotDetailsPage({ readOnly = false }) {
                     <input
                         type="text"
                         placeholder="Schüler suchen..."
+                        aria-label="Schüler suchen"
                         value={filter}
                         onChange={event =>
-                            setFilter(event.target.value)
+
+                            setFilter(
+                                event.target.value
+                            )
+
                         }
                     />
 
                     <span>
-                        {sortedStudents.length} Schüler
+
+                        {sortedStudents.length} von{' '}
+
+                        {students.length} Schülern
+
                     </span>
 
                 </div>
 
+
                 <div className="kurs-details-table-scroll">
 
-                    <table className="kurs-details-table">
+                    <table className="kurs-details-table angebot-student-table">
 
                         <thead>
 
                         <tr>
 
-                            {[
-                                ['nachname', 'Nachname'],
-                                ['vorname', 'Vorname'],
-                                ['jahrgang', 'Jahrgang'],
-                                ['klasse', 'Klasse'],
-                                ['fotoFreigabe', 'Fotofreigabe'],
-                                ['anzahlAnwesend', 'Anwesend'],
-                                ['anzahlEntschuldigt', 'Entschuldigt'],
-                                ['anzahlFehlend', 'Fehlend']
-                            ].map(([key, label]) => (
+
+                            {/* SCHÜLERDATEN */}
+
+                            {STUDENT_COLUMNS.map(column => (
 
                                 <th
-                                    key={key}
-                                    onClick={() => handleSort(key)}
+                                    key={column.key}
+                                    onClick={() =>
+
+                                        handleSort(column.key)
+
+                                    }
                                 >
-                                    {label}
-                                    {sortIndicator(key)}
+
+                                    {column.label}
+
+                                    {sortIndicator(column.key)}
+
                                 </th>
 
                             ))}
 
-                            <th>Status am {selectedDate}</th>
 
-                            <th>Email 1</th>
-                            <th>Telefon 1</th>
-                            <th>Mobil 1</th>
-                            <th>Email 2</th>
-                            <th>Telefon 2</th>
-                            <th>Mobil 2</th>
+                            {/* STATISTIK */}
 
-                            {!readOnly && <th>Aktionen</th>}
+                            {STATISTIK_COLUMNS.map(column => (
+
+                                <th
+                                    key={column.key}
+                                    className="angebot-statistik-column"
+                                    onClick={() =>
+
+                                        handleSort(column.key)
+
+                                    }
+                                >
+
+                                    {column.label}
+
+                                    {sortIndicator(column.key)}
+
+                                </th>
+
+                            ))}
+
+
+                            {/* TAGESANWESENHEIT */}
+
+                            <th>
+
+                                Status am{' '}
+
+                                {selectedDate
+
+                                    ? formatDatum(selectedDate)
+
+                                    : '–'}
+
+                            </th>
+
+                            <th>Abwesend ab</th>
+
+                            <th>Abwesend bis</th>
+
+                            <th>Grund Abwesenheit</th>
+
+                            <th>Bemerkung</th>
+
+
+                            {/* KONTAKTDATEN */}
+
+                            {CONTACT_COLUMNS.map(column => (
+
+                                <th
+                                    key={column.key}
+                                    onClick={() =>
+
+                                        handleSort(column.key)
+
+                                    }
+                                >
+
+                                    {column.label}
+
+                                    {sortIndicator(column.key)}
+
+                                </th>
+
+                            ))}
+
+
+                            {!readOnly && (
+
+                                <th>Aktionen</th>
+
+                            )}
 
                         </tr>
 
                         </thead>
+
 
                         <tbody>
 
                         {sortedStudents.length === 0 ? (
 
                             <tr>
+
                                 <td
-                                    colSpan={readOnly ? 15 : 16}
+                                    colSpan={columnCount}
                                     className="kurs-details-empty"
                                 >
+
                                     Keine Schüler gefunden.
+
                                 </td>
+
                             </tr>
 
                         ) : (
 
                             sortedStudents.map(student => (
 
-                                <tr key={student.id}>
+                                <tr key={student.teilnahmeId}>
 
-                                    <td
-                                        onClick={() => { if (!readOnly) navigate(`/students/${student.id}`); }}
-                                    >
-                                        {student.nachname || '–'}
-                                    </td>
 
-                                    <td
-                                        onClick={() => { if (!readOnly) navigate(`/students/${student.id}`); }}
-                                    >
-                                        {student.vorname || '–'}
-                                    </td>
+                                    {/* SCHÜLERDATEN */}
 
-                                    <td>{student.jahrgang ?? '–'}</td>
-                                    <td>{student.klasse || '–'}</td>
-                                    <td>{student.fotoFreigabe || '–'}</td>
+                                    {STUDENT_COLUMNS.map(column => (
 
-                                    <td>{student.anzahlAnwesend}</td>
-                                    <td>{student.anzahlEntschuldigt}</td>
-                                    <td>{student.anzahlFehlend}</td>
+                                        <td key={column.key}>
+
+                                            {column.key === 'nachname' ? (
+
+                                                <button
+                                                    type="button"
+                                                    className="angebot-student-link"
+                                                    onClick={() =>
+
+                                                        handleStudentOpen(
+                                                            student
+                                                        )
+
+                                                    }
+                                                >
+
+                                                    {formatValue(
+                                                        student.nachname
+                                                    )}
+
+                                                </button>
+
+                                            ) : (
+
+                                                formatValue(
+                                                    student[column.key]
+                                                )
+
+                                            )}
+
+                                        </td>
+
+                                    ))}
+
+
+                                    {/* STATISTIK */}
+
+                                    {STATISTIK_COLUMNS.map(column => (
+
+                                        <td
+                                            key={column.key}
+                                            className="angebot-statistik-cell"
+                                        >
+
+                                            {renderStatistikCell(
+
+                                                student,
+
+                                                column.key
+
+                                            )}
+
+                                        </td>
+
+                                    ))}
+
+
+                                    {/* TAGESSTATUS */}
 
                                     <td>
 
-                                        <select
-                                            className="angebot-status-select"
-                                            value={
-                                                attendanceByStudent.get(
-                                                    Number(student.id)
-                                                ) || ''
-                                            }
-                                            disabled={
-                                                readOnly || savingStudentId === student.id
-                                            }
-                                            onChange={event =>
-                                                handleSaveAnwesenheit(
-                                                    student.id,
-                                                    event.target.value
-                                                )
-                                            }
-                                        >
-
-                                            <option value="">
-                                                Nicht erfasst
-                                            </option>
-
-                                            {STATUS_OPTIONS.map(option => (
-                                                <option
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
-                                                    {option.label}
-                                                </option>
-                                            ))}
-
-                                        </select>
+                                        {renderAttendanceStatus(student)}
 
                                     </td>
 
-                                    <td>{student.email1 || '–'}</td>
-                                    <td>{student.telefon1 || '–'}</td>
-                                    <td>{student.mobil1 || '–'}</td>
-                                    <td>{student.email2 || '–'}</td>
-                                    <td>{student.telefon2 || '–'}</td>
-                                    <td>{student.mobil2 || '–'}</td>
+
+                                    {/* ABWESEND AB */}
+
+                                    <td>
+
+                                        {getAttendanceField(
+
+                                            student,
+
+                                            'abwesendAb'
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* ABWESEND BIS */}
+
+                                    <td>
+
+                                        {getAttendanceField(
+
+                                            student,
+
+                                            'abwesendBis'
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* GRUND */}
+
+                                    <td className="angebot-attendance-text">
+
+                                        {getAttendanceField(
+
+                                            student,
+
+                                            'grundAbwesenheit'
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* BEMERKUNG */}
+
+                                    <td className="angebot-attendance-text">
+
+                                        {getAttendanceField(
+
+                                            student,
+
+                                            'bemerkung'
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* KONTAKTDATEN */}
+
+                                    {CONTACT_COLUMNS.map(column => (
+
+                                        <td key={column.key}>
+
+                                            {formatValue(
+                                                student[column.key]
+                                            )}
+
+                                        </td>
+
+                                    ))}
+
+
+                                    {/* AKTIONEN */}
 
                                     {!readOnly && (
-                                    <td>
-                                        <button
-                                            type="button"
-                                            className="angebot-remove-button"
-                                            disabled={
-                                                deletingTeilnahmeId ===
+
+                                        <td>
+
+                                            <button
+                                                type="button"
+                                                className="angebot-remove-button"
+                                                disabled={mutationLoading}
+                                                onClick={() =>
+
+                                                    handleRemoveStudent(
+                                                        student
+                                                    )
+
+                                                }
+                                            >
+
+                                                {deletingTeilnahmeId ===
                                                 student.teilnahmeId
-                                            }
-                                            onClick={() =>
-                                                handleRemoveStudent(student)
-                                            }
-                                        >
-                                            Entfernen
-                                        </button>
-                                    </td>
+
+                                                    ? 'Wird entfernt...'
+
+                                                    : 'Entfernen'}
+
+                                            </button>
+
+                                        </td>
+
                                     )}
 
                                 </tr>

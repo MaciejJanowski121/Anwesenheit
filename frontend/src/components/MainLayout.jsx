@@ -54,6 +54,10 @@ const NAVIGATION = [
             {
                 label: 'Anwesenheit',
                 path: '/anwesenheit'
+            },
+            {
+                label: 'Anwesenheitszeiten',
+                path: '/anwesenheitszeiten'
             }
         ]
     },
@@ -81,6 +85,12 @@ const NAVIGATION = [
                 path: '/kursinfos'
             }
         ]
+    },
+    {
+        id: 'exporte',
+        label: 'Exporte',
+        icon: '↓',
+        path: '/exporte'
     },
     {
         id: 'finanzen',
@@ -176,7 +186,8 @@ function MainLayout({ user, onLogout }) {
 
     const [openMenu, setOpenMenu] = useState(null);
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] =
+        useState(false);
 
     /* =====================================================
        SICHTBARE NAVIGATION

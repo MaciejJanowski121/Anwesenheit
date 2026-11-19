@@ -1,0 +1,92 @@
+/* =====================================================
+   ANA-ANWESENHEITSARCHIV
+   ===================================================== */
+
+.student-ana-archiv {
+    margin-top: 24px;
+}
+
+.student-ana-archiv-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.student-ana-archiv-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    background: var(--surface-secondary);
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.student-ana-archiv-reset-row {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-bottom: 18px;
+}
+
+
+/* =====================================================
+   STATISTIK
+   ===================================================== */
+
+.student-ana-archiv-statistik {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+}
+
+
+/* =====================================================
+   TABELLE
+   ===================================================== */
+
+.student-ana-archiv-table {
+    min-width: 750px;
+}
+
+
+/* =====================================================
+   ENTSCHULDIGT
+   ===================================================== */
+
+.student-ana-archiv .student-anwesenheit-status.entschuldigt {
+    background: rgba(217, 119, 6, 0.12);
+
+    color: #d97706;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+    .student-ana-archiv-statistik {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 420px) {
+
+    .student-ana-archiv-statistik {
+        grid-template-columns: 1fr;
+    }
+}

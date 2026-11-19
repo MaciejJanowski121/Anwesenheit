@@ -4,7 +4,17 @@ import React, {
     useState
 } from 'react';
 
+import StudentAnaArchiv
+    from './anwesenheit/StudentAnaArchiv';
+import StudentAnwesenheit
+    from './anwesenheit/StudentAnwesenheit';
+
 import './StudentDetailView.css';
+
+
+/* =====================================================
+   WOCHENTAGE
+   ===================================================== */
 
 const WOCHENTAGE = [
     'Montag',
@@ -14,38 +24,54 @@ const WOCHENTAGE = [
     'Freitag'
 ];
 
+
+/* =====================================================
+   STUDENT DETAIL VIEW
+   ===================================================== */
+
 function StudentDetailView({
+
                                student,
+
+                               // ANA
                                buchungen = [],
                                kurse = [],
+
+                               // Tagesanwesenheit
                                anwesenheiten = [],
 
                                // Angebote
                                angebote = [],
                                angebotTeilnahmen = [],
 
-                               // ANA
+                               // ANA Aktionen
                                onAssignKurs,
                                onDeleteBuchung,
                                onUpdateBesonderheiten,
 
-                               // Angebote
+                               // Angebote Aktionen
                                onAssignAngebot,
                                onDeleteAngebotTeilnahme,
                                onUpdateAngebotBesonderheiten,
 
+                               // Navigation
                                onClose
+
                            }) {
 
     /* =====================================================
        ANA – KURS ZUWEISEN
        ===================================================== */
 
-    const [selectedWochentag, setSelectedWochentag] =
-        useState('');
+    const [
+        selectedWochentag,
+        setSelectedWochentag
+    ] = useState('');
 
-    const [selectedKursId, setSelectedKursId] =
-        useState('');
+    const [
+        selectedKursId,
+        setSelectedKursId
+    ] = useState('');
 
 
     /* =====================================================
@@ -139,32 +165,13 @@ function StudentDetailView({
 
 
     /* =====================================================
-       ANWESENHEIT FILTER
-       ===================================================== */
-
-    const [
-        anwesenheitDatumFilter,
-        setAnwesenheitDatumFilter
-    ] = useState('');
-
-    const [
-        anwesenheitKursFilter,
-        setAnwesenheitKursFilter
-    ] = useState('');
-
-    const [
-        anwesenheitStatusFilter,
-        setAnwesenheitStatusFilter
-    ] = useState('');
-
-
-    /* =====================================================
        ANA – KURSE NACH WOCHENTAG FILTERN
        ===================================================== */
 
     const filteredKurse = useMemo(() => {
 
         if (!selectedWochentag) {
+
             return [];
         }
 
@@ -186,14 +193,17 @@ function StudentDetailView({
     const filteredAngebote = useMemo(() => {
 
         if (!selectedAngebotWochentag) {
+
             return [];
         }
 
         const assignedIds = new Set(
+
             angebotTeilnahmen.map(
                 (teilnahme) =>
                     String(teilnahme.angebot?.id)
             )
+
         );
 
         return angebote.filter((angebot) =>
@@ -211,129 +221,6 @@ function StudentDetailView({
         angebotTeilnahmen,
         selectedAngebotWochentag
     ]);
-
-
-    /* =====================================================
-       ANWESENHEIT – KURSE ERMITTELN
-       ===================================================== */
-
-    const anwesenheitKurse = useMemo(() => {
-
-        const kursMap = new Map();
-
-        anwesenheiten.forEach((anwesenheit) => {
-
-            const kurs = anwesenheit.kurs;
-
-            if (kurs?.id) {
-
-                kursMap.set(
-                    String(kurs.id),
-                    kurs
-                );
-            }
-        });
-
-        return [...kursMap.values()].sort(
-            (a, b) =>
-                String(a.name ?? '')
-                    .localeCompare(
-                        String(b.name ?? ''),
-                        'de'
-                    )
-        );
-
-    }, [anwesenheiten]);
-
-
-    /* =====================================================
-       ANWESENHEIT – STATUS ERMITTELN
-       ===================================================== */
-
-    const anwesenheitStatus = useMemo(() => {
-
-        return [
-            ...new Set(
-                anwesenheiten
-                    .map(
-                        (anwesenheit) =>
-                            anwesenheit.status
-                    )
-                    .filter(Boolean)
-            )
-        ].sort(
-            (a, b) =>
-                String(a)
-                    .localeCompare(
-                        String(b),
-                        'de'
-                    )
-        );
-
-    }, [anwesenheiten]);
-
-
-    /* =====================================================
-       ANWESENHEITEN FILTERN UND SORTIEREN
-       ===================================================== */
-
-    const filteredAnwesenheiten = useMemo(() => {
-
-        return [...anwesenheiten]
-
-            .filter((anwesenheit) => {
-
-                const matchesDatum =
-                    !anwesenheitDatumFilter ||
-                    String(
-                        anwesenheit.datum ?? ''
-                    ) === anwesenheitDatumFilter;
-
-                const matchesKurs =
-                    !anwesenheitKursFilter ||
-                    String(
-                        anwesenheit.kurs?.id ?? ''
-                    ) === String(
-                        anwesenheitKursFilter
-                    );
-
-                const matchesStatus =
-                    !anwesenheitStatusFilter ||
-                    String(
-                        anwesenheit.status ?? ''
-                    ) === anwesenheitStatusFilter;
-
-                return (
-                    matchesDatum &&
-                    matchesKurs &&
-                    matchesStatus
-                );
-            })
-
-            .sort(
-                (a, b) =>
-                    String(
-                        b.datum ?? ''
-                    ).localeCompare(
-                        String(
-                            a.datum ?? ''
-                        )
-                    )
-            );
-
-    }, [
-        anwesenheiten,
-        anwesenheitDatumFilter,
-        anwesenheitKursFilter,
-        anwesenheitStatusFilter
-    ]);
-
-
-    const hasAnwesenheitFilter = Boolean(
-        anwesenheitDatumFilter ||
-        anwesenheitKursFilter ||
-        anwesenheitStatusFilter
-    );
 
 
     /* =====================================================
@@ -369,6 +256,7 @@ function StudentDetailView({
     const handleAssign = async () => {
 
         if (!selectedKursId) {
+
             return;
         }
 
@@ -426,6 +314,7 @@ function StudentDetailView({
             !selectedAngebotId ||
             assigningAngebot
         ) {
+
             return;
         }
 
@@ -555,18 +444,6 @@ function StudentDetailView({
 
             setSavingAngebotBesonderheitenId(null);
         }
-    };
-
-
-    /* =====================================================
-       ANWESENHEITSFILTER ZURÜCKSETZEN
-       ===================================================== */
-
-    const resetAnwesenheitFilter = () => {
-
-        setAnwesenheitDatumFilter('');
-        setAnwesenheitKursFilter('');
-        setAnwesenheitStatusFilter('');
     };
 
 
@@ -876,11 +753,13 @@ function StudentDetailView({
                                     key={angebot.id}
                                     value={angebot.id}
                                 >
+
                                     {angebot.name}
 
                                     {angebot.beginn && angebot.ende
                                         ? ` | ${angebot.beginn} - ${angebot.ende}`
                                         : ''}
+
                                 </option>
 
                             ))}
@@ -899,9 +778,11 @@ function StudentDetailView({
                             assigningAngebot
                         }
                     >
+
                         {assigningAngebot
                             ? 'Wird hinzugefügt...'
                             : 'Angebot hinzufügen'}
+
                     </button>
 
                 </div>
@@ -911,8 +792,10 @@ function StudentDetailView({
                     filteredAngebote.length === 0 && (
 
                         <p className="empty-text">
+
                             Für {selectedAngebotWochentag} sind
                             keine weiteren Angebote verfügbar.
+
                         </p>
 
                     )}
@@ -931,14 +814,23 @@ function StudentDetailView({
                             <thead>
 
                             <tr>
+
                                 <th>Angebot</th>
+
                                 <th>Angebotsart</th>
+
                                 <th>Angebotsleitung</th>
+
                                 <th>Wochentag</th>
+
                                 <th>Beginn</th>
+
                                 <th>Ende</th>
+
                                 <th>Besonderheiten</th>
+
                                 <th>Aktionen</th>
+
                             </tr>
 
                             </thead>
@@ -948,7 +840,8 @@ function StudentDetailView({
 
                             {angebotTeilnahmen.map((teilnahme) => {
 
-                                const angebot = teilnahme.angebot;
+                                const angebot =
+                                    teilnahme.angebot;
 
                                 return (
 
@@ -1003,15 +896,19 @@ function StudentDetailView({
                                                     }
                                                 />
 
+
                                                 <div className="besonderheiten-footer">
 
                                                     <span className="besonderheiten-counter">
+
                                                         {(
                                                             angebotBesonderheitenValues[
                                                                 teilnahme.id
                                                                 ] ?? ''
                                                         ).length} / 50
+
                                                     </span>
+
 
                                                     <button
                                                         type="button"
@@ -1026,9 +923,11 @@ function StudentDetailView({
                                                             )
                                                         }
                                                     >
+
                                                         {savingAngebotBesonderheitenId === teilnahme.id
                                                             ? 'Speichert...'
                                                             : 'Speichern'}
+
                                                     </button>
 
                                                 </div>
@@ -1051,7 +950,9 @@ function StudentDetailView({
                                                     )
                                                 }
                                             >
+
                                                 Entfernen
+
                                             </button>
 
                                         </td>
@@ -1071,7 +972,9 @@ function StudentDetailView({
                 ) : (
 
                     <p className="empty-text">
+
                         Noch keine Angebotsbuchungen vorhanden.
+
                     </p>
 
                 )}
@@ -1155,11 +1058,13 @@ function StudentDetailView({
                                     key={kurs.id}
                                     value={kurs.id}
                                 >
+
                                     {kurs.name}
 
                                     {kurs.uhrzeit
                                         ? ` | ${kurs.uhrzeit}`
                                         : ''}
+
                                 </option>
 
                             ))}
@@ -1175,7 +1080,9 @@ function StudentDetailView({
                         onClick={handleAssign}
                         disabled={!selectedKursId}
                     >
+
                         Kurs hinzufügen
+
                     </button>
 
                 </div>
@@ -1185,8 +1092,10 @@ function StudentDetailView({
                     filteredKurse.length === 0 && (
 
                         <p className="empty-text">
+
                             Für {selectedWochentag} sind
                             keine Kurse vorhanden.
+
                         </p>
 
                     )}
@@ -1205,14 +1114,23 @@ function StudentDetailView({
                             <thead>
 
                             <tr>
+
                                 <th>Kurs</th>
+
                                 <th>Kursleitung</th>
+
                                 <th>Wochentag</th>
+
                                 <th>Uhrzeit</th>
+
                                 <th>Buchungsart</th>
+
                                 <th>Gebühr</th>
+
                                 <th>Besonderheiten</th>
+
                                 <th>Aktionen</th>
+
                             </tr>
 
                             </thead>
@@ -1245,9 +1163,11 @@ function StudentDetailView({
                                     </td>
 
                                     <td>
+
                                         {buchung.kurs?.kursgebuehr != null
                                             ? `${buchung.kurs.kursgebuehr} €`
                                             : '–'}
+
                                     </td>
 
 
@@ -1275,15 +1195,19 @@ function StudentDetailView({
                                                 }
                                             />
 
+
                                             <div className="besonderheiten-footer">
 
                                                 <span className="besonderheiten-counter">
+
                                                     {(
                                                         besonderheitenValues[
                                                             buchung.id
                                                             ] ?? ''
                                                     ).length} / 50
+
                                                 </span>
+
 
                                                 <button
                                                     type="button"
@@ -1298,9 +1222,11 @@ function StudentDetailView({
                                                         )
                                                     }
                                                 >
+
                                                     {savingBesonderheitenId === buchung.id
                                                         ? 'Speichert...'
                                                         : 'Speichern'}
+
                                                 </button>
 
                                             </div>
@@ -1323,7 +1249,9 @@ function StudentDetailView({
                                                 )
                                             }
                                         >
+
                                             Entfernen
+
                                         </button>
 
                                     </td>
@@ -1341,7 +1269,9 @@ function StudentDetailView({
                 ) : (
 
                     <p className="empty-text">
+
                         Noch keine Kursbuchungen vorhanden.
+
                     </p>
 
                 )}
@@ -1350,228 +1280,23 @@ function StudentDetailView({
 
 
             {/* =========================================
-                ANWESENHEIT
+                TAGESANWESENHEIT
+
+                Die Anwesenheit wird zentral über
+                StudentAnwesenheit dargestellt.
+
+                Ein Eintrag pro Schüler und Tag.
                ========================================= */}
 
-            <section className="detail-section">
-
-                <div className="detail-anwesenheit-header">
-
-                    <div>
-
-                        <h3>
-                            Anwesenheit
-                        </h3>
-
-                        <p>
-                            Anwesenheiten nach Datum,
-                            Kurs oder Status filtern
-                        </p>
-
-                    </div>
-
-
-                    {hasAnwesenheitFilter && (
-
-                        <button
-                            type="button"
-                            className="detail-filter-reset"
-                            onClick={resetAnwesenheitFilter}
-                        >
-                            Filter zurücksetzen
-                        </button>
-
-                    )}
-
-                </div>
-
-
-                {/* =====================================
-                    ANWESENHEITSFILTER
-                   ===================================== */}
-
-                <div className="detail-anwesenheit-filter">
-
-                    <div className="detail-filter-field">
-
-                        <label htmlFor="anwesenheit-datum">
-                            Datum
-                        </label>
-
-                        <input
-                            id="anwesenheit-datum"
-                            type="date"
-                            value={anwesenheitDatumFilter}
-                            onChange={(event) =>
-                                setAnwesenheitDatumFilter(
-                                    event.target.value
-                                )
-                            }
-                        />
-
-                    </div>
-
-
-                    <div className="detail-filter-field">
-
-                        <label htmlFor="anwesenheit-kurs">
-                            Kurs
-                        </label>
-
-                        <select
-                            id="anwesenheit-kurs"
-                            value={anwesenheitKursFilter}
-                            onChange={(event) =>
-                                setAnwesenheitKursFilter(
-                                    event.target.value
-                                )
-                            }
-                        >
-
-                            <option value="">
-                                Alle Kurse
-                            </option>
-
-                            {anwesenheitKurse.map((kurs) => (
-
-                                <option
-                                    key={kurs.id}
-                                    value={kurs.id}
-                                >
-                                    {kurs.name}
-                                </option>
-
-                            ))}
-
-                        </select>
-
-                    </div>
-
-
-                    <div className="detail-filter-field">
-
-                        <label htmlFor="anwesenheit-status">
-                            Status
-                        </label>
-
-                        <select
-                            id="anwesenheit-status"
-                            value={anwesenheitStatusFilter}
-                            onChange={(event) =>
-                                setAnwesenheitStatusFilter(
-                                    event.target.value
-                                )
-                            }
-                        >
-
-                            <option value="">
-                                Alle Status
-                            </option>
-
-                            {anwesenheitStatus.map((status) => (
-
-                                <option
-                                    key={status}
-                                    value={status}
-                                >
-                                    {status}
-                                </option>
-
-                            ))}
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                {/* =====================================
-                    ANZAHL ANWESENHEITEN
-                   ===================================== */}
-
-                <div className="detail-anwesenheit-count">
-
-                    <strong>
-                        {filteredAnwesenheiten.length}
-                    </strong>
-
-                    {' '}
-
-                    {filteredAnwesenheiten.length === 1
-                        ? 'Eintrag'
-                        : 'Einträge'}
-
-                </div>
-
-
-                {/* =====================================
-                    ANWESENHEITSTABELLE
-                   ===================================== */}
-
-                {filteredAnwesenheiten.length > 0 ? (
-
-                    <div className="detail-table-scroll">
-
-                        <table className="detail-table">
-
-                            <thead>
-
-                            <tr>
-                                <th>Datum</th>
-                                <th>Kurs</th>
-                                <th>Status</th>
-                                <th>Bemerkung</th>
-                            </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                            {filteredAnwesenheiten.map((anwesenheit) => (
-
-                                <tr key={anwesenheit.id}>
-
-                                    <td>
-                                        {anwesenheit.datum || '–'}
-                                    </td>
-
-                                    <td>
-                                        {anwesenheit.kurs?.name || '–'}
-                                    </td>
-
-                                    <td>
-                                        {anwesenheit.status || '–'}
-                                    </td>
-
-                                    <td>
-                                        {anwesenheit.bemerkung || '–'}
-                                    </td>
-
-                                </tr>
-
-                            ))}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                ) : (
-
-                    <p className="empty-text">
-
-                        {anwesenheiten.length > 0
-                            ? 'Keine Anwesenheiten für die aktuelle Filterauswahl gefunden.'
-                            : 'Noch keine Anwesenheitsdaten vorhanden.'}
-
-                    </p>
-
-                )}
-
-            </section>
+            <StudentAnwesenheit
+                key={`tagesanwesenheit-${student.id}`}
+                anwesenheiten={anwesenheiten}
+            />
+
+            <StudentAnaArchiv
+                key={`ana-archiv-${student.id}`}
+                studentId={student.id}
+            />
 
         </div>
     );
