@@ -132,7 +132,7 @@ export const updateTagesAnwesenheit = async (
 };
 
 /* =====================================================
-   SAMMELAKTUALISIERUNG
+   SAMMELAKTUALISIERUNG EINES TAGES
    ===================================================== */
 
 export const saveSammelTagesAnwesenheit = async (
@@ -145,6 +145,32 @@ export const saveSammelTagesAnwesenheit = async (
         `${API_URL}/sammel`,
         {
             datum,
+            studentIds,
+            aenderungen
+        }
+    );
+
+    return response.data;
+};
+
+/* =====================================================
+   SAMMELAKTUALISIERUNG EINES ZEITRAUMS
+   ===================================================== */
+
+export const saveSammelTagesAnwesenheitZeitraum = async (
+    von,
+    bis,
+    wochentage,
+    studentIds,
+    aenderungen
+) => {
+
+    const response = await axios.post(
+        `${API_URL}/sammel/zeitraum`,
+        {
+            von,
+            bis,
+            wochentage,
             studentIds,
             aenderungen
         }

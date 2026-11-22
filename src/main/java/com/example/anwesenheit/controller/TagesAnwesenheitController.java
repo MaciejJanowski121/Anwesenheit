@@ -9,6 +9,12 @@ import com.example.anwesenheit.service
 import com.example.anwesenheit.service
         .TagesAnwesenheitService.SammelAnwesenheitDto;
 
+import com.example.anwesenheit.service
+        .TagesAnwesenheitService.SammelAnwesenheitZeitraumDto;
+
+import com.example.anwesenheit.service
+        .TagesAnwesenheitService.SammelAnwesenheitZeitraumResponse;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -150,7 +156,7 @@ public class TagesAnwesenheitController {
     }
 
     /* =====================================================
-       SAMMELAKTUALISIERUNG
+       SAMMELAKTUALISIERUNG EINES TAGES
        ===================================================== */
 
     @PostMapping("/sammel")
@@ -160,6 +166,20 @@ public class TagesAnwesenheitController {
     ) {
 
         return service.saveSammelAnwesenheit(dto);
+    }
+
+    /* =====================================================
+       SAMMELAKTUALISIERUNG EINES ZEITRAUMS
+       ===================================================== */
+
+    @PostMapping("/sammel/zeitraum")
+    public SammelAnwesenheitZeitraumResponse
+    saveSammelAnwesenheitZeitraum(
+
+            @RequestBody SammelAnwesenheitZeitraumDto dto
+    ) {
+
+        return service.saveSammelAnwesenheitZeitraum(dto);
     }
 
     /* =====================================================

@@ -31,7 +31,7 @@ import {
 import {
     getTagesAnwesenheitenByDatum,
     updateTagesAnwesenheit,
-    saveSammelTagesAnwesenheit
+    saveSammelTagesAnwesenheitZeitraum
 } from '../../services/tagesAnwesenheitService';
 
 import AnwesenheitFilter from './AnwesenheitFilter';
@@ -764,41 +764,137 @@ function AnwesenheitErfassung() {
 
     const sortedRows = useMemo(() => {
 
+        const direction =
+            sortDirection === 'asc' ? 1 : -1;
+
         return [...filteredRows].sort((a, b) => {
 
-            let result;
+            let result = 0;
 
-            if (sortKey === 'jahrgang') {
+            const attendanceA = a.anwesenheit;
+            const attendanceB = b.anwesenheit;
 
-                result =
-                    Number(a.jahrgang ?? 0) -
-                    Number(b.jahrgang ?? 0);
+            switch (sortKey) {
 
-            } else {
+                /* =========================================
+                   JAHRGANG
+                   ========================================= */
 
-                result = String(
-                    a[sortKey] ?? ''
-                ).localeCompare(
-                    String(b[sortKey] ?? ''),
+                case 'jahrgang':
+
+                    result =
+                        Number(a.jahrgang ?? 0) -
+                        Number(b.jahrgang ?? 0);
+
+                    break;
+
+                /* =========================================
+                   ANWESEND
+                   ========================================= */
+
+                case 'anwesend':
+
+                    result =
+                        Number(attendanceA.status === 'ANWESEND') -
+                        Number(attendanceB.status === 'ANWESEND');
+
+                    break;
+
+                /* =========================================
+                   FEHLT
+                   ========================================= */
+
+                case 'fehlt':
+
+                    result =
+                        Number(attendanceA.status === 'FEHLT') -
+                        Number(attendanceB.status === 'FEHLT');
+
+                    break;
+
+                /* =========================================
+                   ABWESENHEITSZEITEN
+                   ========================================= */
+
+                case 'abwesendAb':
+                case 'abwesendBis': {
+
+                    const timeA =
+                        attendanceA[sortKey] || '';
+
+                    const timeB =
+                        attendanceB[sortKey] || '';
+
+                    /*
+                     * Leere Uhrzeiten bleiben unabhängig
+                     * von der Sortierrichtung am Ende.
+                     */
+
+                    if (!timeA && timeB) {
+                        return 1;
+                    }
+
+                    if (timeA && !timeB) {
+                        return -1;
+                    }
+
+                    result = timeA.localeCompare(timeB);
+
+                    break;
+                }
+
+                /* =========================================
+                   ANA ANWESENHEITSKONTROLLE
+                   ========================================= */
+
+                case 'anaAnwesenheitskontrolle':
+
+                    result =
+                        Number(
+                            attendanceA.anaAnwesenheitskontrolle === true
+                        ) -
+                        Number(
+                            attendanceB.anaAnwesenheitskontrolle === true
+                        );
+
+                    break;
+
+                /* =========================================
+                   STANDARD TEXTSORTIERUNG
+                   ========================================= */
+
+                default:
+
+                    result = String(
+                        a[sortKey] ?? ''
+                    ).localeCompare(
+                        String(b[sortKey] ?? ''),
+                        'de',
+                        {
+                            numeric: true,
+                            sensitivity: 'base'
+                        }
+                    );
+
+                    break;
+            }
+
+            /* =============================================
+               BEI GLEICHEN WERTEN NACH NAMEN SORTIEREN
+               ============================================= */
+
+            if (result === 0) {
+
+                return a.name.localeCompare(
+                    b.name,
                     'de',
                     {
-                        numeric: true,
                         sensitivity: 'base'
                     }
                 );
             }
 
-            if (result === 0) {
-
-                result = a.name.localeCompare(
-                    b.name,
-                    'de'
-                );
-            }
-
-            return sortDirection === 'asc'
-                ? result
-                : -result;
+            return result * direction;
         });
 
     }, [
@@ -806,6 +902,10 @@ function AnwesenheitErfassung() {
         sortKey,
         sortDirection
     ]);
+
+    /* =====================================================
+       SORTIERRICHTUNG ÄNDERN
+       ===================================================== */
 
     const handleSort = key => {
 
@@ -820,7 +920,23 @@ function AnwesenheitErfassung() {
         } else {
 
             setSortKey(key);
-            setSortDirection('asc');
+
+            /*
+             * Bei Checkbox-Spalten werden zunächst
+             * die ausgewählten Schüler angezeigt.
+             */
+
+            const checkboxColumns = [
+                'anwesend',
+                'fehlt',
+                'anaAnwesenheitskontrolle'
+            ];
+
+            setSortDirection(
+                checkboxColumns.includes(key)
+                    ? 'desc'
+                    : 'asc'
+            );
         }
     };
 
@@ -1033,15 +1149,13 @@ function AnwesenheitErfassung() {
                 createEmptyAnwesenheit();
 
             const next = {
-
                 ...current,
-
                 [field]: value
             };
 
             /*
-             * Vollständig fehlende Schüler
-             * benötigen keine zusätzlichen Zeiten.
+             * Bei vollständiger Abwesenheit
+             * werden beide Abwesenheitszeiträume entfernt.
              */
 
             if (
@@ -1051,12 +1165,13 @@ function AnwesenheitErfassung() {
 
                 next.abwesendAb = '';
                 next.abwesendBis = '';
+
+                next.abwesendAb2 = '';
+                next.abwesendBis2 = '';
             }
 
             return {
-
                 ...previous,
-
                 [id]: next
             };
         });
@@ -1201,18 +1316,34 @@ function AnwesenheitErfassung() {
     };
 
     /* =====================================================
-       SAMMELAKTUALISIERUNG
+       SAMMELAKTUALISIERUNG EINES ZEITRAUMS
        ===================================================== */
 
-    const handleSammelSave = async aenderungen => {
+    const handleSammelSave = async (
+        aenderungen,
+        zeitraum
+    ) => {
+
+        /* =====================================================
+           AKTUELLEN STATUS PRÜFEN
+           ===================================================== */
 
         if (
             saving ||
             loading ||
-            loadError ||
-            selectedStudentIds.length === 0
+            loadError
         ) {
-            return;
+
+            throw new Error(
+                'Die Sammelerfassung ist momentan nicht verfügbar.'
+            );
+        }
+
+        if (selectedStudentIds.length === 0) {
+
+            throw new Error(
+                'Bitte wählen Sie mindestens einen Schüler aus.'
+            );
         }
 
         if (
@@ -1220,73 +1351,143 @@ function AnwesenheitErfassung() {
             Object.keys(aenderungen).length === 0
         ) {
 
-            setError(
+            throw new Error(
                 'Bitte wählen Sie mindestens eine Änderung aus.'
             );
-
-            return;
         }
 
-        /*
-         * Einzeländerungen zuerst speichern,
-         * damit keine lokalen Änderungen
-         * überschrieben werden.
-         */
+        /* =====================================================
+           OFFENE EINZELÄNDERUNGEN PRÜFEN
+           ===================================================== */
 
         if (hasUnsavedChanges) {
 
-            setError(
+            throw new Error(
                 'Bitte speichern Sie zuerst die offenen Einzeländerungen.'
             );
-
-            return;
         }
+
+        /* =====================================================
+           ZEITRAUM VALIDIEREN
+           ===================================================== */
+
+        if (
+            !zeitraum ||
+            !zeitraum.von ||
+            !zeitraum.bis
+        ) {
+
+            throw new Error(
+                'Bitte wählen Sie ein Start- und Enddatum.'
+            );
+        }
+
+        if (zeitraum.von > zeitraum.bis) {
+
+            throw new Error(
+                'Das Von-Datum darf nicht nach dem Bis-Datum liegen.'
+            );
+        }
+
+        if (
+            !Array.isArray(zeitraum.wochentage) ||
+            zeitraum.wochentage.length === 0
+        ) {
+
+            throw new Error(
+                'Bitte wählen Sie mindestens einen Wochentag aus.'
+            );
+        }
+
+        /* =====================================================
+           PAYLOAD ERSTELLEN
+           ===================================================== */
 
         const payload = {
             ...aenderungen
         };
 
+        /*
+         * Bei vollständiger Abwesenheit werden
+         * beide Abwesenheitszeiträume entfernt.
+         */
+
         if (payload.status === 'FEHLT') {
 
             payload.abwesendAb = null;
             payload.abwesendBis = null;
+
+            payload.abwesendAb2 = null;
+            payload.abwesendBis2 = null;
         }
 
-        /* =========================================
-           VALIDIERUNG ALLER AUSGEWÄHLTEN SCHÜLER
-           ========================================= */
+        /* =====================================================
+           ABWESENHEITSGRUND VALIDIEREN
+           ===================================================== */
 
-        for (const studentId of selectedStudentIds) {
+        if (
+            typeof payload.grundAbwesenheit === 'string' &&
+            payload.grundAbwesenheit.length > 50
+        ) {
 
-            const current =
-                anwesenheiten[studentId] ||
-                createEmptyAnwesenheit();
-
-            const next = normalizeAnwesenheit({
-
-                ...current,
-
-                ...payload
-            });
-
-            const validationError =
-                validateAnwesenheit(next);
-
-            if (validationError) {
-
-                const student =
-                    students.find(item =>
-                        normalizeId(item.id) ===
-                        studentId
-                    );
-
-                setError(
-                    `${getStudentName(student)}: ${validationError}`
-                );
-
-                return;
-            }
+            throw new Error(
+                'Der Abwesenheitsgrund darf maximal 50 Zeichen enthalten.'
+            );
         }
+
+        /* =====================================================
+           UHRZEITEN VALIDIEREN
+           ===================================================== */
+
+        if (
+            payload.abwesendAb &&
+            payload.abwesendBis &&
+            payload.abwesendAb >= payload.abwesendBis
+        ) {
+
+            throw new Error(
+                'Abwesend ab muss vor Abwesend bis liegen.'
+            );
+        }
+
+        /* =====================================================
+           AUSGEWÄHLTE SCHÜLER ERMITTELN
+           ===================================================== */
+
+        const visibleStudentIds = new Set(
+
+            sortedRows.map(row =>
+                normalizeId(row.studentId)
+            )
+        );
+
+        const studentIds = [
+
+            ...new Set(
+
+                selectedStudentIds.filter(id =>
+                    visibleStudentIds.has(id)
+                )
+            )
+
+        ].map(Number);
+
+        if (
+            studentIds.length === 0 ||
+            studentIds.some(id =>
+                !Number.isSafeInteger(id) ||
+                id <= 0
+            )
+        ) {
+
+            throw new Error(
+                'Die Schülerauswahl ist ungültig.'
+            );
+        }
+
+        /* =====================================================
+           SAMMELAKTUALISIERUNG SPEICHERN
+           ===================================================== */
 
         try {
 
@@ -1295,51 +1496,122 @@ function AnwesenheitErfassung() {
             setMessage('');
 
             const result =
-                await saveSammelTagesAnwesenheit(
+                await saveSammelTagesAnwesenheitZeitraum(
 
-                    datum,
+                    zeitraum.von,
 
-                    selectedStudentIds.map(Number),
+                    zeitraum.bis,
+
+                    zeitraum.wochentage,
+
+                    studentIds,
 
                     payload
                 );
 
-            const savedEntries = {};
+            /* =====================================================
+               ERFOLGSMELDUNG ERSTELLEN
+               ===================================================== */
 
-            asArray(result).forEach(eintrag => {
+            const successMessage =
 
-                const studentId =
-                    normalizeId(
-                        eintrag.student?.id
+                `${result.anzahlEintraege} Anwesenheitseinträge ` +
+
+                `für ${result.anzahlSchueler} Schüler ` +
+
+                `an ${result.anzahlTage} Tagen ` +
+
+                'wurden erfolgreich gespeichert.';
+
+            /* =====================================================
+               AKTUELL ANGEZEIGTEN TAG PRÜFEN
+               ===================================================== */
+
+            const aktuellerTagBetroffen =
+
+                Array.isArray(result.gespeicherteTage) &&
+
+                result.gespeicherteTage.includes(datum);
+
+            /*
+             * Die Tabelle zeigt weiterhin nur
+             * die Anwesenheiten des aktuell
+             * ausgewählten Datums an.
+             *
+             * Nur wenn dieses Datum betroffen ist,
+             * müssen die Anwesenheiten neu geladen werden.
+             */
+
+            if (aktuellerTagBetroffen) {
+
+                try {
+
+                    const attendanceData =
+                        await getTagesAnwesenheitenByDatum(
+                            datum
+                        );
+
+                    const attendanceMap = {};
+
+                    asArray(attendanceData).forEach(
+                        eintrag => {
+
+                            const studentId =
+                                eintrag.student?.id;
+
+                            if (studentId == null) {
+                                return;
+                            }
+
+                            attendanceMap[
+                                normalizeId(studentId)
+                                ] = normalizeAnwesenheit(
+                                eintrag
+                            );
+                        }
                     );
 
-                if (!studentId) {
+                    setOriginalAnwesenheiten(
+                        attendanceMap
+                    );
+
+                    setAnwesenheiten({
+                        ...attendanceMap
+                    });
+
+                } catch (reloadError) {
+
+                    /*
+                     * Die Speicherung war erfolgreich.
+                     * Nur das erneute Laden ist fehlgeschlagen.
+                     */
+
+                    console.error(
+                        'Anwesenheiten konnten nach dem Speichern nicht geladen werden:',
+                        reloadError
+                    );
+
+                    setMessage(successMessage);
+
+                    setError(
+                        'Die Sammelerfassung wurde gespeichert, ' +
+                        'aber die aktuelle Ansicht konnte nicht ' +
+                        'aktualisiert werden. Bitte laden Sie ' +
+                        'die Ansicht erneut.'
+                    );
+
+                    setLoadError(true);
+                    setSelectedStudentIds([]);
+
                     return;
                 }
+            }
 
-                savedEntries[studentId] =
-                    normalizeAnwesenheit(
-                        eintrag
-                    );
-            });
+            /* =====================================================
+               ERFOLG ANZEIGEN
+               ===================================================== */
 
-            setOriginalAnwesenheiten(previous => ({
-
-                ...previous,
-
-                ...savedEntries
-            }));
-
-            setAnwesenheiten(previous => ({
-
-                ...previous,
-
-                ...savedEntries
-            }));
-
-            setMessage(
-                `${Object.keys(savedEntries).length} Anwesenheiten wurden aktualisiert.`
-            );
+            setMessage(successMessage);
 
             setSelectedStudentIds([]);
 
@@ -1350,12 +1622,16 @@ function AnwesenheitErfassung() {
                 err
             );
 
-            setError(
-                getErrorMessage(
-                    err,
-                    'Die Sammelaktualisierung ist fehlgeschlagen.'
-                )
+            const errorMessage = getErrorMessage(
+
+                err,
+
+                'Die Sammelaktualisierung ist fehlgeschlagen.'
             );
+
+            setError(errorMessage);
+
+            throw new Error(errorMessage);
 
         } finally {
 
@@ -1373,7 +1649,9 @@ function AnwesenheitErfassung() {
 
             row.anwesenheit.status ||
             row.anwesenheit.abwesendAb ||
-            row.anwesenheit.abwesendBis
+            row.anwesenheit.abwesendBis ||
+            row.anwesenheit.abwesendAb2 ||
+            row.anwesenheit.abwesendBis2
 
         ).length;
 
@@ -1582,6 +1860,8 @@ function AnwesenheitErfassung() {
                     {/* TABELLE */}
 
                     <AnwesenheitTabelle
+
+                        key={datum}
 
                         rows={sortedRows}
 

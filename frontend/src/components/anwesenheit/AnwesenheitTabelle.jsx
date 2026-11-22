@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
     TIME_OPTIONS,
@@ -22,7 +22,6 @@ function SortableHeader({
     const active = sortKey === column;
 
     return (
-
         <th
             className={`sortable-header ${className}`}
             aria-sort={
@@ -33,25 +32,19 @@ function SortableHeader({
                     : 'none'
             }
         >
-
             <button
                 type="button"
                 className="anwesenheit-sort-button"
                 onClick={() => onSort(column)}
             >
-
                 {label}
 
                 {active && (
                     <span className="anwesenheit-sort-icon">
-                        {sortDirection === 'asc'
-                            ? ' ▲'
-                            : ' ▼'}
+                        {sortDirection === 'asc' ? ' ▲' : ' ▼'}
                     </span>
                 )}
-
             </button>
-
         </th>
     );
 }
@@ -68,7 +61,6 @@ function TimeSelect({
                     }) {
 
     return (
-
         <select
             className="anwesenheit-time-select"
             value={value || ''}
@@ -78,24 +70,16 @@ function TimeSelect({
                 onChange(event.target.value)
             }
         >
-
-            <option value="">
-                –
-            </option>
+            <option value="">–</option>
 
             {TIME_OPTIONS.map(time => (
-
                 <option
                     key={time}
                     value={time}
                 >
-
                     {time}
-
                 </option>
-
             ))}
-
         </select>
     );
 }
@@ -129,6 +113,60 @@ function AnwesenheitTabelle({
                             }) {
 
     /* =====================================================
+       ZWEITE ABWESENHEIT
+       ===================================================== */
+
+    const [expandedStudentIds, setExpandedStudentIds] =
+        useState(() => new Set());
+
+    const hasSecondAbsence = (anwesenheit) =>
+        Boolean(
+            anwesenheit?.abwesendAb2 ||
+            anwesenheit?.abwesendBis2 ||
+            anwesenheit?.grundAbwesenheit2
+        );
+
+    const isSecondAbsenceExpanded = (
+        studentId,
+        anwesenheit
+    ) =>
+        expandedStudentIds.has(String(studentId)) ||
+        hasSecondAbsence(anwesenheit);
+
+    const addSecondAbsence = (studentId) => {
+
+        setExpandedStudentIds(previous => {
+
+            const next = new Set(previous);
+
+            next.add(String(studentId));
+
+            return next;
+        });
+    };
+
+    const removeSecondAbsence = (studentId) => {
+
+        /*
+         * Alle drei Felder der zweiten Abwesenheit
+         * werden zurückgesetzt.
+         */
+
+        onChange(studentId, 'abwesendAb2', '');
+        onChange(studentId, 'abwesendBis2', '');
+        onChange(studentId, 'grundAbwesenheit2', '');
+
+        setExpandedStudentIds(previous => {
+
+            const next = new Set(previous);
+
+            next.delete(String(studentId));
+
+            return next;
+        });
+    };
+
+    /* =====================================================
        SCHÜLERAUSWAHL
        ===================================================== */
 
@@ -139,17 +177,13 @@ function AnwesenheitTabelle({
     const allSelected =
         rows.length > 0 &&
         rows.every(row =>
-            selectedIds.has(
-                String(row.studentId)
-            )
+            selectedIds.has(String(row.studentId))
         );
 
     const partiallySelected =
         !allSelected &&
         rows.some(row =>
-            selectedIds.has(
-                String(row.studentId)
-            )
+            selectedIds.has(String(row.studentId))
         );
 
     /* =====================================================
@@ -157,7 +191,6 @@ function AnwesenheitTabelle({
        ===================================================== */
 
     return (
-
         <div className="anwesenheit-table-scroll">
 
             <table className="anwesenheit-table anwesenheit-daily-table">
@@ -167,13 +200,11 @@ function AnwesenheitTabelle({
                    ========================================= */}
 
                 <thead>
-
                 <tr>
 
                     {/* ALLE SCHÜLER AUSWÄHLEN */}
 
                     <th className="anwesenheit-selection-column">
-
                         <input
                             type="checkbox"
                             className="attendance-checkbox"
@@ -192,7 +223,6 @@ function AnwesenheitTabelle({
                             }}
                             onChange={onSelectAll}
                         />
-
                     </th>
 
                     {/* NAME */}
@@ -250,63 +280,77 @@ function AnwesenheitTabelle({
 
                     {/* ANWESEND */}
 
-                    <th className="status-column">
+                    <SortableHeader
+                        label="Anwesend"
+                        column="anwesend"
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSort={onSort}
+                        className="status-column"
+                    />
 
-                        Anwesend
+                    {/* ABWESEND */}
 
-                    </th>
-
-                    {/* FEHLT */}
-
-                    <th className="status-column">
-
-                        Fehlt
-
-                    </th>
+                    <SortableHeader
+                        label="Abwesend"
+                        column="fehlt"
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSort={onSort}
+                        className="status-column"
+                    />
 
                     {/* ABWESEND AB */}
 
-                    <th className="anwesenheit-time-column">
-
-                        Abwesend ab
-
-                    </th>
+                    <SortableHeader
+                        label="Abwesend ab"
+                        column="abwesendAb"
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSort={onSort}
+                        className="anwesenheit-time-column"
+                    />
 
                     {/* ABWESEND BIS */}
 
-                    <th className="anwesenheit-time-column">
-
-                        Abwesend bis
-
-                    </th>
+                    <SortableHeader
+                        label="Abwesend bis"
+                        column="abwesendBis"
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSort={onSort}
+                        className="anwesenheit-time-column"
+                    />
 
                     {/* GRUND ABWESENHEIT */}
 
                     <th className="anwesenheit-grund-column">
-
                         Grund Abwesenheit
-
                     </th>
 
                     {/* ANA ANWESENHEITSKONTROLLE */}
 
-                    <th className="anwesenheit-ana-kontrolle-column">
-
-                        ANA<br />
-                        Anwesenheitskontrolle
-
-                    </th>
+                    <SortableHeader
+                        label={
+                            <span>
+                                    ANA<br />
+                                    Anwesenheitskontrolle
+                                </span>
+                        }
+                        column="anaAnwesenheitskontrolle"
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSort={onSort}
+                        className="anwesenheit-ana-kontrolle-column"
+                    />
 
                     {/* BEMERKUNG */}
 
                     <th className="anwesenheit-bemerkung-column">
-
                         Bemerkung
-
                     </th>
 
                 </tr>
-
                 </thead>
 
                 {/* =========================================
@@ -317,16 +361,12 @@ function AnwesenheitTabelle({
 
                 {rows.map(row => {
 
-                    const studentId =
-                        row.studentId;
+                    const studentId = row.studentId;
 
-                    const anwesenheit =
-                        row.anwesenheit;
+                    const anwesenheit = row.anwesenheit;
 
                     const isSelected =
-                        selectedIds.has(
-                            String(studentId)
-                        );
+                        selectedIds.has(String(studentId));
 
                     const isAnwesend =
                         anwesenheit.status ===
@@ -337,338 +377,423 @@ function AnwesenheitTabelle({
                         ANWESENHEIT_STATUS.FEHLT;
 
                     const klasseClassName =
-                        getKlasseClassName(
-                            row.klasse
-                        );
+                        getKlasseClassName(row.klasse);
 
-                    const gruppen =
-                        row.gruppen || [];
+                    const gruppen = row.gruppen || [];
+
+                    const secondAbsenceExpanded =
+                        isSecondAbsenceExpanded(
+                            studentId,
+                            anwesenheit
+                        );
 
                     return (
 
-                        <tr
-                            key={studentId}
-                            className={[
-                                klasseClassName,
-                                isSelected
-                                    ? 'anwesenheit-row-selected'
-                                    : ''
-                            ]
-                                .filter(Boolean)
-                                .join(' ')}
-                        >
+                        <React.Fragment key={studentId}>
 
                             {/* =================================
-                               SCHÜLER AUSWÄHLEN
-                               ================================= */}
+                                   HAUPTZEILE
+                                   ================================= */}
 
-                            <td className="anwesenheit-selection-column">
+                            <tr
+                                className={[
+                                    klasseClassName,
+                                    isSelected
+                                        ? 'anwesenheit-row-selected'
+                                        : ''
+                                ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                            >
 
-                                <input
-                                    type="checkbox"
-                                    className="attendance-checkbox"
-                                    checked={isSelected}
-                                    disabled={disabled}
-                                    aria-label={`${row.name} auswählen`}
-                                    onChange={() =>
-                                        onSelectStudent(
-                                            studentId
-                                        )
-                                    }
-                                />
+                                {/* SCHÜLER AUSWÄHLEN */}
 
-                            </td>
+                                <td className="anwesenheit-selection-column">
+                                    <input
+                                        type="checkbox"
+                                        className="attendance-checkbox"
+                                        checked={isSelected}
+                                        disabled={disabled}
+                                        aria-label={`${row.name} auswählen`}
+                                        onChange={() =>
+                                            onSelectStudent(studentId)
+                                        }
+                                    />
+                                </td>
 
-                            {/* =================================
-                               NAME
-                               ================================= */}
+                                {/* NAME */}
 
-                            <td className="anwesenheit-name-cell">
+                                <td className="anwesenheit-name-cell">
+                                    {row.name}
+                                </td>
 
-                                {row.name}
+                                {/* JAHRGANG */}
 
-                            </td>
+                                <td>
+                                    {row.jahrgang ?? '–'}
+                                </td>
 
-                            {/* =================================
-                               JAHRGANG
-                               ================================= */}
+                                {/* KLASSE */}
 
-                            <td>
+                                <td className="klasse-cell">
+                                    {row.klasse || '–'}
+                                </td>
 
-                                {row.jahrgang ?? '–'}
+                                {/* ANGEBOTE / ANA */}
 
-                            </td>
+                                <td className="anwesenheit-gruppen-cell">
 
-                            {/* =================================
-                               KLASSE
-                               ================================= */}
+                                    {gruppen.length === 0 ? (
 
-                            <td className="klasse-cell">
+                                        <span className="anwesenheit-muted">
+                                                –
+                                            </span>
 
-                                {row.klasse || '–'}
+                                    ) : (
 
-                            </td>
+                                        <div className="anwesenheit-gruppen-list">
 
-                            {/* =================================
-                               ANGEBOTE / ANA
-                               ================================= */}
+                                            {gruppen.map(gruppe => (
 
-                            <td className="anwesenheit-gruppen-cell">
-
-                                {gruppen.length === 0 ? (
-
-                                    <span className="anwesenheit-muted">
-                                        –
-                                    </span>
-
-                                ) : (
-
-                                    <div className="anwesenheit-gruppen-list">
-
-                                        {gruppen.map(gruppe => (
-
-                                            <div
-                                                key={`${gruppe.typ}-${gruppe.id}`}
-                                                className="anwesenheit-gruppe"
-                                            >
-
-                                                <span
-                                                    className={
-                                                        gruppe.typ === 'ANA'
-                                                            ? 'anwesenheit-gruppe-badge ana'
-                                                            : 'anwesenheit-gruppe-badge angebot'
-                                                    }
+                                                <div
+                                                    key={`${gruppe.typ}-${gruppe.id}`}
+                                                    className="anwesenheit-gruppe"
                                                 >
 
-                                                    {gruppe.typ}
+                                                        <span
+                                                            className={
+                                                                gruppe.typ === 'ANA'
+                                                                    ? 'anwesenheit-gruppe-badge ana'
+                                                                    : 'anwesenheit-gruppe-badge angebot'
+                                                            }
+                                                        >
+                                                            {gruppe.typ}
+                                                        </span>
 
-                                                </span>
+                                                    <span className="anwesenheit-gruppe-name">
+                                                            {gruppe.name || '–'}
+                                                        </span>
 
-                                                <span className="anwesenheit-gruppe-name">
+                                                </div>
 
-                                                    {gruppe.name || '–'}
+                                            ))}
 
-                                                </span>
+                                        </div>
 
-                                            </div>
+                                    )}
 
-                                        ))}
+                                </td>
+
+                                {/* BESONDERHEITEN */}
+
+                                <td className="besonderheiten-cell">
+
+                                    {row.besonderheiten ? (
+
+                                        <span className="besonderheiten-readonly">
+                                                {row.besonderheiten}
+                                            </span>
+
+                                    ) : (
+
+                                        <span className="anwesenheit-muted">
+                                                –
+                                            </span>
+
+                                    )}
+
+                                </td>
+
+                                {/* ANWESEND */}
+
+                                <td className="attendance-checkbox-cell">
+                                    <input
+                                        type="checkbox"
+                                        className="attendance-checkbox anwesenheit-present-checkbox"
+                                        checked={isAnwesend}
+                                        disabled={disabled}
+                                        aria-label={`${row.name}: Anwesend`}
+                                        onChange={() =>
+                                            onStatusChange(
+                                                studentId,
+                                                ANWESENHEIT_STATUS.ANWESEND
+                                            )
+                                        }
+                                    />
+                                </td>
+
+                                {/* ABWESEND */}
+
+                                <td className="attendance-checkbox-cell">
+                                    <input
+                                        type="checkbox"
+                                        className="attendance-checkbox anwesenheit-absent-checkbox"
+                                        checked={isFehlend}
+                                        disabled={disabled}
+                                        aria-label={`${row.name}: Abwesend`}
+                                        onChange={() =>
+                                            onStatusChange(
+                                                studentId,
+                                                ANWESENHEIT_STATUS.FEHLT
+                                            )
+                                        }
+                                    />
+                                </td>
+
+                                {/* ABWESEND AB */}
+
+                                <td className="anwesenheit-time-cell">
+
+                                    <div className="anwesenheit-time-with-add">
+
+                                        {!secondAbsenceExpanded && (
+
+                                            <button
+                                                type="button"
+                                                className="anwesenheit-add-absence"
+                                                disabled={disabled || isFehlend}
+                                                title="Zweite Abwesenheit hinzufügen"
+                                                aria-label={`${row.name}: Zweite Abwesenheit hinzufügen`}
+                                                onClick={() =>
+                                                    addSecondAbsence(studentId)
+                                                }
+                                            >
+                                                +
+                                            </button>
+
+                                        )}
+
+                                        <TimeSelect
+                                            value={anwesenheit.abwesendAb}
+                                            disabled={disabled || isFehlend}
+                                            label={`${row.name}: Abwesend ab`}
+                                            onChange={value =>
+                                                onChange(
+                                                    studentId,
+                                                    'abwesendAb',
+                                                    value
+                                                )
+                                            }
+                                        />
 
                                     </div>
 
-                                )}
+                                </td>
 
-                            </td>
+                                {/* ABWESEND BIS */}
 
-                            {/* =================================
-                               BESONDERHEITEN
-                               ================================= */}
+                                <td className="anwesenheit-time-cell">
+                                    <TimeSelect
+                                        value={anwesenheit.abwesendBis}
+                                        disabled={disabled || isFehlend}
+                                        label={`${row.name}: Abwesend bis`}
+                                        onChange={value =>
+                                            onChange(
+                                                studentId,
+                                                'abwesendBis',
+                                                value
+                                            )
+                                        }
+                                    />
+                                </td>
 
-                            <td className="besonderheiten-cell">
+                                {/* GRUND ABWESENHEIT */}
 
-                                {row.besonderheiten ? (
+                                <td className="anwesenheit-grund-cell">
 
-                                    <span className="besonderheiten-readonly">
-
-                                        {row.besonderheiten}
-
-                                    </span>
-
-                                ) : (
-
-                                    <span className="anwesenheit-muted">
-                                        –
-                                    </span>
-
-                                )}
-
-                            </td>
-
-                            {/* =================================
-                               ANWESEND
-                               ================================= */}
-
-                            <td className="attendance-checkbox-cell">
-
-                                <input
-                                    type="checkbox"
-                                    className="attendance-checkbox anwesenheit-present-checkbox"
-                                    checked={isAnwesend}
-                                    disabled={disabled}
-                                    aria-label={`${row.name}: Anwesend`}
-                                    onChange={() =>
-                                        onStatusChange(
-                                            studentId,
-                                            ANWESENHEIT_STATUS.ANWESEND
-                                        )
-                                    }
-                                />
-
-                            </td>
-
-                            {/* =================================
-                               FEHLT
-                               ================================= */}
-
-                            <td className="attendance-checkbox-cell">
-
-                                <input
-                                    type="checkbox"
-                                    className="attendance-checkbox anwesenheit-absent-checkbox"
-                                    checked={isFehlend}
-                                    disabled={disabled}
-                                    aria-label={`${row.name}: Fehlt`}
-                                    onChange={() =>
-                                        onStatusChange(
-                                            studentId,
-                                            ANWESENHEIT_STATUS.FEHLT
-                                        )
-                                    }
-                                />
-
-                            </td>
-
-                            {/* =================================
-                               ABWESEND AB
-                               ================================= */}
-
-                            <td className="anwesenheit-time-cell">
-
-                                <TimeSelect
-                                    value={
-                                        anwesenheit.abwesendAb
-                                    }
-                                    disabled={
-                                        disabled ||
-                                        isFehlend
-                                    }
-                                    label={`${row.name}: Abwesend ab`}
-                                    onChange={value =>
-                                        onChange(
-                                            studentId,
-                                            'abwesendAb',
-                                            value
-                                        )
-                                    }
-                                />
-
-                            </td>
-
-                            {/* =================================
-                               ABWESEND BIS
-                               ================================= */}
-
-                            <td className="anwesenheit-time-cell">
-
-                                <TimeSelect
-                                    value={
-                                        anwesenheit.abwesendBis
-                                    }
-                                    disabled={
-                                        disabled ||
-                                        isFehlend
-                                    }
-                                    label={`${row.name}: Abwesend bis`}
-                                    onChange={value =>
-                                        onChange(
-                                            studentId,
-                                            'abwesendBis',
-                                            value
-                                        )
-                                    }
-                                />
-
-                            </td>
-
-                            {/* =================================
-                               GRUND ABWESENHEIT
-                               ================================= */}
-
-                            <td className="anwesenheit-grund-cell">
-
-                                <input
-                                    type="text"
-                                    className="anwesenheit-grund-input"
-                                    placeholder="Abwesenheitsgrund..."
-                                    value={
-                                        anwesenheit.grundAbwesenheit || ''
-                                    }
-                                    maxLength={50}
-                                    disabled={disabled}
-                                    aria-label={`${row.name}: Grund Abwesenheit`}
-                                    onChange={event =>
-                                        onChange(
-                                            studentId,
-                                            'grundAbwesenheit',
-                                            event.target.value
-                                        )
-                                    }
-                                />
-
-                                <span className="anwesenheit-grund-counter">
-
-                                    {
-                                        (
+                                    <input
+                                        type="text"
+                                        className="anwesenheit-grund-input"
+                                        placeholder="Abwesenheitsgrund..."
+                                        value={
                                             anwesenheit.grundAbwesenheit || ''
-                                        ).length
-                                    } / 50
+                                        }
+                                        maxLength={50}
+                                        disabled={disabled}
+                                        aria-label={`${row.name}: Grund Abwesenheit`}
+                                        onChange={event =>
+                                            onChange(
+                                                studentId,
+                                                'grundAbwesenheit',
+                                                event.target.value
+                                            )
+                                        }
+                                    />
 
-                                </span>
+                                    <span className="anwesenheit-grund-counter">
+                                            {
+                                                (
+                                                    anwesenheit.grundAbwesenheit || ''
+                                                ).length
+                                            } / 50
+                                        </span>
 
-                            </td>
+                                </td>
+
+                                {/* ANA ANWESENHEITSKONTROLLE */}
+
+                                <td className="attendance-checkbox-cell">
+                                    <input
+                                        type="checkbox"
+                                        className="attendance-checkbox anwesenheit-ana-checkbox"
+                                        checked={
+                                            anwesenheit.anaAnwesenheitskontrolle === true
+                                        }
+                                        disabled={disabled}
+                                        aria-label={`${row.name}: ANA Anwesenheitskontrolle`}
+                                        onChange={event =>
+                                            onChange(
+                                                studentId,
+                                                'anaAnwesenheitskontrolle',
+                                                event.target.checked
+                                            )
+                                        }
+                                    />
+                                </td>
+
+                                {/* BEMERKUNG */}
+
+                                <td className="anwesenheit-bemerkung-cell">
+                                    <input
+                                        type="text"
+                                        className="bemerkung-input"
+                                        placeholder="Bemerkung..."
+                                        value={anwesenheit.bemerkung || ''}
+                                        disabled={disabled}
+                                        aria-label={`${row.name}: Bemerkung`}
+                                        onChange={event =>
+                                            onChange(
+                                                studentId,
+                                                'bemerkung',
+                                                event.target.value
+                                            )
+                                        }
+                                    />
+                                </td>
+
+                            </tr>
 
                             {/* =================================
-                               ANA ANWESENHEITSKONTROLLE
-                               ================================= */}
+                                   ZWEITE ABWESENHEIT
+                                   ================================= */}
 
-                            <td className="attendance-checkbox-cell">
+                            {secondAbsenceExpanded && (
 
-                                <input
-                                    type="checkbox"
-                                    className="attendance-checkbox anwesenheit-ana-checkbox"
-                                    checked={
-                                        anwesenheit.anaAnwesenheitskontrolle === true
-                                    }
-                                    disabled={disabled}
-                                    aria-label={`${row.name}: ANA Anwesenheitskontrolle`}
-                                    onChange={event =>
-                                        onChange(
-                                            studentId,
-                                            'anaAnwesenheitskontrolle',
-                                            event.target.checked
-                                        )
-                                    }
-                                />
+                                <tr
+                                    className={[
+                                        klasseClassName,
+                                        'anwesenheit-second-absence-row',
+                                        isSelected
+                                            ? 'anwesenheit-row-selected'
+                                            : ''
+                                    ]
+                                        .filter(Boolean)
+                                        .join(' ')}
+                                >
 
-                            </td>
+                                    {/* LEERE SPALTEN */}
 
-                            {/* =================================
-                               BEMERKUNG
-                               ================================= */}
+                                    <td colSpan={8}>
+                                        <div className="anwesenheit-second-absence-label">
+                                            ↳ Zweite Abwesenheit
+                                        </div>
+                                    </td>
 
-                            <td className="anwesenheit-bemerkung-cell">
+                                    {/* ABWESEND AB 2 */}
 
-                                <input
-                                    type="text"
-                                    className="bemerkung-input"
-                                    placeholder="Bemerkung..."
-                                    value={
-                                        anwesenheit.bemerkung || ''
-                                    }
-                                    disabled={disabled}
-                                    aria-label={`${row.name}: Bemerkung`}
-                                    onChange={event =>
-                                        onChange(
-                                            studentId,
-                                            'bemerkung',
-                                            event.target.value
-                                        )
-                                    }
-                                />
+                                    <td className="anwesenheit-time-cell">
 
-                            </td>
+                                        <div className="anwesenheit-time-with-add">
 
-                        </tr>
+                                            <button
+                                                type="button"
+                                                className="anwesenheit-remove-absence"
+                                                disabled={disabled}
+                                                title="Zweite Abwesenheit entfernen"
+                                                aria-label={`${row.name}: Zweite Abwesenheit entfernen`}
+                                                onClick={() =>
+                                                    removeSecondAbsence(studentId)
+                                                }
+                                            >
+                                                −
+                                            </button>
+
+                                            <TimeSelect
+                                                value={anwesenheit.abwesendAb2}
+                                                disabled={disabled || isFehlend}
+                                                label={`${row.name}: Zweite Abwesenheit ab`}
+                                                onChange={value =>
+                                                    onChange(
+                                                        studentId,
+                                                        'abwesendAb2',
+                                                        value
+                                                    )
+                                                }
+                                            />
+
+                                        </div>
+
+                                    </td>
+
+                                    {/* ABWESEND BIS 2 */}
+
+                                    <td className="anwesenheit-time-cell">
+                                        <TimeSelect
+                                            value={anwesenheit.abwesendBis2}
+                                            disabled={disabled || isFehlend}
+                                            label={`${row.name}: Zweite Abwesenheit bis`}
+                                            onChange={value =>
+                                                onChange(
+                                                    studentId,
+                                                    'abwesendBis2',
+                                                    value
+                                                )
+                                            }
+                                        />
+                                    </td>
+
+                                    {/* GRUND ABWESENHEIT 2 */}
+
+                                    <td className="anwesenheit-grund-cell">
+
+                                        <input
+                                            type="text"
+                                            className="anwesenheit-grund-input"
+                                            placeholder="Zweiter Abwesenheitsgrund..."
+                                            value={
+                                                anwesenheit.grundAbwesenheit2 || ''
+                                            }
+                                            maxLength={50}
+                                            disabled={disabled}
+                                            aria-label={`${row.name}: Zweiter Abwesenheitsgrund`}
+                                            onChange={event =>
+                                                onChange(
+                                                    studentId,
+                                                    'grundAbwesenheit2',
+                                                    event.target.value
+                                                )
+                                            }
+                                        />
+
+                                        <span className="anwesenheit-grund-counter">
+                                                {
+                                                    (
+                                                        anwesenheit.grundAbwesenheit2 || ''
+                                                    ).length
+                                                } / 50
+                                            </span>
+
+                                    </td>
+
+                                    {/* ANA + BEMERKUNG */}
+
+                                    <td colSpan={2} />
+
+                                </tr>
+
+                            )}
+
+                        </React.Fragment>
 
                     );
                 })}

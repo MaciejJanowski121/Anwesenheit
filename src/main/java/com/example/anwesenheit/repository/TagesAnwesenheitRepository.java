@@ -75,6 +75,20 @@ public interface TagesAnwesenheitRepository
     );
 
     /*
+     * Anwesenheiten ausgewählter Schüler
+     * innerhalb eines bestimmten Zeitraums.
+     *
+     * Wird für die Sammelerfassung
+     * über mehrere Tage verwendet.
+     */
+    List<TagesAnwesenheit>
+    findByStudentIdInAndDatumBetween(
+            List<Long> studentIds,
+            LocalDate von,
+            LocalDate bis
+    );
+
+    /*
      * Statistik eines Schülers.
      */
     long countByStudentIdAndStatusIgnoreCase(

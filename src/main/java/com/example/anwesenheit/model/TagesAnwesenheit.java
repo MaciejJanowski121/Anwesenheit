@@ -51,20 +51,46 @@ public class TagesAnwesenheit {
     private String status;
 
     /*
-     * Beginn einer Abwesenheit.
+     * Beginn der ersten Abwesenheit.
      */
     private LocalTime abwesendAb;
 
     /*
-     * Ende einer Abwesenheit.
+     * Ende der ersten Abwesenheit.
      */
     private LocalTime abwesendBis;
 
     /*
-     * Grund der Abwesenheit.
+     * Grund der ersten Abwesenheit.
      */
     @Column(length = 50)
     private String grundAbwesenheit;
+
+    /* =====================================================
+       ZWEITE ABWESENHEIT (OPTIONAL)
+       ===================================================== */
+
+    /*
+     * Beginn der zweiten Abwesenheit.
+     */
+    @Column(name = "abwesend_ab_2")
+    private LocalTime abwesendAb2;
+
+    /*
+     * Ende der zweiten Abwesenheit.
+     */
+    @Column(name = "abwesend_bis_2")
+    private LocalTime abwesendBis2;
+
+    /*
+     * Grund der zweiten Abwesenheit.
+     */
+    @Column(name = "grund_abwesenheit_2", length = 50)
+    private String grundAbwesenheit2;
+
+    /* =====================================================
+       ANA ANWESENHEITSKONTROLLE
+       ===================================================== */
 
     /*
      * Bestätigung der Anwesenheitskontrolle

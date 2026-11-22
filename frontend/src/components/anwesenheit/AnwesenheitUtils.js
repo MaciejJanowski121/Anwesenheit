@@ -242,9 +242,15 @@ export const getKlasseClassName = (klasse) => {
 export const createEmptyAnwesenheit = () => ({
 
     status: '',
+
     abwesendAb: '',
     abwesendBis: '',
     grundAbwesenheit: '',
+
+    abwesendAb2: '',
+    abwesendBis2: '',
+    grundAbwesenheit2: '',
+
     anaAnwesenheitskontrolle: false,
     bemerkung: ''
 });
@@ -268,6 +274,15 @@ export const normalizeAnwesenheit = (
 
     grundAbwesenheit:
         anwesenheit?.grundAbwesenheit || '',
+
+    abwesendAb2:
+        formatTime(anwesenheit?.abwesendAb2),
+
+    abwesendBis2:
+        formatTime(anwesenheit?.abwesendBis2),
+
+    grundAbwesenheit2:
+        anwesenheit?.grundAbwesenheit2 || '',
 
     anaAnwesenheitskontrolle:
         anwesenheit?.anaAnwesenheitskontrolle === true,
@@ -298,6 +313,15 @@ export const createAnwesenheitPayload = (
 
     grundAbwesenheit:
         anwesenheit.grundAbwesenheit || null,
+
+    abwesendAb2:
+        anwesenheit.abwesendAb2 || null,
+
+    abwesendBis2:
+        anwesenheit.abwesendBis2 || null,
+
+    grundAbwesenheit2:
+        anwesenheit.grundAbwesenheit2 || null,
 
     anaAnwesenheitskontrolle:
         anwesenheit.anaAnwesenheitskontrolle === true,
@@ -347,65 +371,128 @@ export const validateAnwesenheit = (
     anwesenheit
 ) => {
 
+    const status = anwesenheit.status;
+
+    const ab1 = anwesenheit.abwesendAb || '';
+    const bis1 = anwesenheit.abwesendBis || '';
+
+    const ab2 = anwesenheit.abwesendAb2 || '';
+    const bis2 = anwesenheit.abwesendBis2 || '';
+
+    const grund1 = anwesenheit.grundAbwesenheit || '';
+    const grund2 = anwesenheit.grundAbwesenheit2 || '';
+
+    /* =====================================================
+       STATUS
+       ===================================================== */
+
     if (
-        anwesenheit.status &&
+        status &&
         !Object.values(
             ANWESENHEIT_STATUS
-        ).includes(anwesenheit.status)
+        ).includes(status)
     ) {
 
         return 'Ungültiger Anwesenheitsstatus.';
     }
 
+    /* =====================================================
+       VOLLSTÄNDIGE ABWESENHEIT
+       ===================================================== */
+
     if (
-        anwesenheit.status ===
-        ANWESENHEIT_STATUS.FEHLT &&
-        (
-            anwesenheit.abwesendAb ||
-            anwesenheit.abwesendBis
-        )
+        status === ANWESENHEIT_STATUS.FEHLT &&
+        (ab1 || bis1 || ab2 || bis2)
     ) {
 
         return 'Bei vollständiger Abwesenheit sind keine Abwesenheitszeiten erforderlich.';
     }
 
-    if (
-        anwesenheit.abwesendAb &&
-        !TIME_OPTIONS.includes(
-            anwesenheit.abwesendAb
-        )
-    ) {
+    /* =====================================================
+       UHRZEITEN VALIDIEREN
+       ===================================================== */
 
-        return 'Ungültige Uhrzeit für Abwesend ab.';
+    const zeiten = [
+        { wert: ab1, label: 'Abwesend ab' },
+        { wert: bis1, label: 'Abwesend bis' },
+        { wert: ab2, label: 'Abwesend ab (2)' },
+        { wert: bis2, label: 'Abwesend bis (2)' }
+    ];
+
+    for (const zeit of zeiten) {
+
+        if (
+            zeit.wert &&
+            !TIME_OPTIONS.includes(zeit.wert)
+        ) {
+
+            return `Ungültige Uhrzeit für ${zeit.label}.`;
+        }
     }
 
-    if (
-        anwesenheit.abwesendBis &&
-        !TIME_OPTIONS.includes(
-            anwesenheit.abwesendBis
-        )
-    ) {
-
-        return 'Ungültige Uhrzeit für Abwesend bis.';
-    }
+    /* =====================================================
+       ERSTE ABWESENHEIT
+       ===================================================== */
 
     if (
-        anwesenheit.abwesendAb &&
-        anwesenheit.abwesendBis &&
-        anwesenheit.abwesendAb >=
-        anwesenheit.abwesendBis
+        ab1 &&
+        bis1 &&
+        ab1 >= bis1
     ) {
 
         return 'Abwesend ab muss vor Abwesend bis liegen.';
     }
 
-    if (
-        String(
-            anwesenheit.grundAbwesenheit ?? ''
-        ).length > 50
-    ) {
+    /* =====================================================
+       ZWEITE ABWESENHEIT
+       ===================================================== */
+
+    const zweiteAbwesenheitVorhanden =
+        Boolean(ab2 || bis2 || grund2);
+
+    if (zweiteAbwesenheitVorhanden) {
+
+        if (!ab2 || !bis2) {
+
+            return 'Für die zweite Abwesenheit müssen Abwesend ab und Abwesend bis angegeben werden.';
+        }
+
+        if (ab2 >= bis2) {
+
+            return 'Bei der zweiten Abwesenheit muss Abwesend ab vor Abwesend bis liegen.';
+        }
+
+        if (!ab1 || !bis1) {
+
+            return 'Für zwei Abwesenheiten muss auch der erste Zeitraum vollständig sein.';
+        }
+
+        /* =====================================================
+           ÜBERSCHNEIDUNG PRÜFEN
+           ===================================================== */
+
+        const ueberschneidung =
+            ab1 < bis2 &&
+            ab2 < bis1;
+
+        if (ueberschneidung) {
+
+            return 'Die beiden Abwesenheitszeiträume dürfen sich nicht überschneiden.';
+        }
+    }
+
+    /* =====================================================
+       ABWESENHEITSGRÜNDE
+       ===================================================== */
+
+    if (grund1.length > 50) {
 
         return 'Der Abwesenheitsgrund darf maximal 50 Zeichen enthalten.';
+    }
+
+    if (grund2.length > 50) {
+
+        return 'Der zweite Abwesenheitsgrund darf maximal 50 Zeichen enthalten.';
     }
 
     return null;
