@@ -252,3 +252,281 @@
     outline: 2px solid #ffffff;
     outline-offset: 3px;
 }
+
+/* =====================================================
+   JAHRGÄNGE FILTER – VERBESSERTES DESIGN
+   ===================================================== */
+
+.angebot-details-page .jahrgang-filter-title {
+    display: block;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e5e5e5;
+}
+
+.angebot-details-page .jahrgang-multiselect {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.angebot-details-page .jahrgang-checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 42px;
+    padding: 8px 10px;
+
+    background: #303030;
+    border: 1px solid #484848;
+    border-radius: 8px;
+
+    color: #e5e5e5;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.angebot-details-page .jahrgang-checkbox-label:hover {
+    background: #393939;
+    border-color: #f58220;
+}
+
+.angebot-details-page .jahrgang-checkbox-label:has(input:checked) {
+    background: rgba(245, 130, 32, 0.15);
+    border-color: #f58220;
+    color: #ff9a45;
+}
+
+.angebot-details-page .jahrgang-checkbox-label input[type="checkbox"] {
+    appearance: auto;
+    -webkit-appearance: checkbox;
+
+    width: 17px;
+    height: 17px;
+    min-width: 17px;
+
+    margin: 0;
+    padding: 0;
+
+    accent-color: #f58220;
+    cursor: pointer;
+}
+
+.angebot-details-page .jahrgang-checkbox-label span {
+    display: inline;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.angebot-details-page .jahrgang-reset-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-height: 38px;
+
+    margin-top: 14px;
+    padding: 8px 16px;
+
+    background: #353535;
+    border: 1px solid #505050;
+    border-radius: 8px;
+
+    color: #e5e5e5;
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.angebot-details-page .jahrgang-reset-button:hover:not(:disabled) {
+    background: #454545;
+    border-color: #f58220;
+}
+
+.angebot-details-page .jahrgang-reset-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .angebot-details-page .jahrgang-multiselect {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .angebot-details-page .jahrgang-multiselect {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* =====================================================
+   ANWESENHEIT ANSEHEN – VERBESSERTES DESIGN
+   ===================================================== */
+
+.angebot-details-page .angebot-datum-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+
+    padding: 28px 32px;
+
+    background: #292929;
+    border: 1px solid #424242;
+    border-radius: 14px;
+}
+
+.angebot-details-page .angebot-datum-section > div:first-child {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.angebot-details-page .angebot-datum-section h2 {
+    margin: 0 0 10px;
+    color: #f5f5f5;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.angebot-details-page .angebot-datum-section p {
+    margin: 0;
+    color: #a5a5a5;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.angebot-details-page .angebot-datum-actions {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.angebot-details-page .angebot-datum-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.angebot-details-page .angebot-datum-field label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e5e5e5;
+}
+
+.angebot-details-page .angebot-datum-field input[type="date"] {
+    box-sizing: border-box;
+    width: 190px;
+    min-height: 44px;
+    padding: 10px 14px;
+
+    background: #202020;
+    color: #f5f5f5;
+
+    border: 1px solid #484848;
+    border-radius: 8px;
+
+    font-size: 14px;
+    color-scheme: dark;
+}
+
+.angebot-details-page .angebot-refresh-button,
+.angebot-details-page .angebot-attendance-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+    width: auto;
+    min-height: 44px;
+
+    padding: 10px 18px;
+
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.angebot-details-page .angebot-refresh-button {
+    background: #363636;
+    color: #f5f5f5;
+    border: 1px solid #555;
+}
+
+.angebot-details-page .angebot-refresh-button:hover:not(:disabled) {
+    background: #454545;
+    border-color: #777;
+}
+
+.angebot-details-page .angebot-attendance-button {
+    background: #f58220;
+    color: #fff;
+    border: 1px solid #f58220;
+}
+
+.angebot-details-page .angebot-attendance-button:hover:not(:disabled) {
+    background: #dc6c0e;
+    border-color: #dc6c0e;
+}
+
+.angebot-details-page .angebot-refresh-button:disabled,
+.angebot-details-page .angebot-attendance-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.angebot-details-page .angebot-attendance-hinweis {
+    margin-top: 14px;
+    padding: 14px 18px;
+
+    background: rgba(245, 130, 32, 0.08);
+    border: 1px solid rgba(245, 130, 32, 0.25);
+    border-radius: 8px;
+
+    color: #e5e5e5;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .angebot-details-page .angebot-datum-section {
+        align-items: stretch;
+        padding: 22px;
+    }
+
+    .angebot-details-page .angebot-datum-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .angebot-details-page .angebot-datum-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .angebot-details-page .angebot-datum-field input[type="date"],
+    .angebot-details-page .angebot-refresh-button,
+    .angebot-details-page .angebot-attendance-button {
+        width: 100%;
+    }
+}

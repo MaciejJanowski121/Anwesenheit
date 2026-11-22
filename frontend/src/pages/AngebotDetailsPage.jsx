@@ -134,8 +134,7 @@ const timeToMinutes = value => {
 /* =====================================================
    ANWESENHEITSSTATUS WÄHREND DES ANGEBOTS
 
-   Die Tagesanwesenheit wird mit Beginn und Ende
-   des Angebots verglichen.
+   Berücksichtigt beide Abwesenheitsintervalle.
    ===================================================== */
 
 const getAngebotStatus = (anwesenheit, angebot) => {
@@ -159,44 +158,95 @@ const getAngebotStatus = (anwesenheit, angebot) => {
         return 'FEHLT';
     }
 
-    const abwesendAb =
-        timeToMinutes(anwesenheit.abwesendAb);
+    const intervalle = [
+        {
+            ab: anwesenheit.abwesendAb,
+            bis: anwesenheit.abwesendBis
+        },
+        {
+            ab: anwesenheit.abwesendAb2,
+            bis: anwesenheit.abwesendBis2
+        }
+    ];
 
-    const abwesendBis =
-        timeToMinutes(anwesenheit.abwesendBis);
+    const ueberschneidungen = [];
 
-    if (
-        abwesendAb !== null ||
-        abwesendBis !== null
-    ) {
+    intervalle.forEach(intervall => {
 
-        const abwesenheitBeginn =
-            abwesendAb ?? 0;
+        const ab = timeToMinutes(intervall.ab);
+        const bis = timeToMinutes(intervall.bis);
 
-        const abwesenheitEnde =
-            abwesendBis ?? 1440;
+        if (ab === null && bis === null) {
+            return;
+        }
 
-        const ueberschneidungBeginn =
-            Math.max(beginn, abwesenheitBeginn);
+        const abwesenheitBeginn = ab ?? 0;
+        const abwesenheitEnde = bis ?? 1440;
 
-        const ueberschneidungEnde =
-            Math.min(ende, abwesenheitEnde);
-
-        const abwesendeMinuten = Math.max(
-            0,
-            ueberschneidungEnde -
-            ueberschneidungBeginn
+        const start = Math.max(
+            beginn,
+            abwesenheitBeginn
         );
 
-        const angebotDauer = ende - beginn;
+        const end = Math.min(
+            ende,
+            abwesenheitEnde
+        );
 
-        if (abwesendeMinuten >= angebotDauer) {
-            return 'FEHLT';
+        if (start < end) {
+            ueberschneidungen.push([start, end]);
+        }
+    });
+
+    ueberschneidungen.sort(
+        (a, b) => a[0] - b[0]
+    );
+
+    let abwesendeMinuten = 0;
+    let currentStart = null;
+    let currentEnd = null;
+
+    ueberschneidungen.forEach(([start, end]) => {
+
+        if (currentStart === null) {
+
+            currentStart = start;
+            currentEnd = end;
+
+            return;
         }
 
-        if (abwesendeMinuten > 0) {
-            return 'TEILWEISE';
+        if (start <= currentEnd) {
+
+            currentEnd = Math.max(
+                currentEnd,
+                end
+            );
+
+        } else {
+
+            abwesendeMinuten +=
+                currentEnd - currentStart;
+
+            currentStart = start;
+            currentEnd = end;
         }
+    });
+
+    if (currentStart !== null) {
+
+        abwesendeMinuten +=
+            currentEnd - currentStart;
+    }
+
+    const angebotDauer = ende - beginn;
+
+    if (abwesendeMinuten >= angebotDauer) {
+        return 'FEHLT';
+    }
+
+    if (abwesendeMinuten > 0) {
+        return 'TEILWEISE';
     }
 
     if (anwesenheit.status === 'ANWESEND') {
@@ -330,8 +380,11 @@ function AngebotDetailsPage({ readOnly = false }) {
     const [addStudentSearch, setAddStudentSearch] =
         useState('');
 
-    const [addStudentJahrgang, setAddStudentJahrgang] =
-        useState('');
+    // Mehrfachauswahl der Jahrgänge
+    const [
+        addStudentJahrgaenge,
+        setAddStudentJahrgaenge
+    ] = useState([]);
 
     const [selectedStudentIds, setSelectedStudentIds] =
         useState([]);
@@ -483,6 +536,7 @@ function AngebotDetailsPage({ readOnly = false }) {
 
         setSelectedStudentIds([]);
         setSelectedJahrgang('');
+        setAddStudentJahrgaenge([]);
         setMessage('');
 
         loadData();
@@ -858,6 +912,27 @@ function AngebotDetailsPage({ readOnly = false }) {
 
 
     /* =====================================================
+       JAHRGÄNGE MEHRFACHAUSWAHL
+       ===================================================== */
+
+    const handleJahrgangSelection = jahrgang => {
+
+        const value = String(jahrgang);
+
+        setAddStudentJahrgaenge(previous =>
+
+            previous.includes(value)
+
+                ? previous.filter(item =>
+                    item !== value
+                )
+
+                : [...previous, value]
+        );
+    };
+
+
+    /* =====================================================
        VERFÜGBARE SCHÜLER
        ===================================================== */
 
@@ -881,13 +956,12 @@ function AngebotDetailsPage({ readOnly = false }) {
 
             .filter(student => {
 
+                // Mehrere Jahrgänge gleichzeitig filtern
                 if (
-
-                    addStudentJahrgang &&
-
-                    String(student.jahrgang) !==
-                    String(addStudentJahrgang)
-
+                    addStudentJahrgaenge.length > 0 &&
+                    !addStudentJahrgaenge.includes(
+                        String(student.jahrgang)
+                    )
                 ) {
                     return false;
                 }
@@ -959,7 +1033,7 @@ function AngebotDetailsPage({ readOnly = false }) {
 
         addStudentSearch,
 
-        addStudentJahrgang
+        addStudentJahrgaenge
 
     ]);
 
@@ -1495,7 +1569,9 @@ function AngebotDetailsPage({ readOnly = false }) {
 
         if (
             field === 'abwesendAb' ||
-            field === 'abwesendBis'
+            field === 'abwesendBis' ||
+            field === 'abwesendAb2' ||
+            field === 'abwesendBis2'
         ) {
 
             return value
@@ -1954,6 +2030,7 @@ function AngebotDetailsPage({ readOnly = false }) {
                                         type="text"
                                         placeholder="Name, Klasse oder Jahrgang..."
                                         value={addStudentSearch}
+                                        disabled={mutationLoading}
                                         onChange={event =>
 
                                             setAddStudentSearch(
@@ -1966,46 +2043,61 @@ function AngebotDetailsPage({ readOnly = false }) {
                                 </div>
 
 
+                                {/* MEHRFACHAUSWAHL JAHRGÄNGE */}
+
                                 <div className="kurs-add-students-field">
 
-                                    <label htmlFor="angebot-student-jahrgang">
+                                    <span className="jahrgang-filter-title">
+                                        Jahrgänge filtern
+                                    </span>
 
-                                        Jahrgang
-
-                                    </label>
-
-                                    <select
-                                        id="angebot-student-jahrgang"
-                                        value={addStudentJahrgang}
-                                        onChange={event =>
-
-                                            setAddStudentJahrgang(
-                                                event.target.value
-                                            )
-
-                                        }
-                                    >
-
-                                        <option value="">
-
-                                            Alle Jahrgänge
-
-                                        </option>
+                                    <div className="jahrgang-multiselect">
 
                                         {jahrgaenge.map(jahrgang => (
 
-                                            <option
+                                            <label
                                                 key={jahrgang}
-                                                value={jahrgang}
+                                                className="jahrgang-checkbox-label"
                                             >
 
-                                                {jahrgang}
+                                                <input
+                                                    type="checkbox"
+                                                    disabled={mutationLoading}
+                                                    checked={
+                                                        addStudentJahrgaenge.includes(
+                                                            String(jahrgang)
+                                                        )
+                                                    }
+                                                    onChange={() =>
+                                                        handleJahrgangSelection(
+                                                            jahrgang
+                                                        )
+                                                    }
+                                                />
 
-                                            </option>
+                                                <span>
+                                                    {jahrgang}
+                                                </span>
+
+                                            </label>
 
                                         ))}
 
-                                    </select>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className="jahrgang-reset-button"
+                                        disabled={
+                                            mutationLoading ||
+                                            addStudentJahrgaenge.length === 0
+                                        }
+                                        onClick={() =>
+                                            setAddStudentJahrgaenge([])
+                                        }
+                                    >
+                                        Auswahl zurücksetzen
+                                    </button>
 
                                 </div>
 
