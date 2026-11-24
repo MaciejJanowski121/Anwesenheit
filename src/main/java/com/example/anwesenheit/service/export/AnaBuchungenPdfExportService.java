@@ -411,7 +411,12 @@ public class AnaBuchungenPdfExportService {
 
             /* =========================================
                WOCHENTAGE UND KURSE
+
+               Jeder neue ANA-Kurs beginnt auf
+               einer neuen Seite.
                ========================================= */
+
+            boolean ersterKurs = true;
 
             for (
                     Map.Entry<String, List<Kurs>> entry :
@@ -430,9 +435,24 @@ public class AnaBuchungenPdfExportService {
                 }
 
 
-                boolean firstKurs = true;
-
                 for (Kurs kurs : tagesKurse) {
+
+                    /* =================================
+                       SEITENUMBRUCH VOR JEDEM NEUEN KURS
+
+                       Der erste Kurs bleibt unterhalb
+                       der Gesamtstatistik.
+                       ================================= */
+
+                    if (!ersterKurs) {
+
+                        document.newPage();
+                    }
+
+
+                    /* =================================
+                       KURSBUCHUNGEN LADEN
+                       ================================= */
 
                     List<Buchung> kursBuchungen =
                             new ArrayList<>(
@@ -447,10 +467,19 @@ public class AnaBuchungenPdfExportService {
                             );
 
                     sortBuchungen(
+
                             kursBuchungen,
+
                             collator
                     );
 
+
+                    /* =================================
+                       KURSTABELLE ERSTELLEN
+
+                       Der Wochentag wird bei jedem
+                       Kurs angezeigt.
+                       ================================= */
 
                     PdfPTable kursTabelle =
                             createKursTabelle(
@@ -459,16 +488,14 @@ public class AnaBuchungenPdfExportService {
 
                                     kursBuchungen,
 
-                                    firstKurs
-                                            ? wochentag
-                                            : null,
+                                    wochentag,
 
                                     tagesKurse.size()
                             );
 
                     document.add(kursTabelle);
 
-                    firstKurs = false;
+                    ersterKurs = false;
                 }
             }
 
@@ -607,47 +634,54 @@ public class AnaBuchungenPdfExportService {
 
         table.setSpacingAfter(8);
 
+
+        /* =============================================
+           SEITENUMBRÜCHE INNERHALB EINES KURSES
+
+           Große Kurse dürfen mehrere Seiten belegen.
+           Tabellenzeilen werden möglichst nicht geteilt.
+           ============================================= */
+
         table.setSplitRows(true);
 
-        table.setSplitLate(false);
+        table.setSplitLate(true);
 
 
         /* =============================================
            WOCHENTAG
+
+           Wird bei jedem Kurs angezeigt.
            ============================================= */
 
-        if (wochentag != null) {
+        PdfPCell dayCell = new PdfPCell(
 
-            PdfPCell dayCell = new PdfPCell(
+                new Phrase(
 
-                    new Phrase(
+                        wochentag
 
-                            wochentag
+                                + " – "
 
-                                    + " – "
+                                + anzahlTagesKurse
 
-                                    + anzahlTagesKurse
+                                + " ANA-Kurse",
 
-                                    + " ANA-Kurse",
+                        DAY_FONT
+                )
+        );
 
-                            DAY_FONT
-                    )
-            );
+        dayCell.setColspan(5);
 
-            dayCell.setColspan(5);
+        dayCell.setBackgroundColor(
+                PRIMARY_COLOR
+        );
 
-            dayCell.setBackgroundColor(
-                    PRIMARY_COLOR
-            );
+        dayCell.setPadding(9);
 
-            dayCell.setPadding(9);
+        dayCell.setBorder(
+                PdfPCell.NO_BORDER
+        );
 
-            dayCell.setBorder(
-                    PdfPCell.NO_BORDER
-            );
-
-            table.addCell(dayCell);
-        }
+        table.addCell(dayCell);
 
 
         /* =============================================
@@ -767,13 +801,16 @@ public class AnaBuchungenPdfExportService {
         addHeaderCell(table, "Besonderheiten");
 
 
-        /*
-         * Kopfzeilen werden bei einem Seitenumbruch
-         * automatisch wiederholt.
-         */
-        table.setHeaderRows(
-                wochentag != null ? 4 : 3
-        );
+        /* =============================================
+           KOPFZEILEN WIEDERHOLEN
+
+           1. Wochentag
+           2. Kursname
+           3. Kursinformationen
+           4. Tabellenüberschriften
+           ============================================= */
+
+        table.setHeaderRows(4);
 
 
         /* =============================================

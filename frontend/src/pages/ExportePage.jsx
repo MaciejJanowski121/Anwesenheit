@@ -10,7 +10,7 @@ import {
     exportAngebotBuchungenPdf,
     exportSchuelerBuchungenPdf,
     exportAnwesenheitsverlaufExcel,
-    exportAnwesenheitszeitenExcel,
+    exportAnwesenheitszeitenPdf,
     exportAnaArchivExcel
 } from '../services/exportService';
 
@@ -894,7 +894,7 @@ function ExportePage() {
 
 
     /* =================================================
-       ANWESENHEITSZEITEN EXPORTIEREN
+       ANWESENHEITSZEITEN PDF EXPORTIEREN
        ================================================= */
 
     const handleZeitenExport = () => {
@@ -924,7 +924,7 @@ function ExportePage() {
 
         handleExport(
             'zeiten',
-            () => exportAnwesenheitszeitenExcel(
+            () => exportAnwesenheitszeitenPdf(
                 zeitenDatum,
                 zeitenFilterTyp,
                 zeitenFilterTyp === 'ALLE'
@@ -1121,7 +1121,7 @@ function ExportePage() {
                     </div>
 
                     <span className="export-section-count pdf">
-                        4 Exporte
+                        5 Exporte
                     </span>
 
                 </div>
@@ -1222,6 +1222,64 @@ function ExportePage() {
 
                     </ExportCard>
 
+
+                    {/* 5. ANWESENHEITSZEITEN PDF */}
+
+                    <ExportCard
+                        title="Anwesenheitszeiten"
+                        description="Auswertung der geplanten und bestätigten Anwesenheit mit PLAN-, SOLL- und IST-Werten in 15-Minuten-Intervallen."
+                        format="PDF"
+                        {...zeitenState}
+                        disabled={
+                            !zeitenDatum ||
+                            (
+                                zeitenFilterTyp !== 'ALLE' &&
+                                (
+                                    !zeitenFilterId ||
+                                    metadataLoading ||
+                                    Boolean(metadataError)
+                                )
+                            )
+                        }
+                        onDownload={handleZeitenExport}
+                    >
+
+                        <DateField
+                            id="export-zeiten-datum"
+                            label="Datum"
+                            value={zeitenDatum}
+                            disabled={zeitenState.loading}
+                            onChange={handleZeitenDatumChange}
+                        />
+
+                        <FilterFields
+                            prefix="export-zeiten"
+                            filterTypes={ZEITEN_FILTER_TYPES}
+                            filterTyp={zeitenFilterTyp}
+                            filterId={zeitenFilterId}
+                            options={zeitenOptions}
+                            onFilterChange={
+                                handleZeitenFilterChange
+                            }
+                            onFilterIdChange={value => {
+
+                                setZeitenFilterId(value);
+
+                                clearExportState('zeiten');
+                            }}
+                            disabled={zeitenState.loading}
+                            metadataLoading={metadataLoading}
+                        />
+
+                        <div className="export-static-info">
+
+                            08:00 – 16:00 Uhr ·
+                            15-Minuten-Intervalle
+
+                        </div>
+
+                    </ExportCard>
+
                 </div>
 
             </section>
@@ -1248,7 +1306,7 @@ function ExportePage() {
                     </div>
 
                     <span className="export-section-count excel">
-                        3 Exporte
+                        2 Exporte
                     </span>
 
                 </div>
@@ -1257,7 +1315,7 @@ function ExportePage() {
                 <div className="export-grid">
 
 
-                    {/* 5. ANWESENHEITSVERLAUF */}
+                    {/* 6. ANWESENHEITSVERLAUF */}
 
                     <ExportCard
                         title="Anwesenheitsverlauf"
@@ -1339,64 +1397,6 @@ function ExportePage() {
                             disabled={verlaufState.loading}
                             metadataLoading={metadataLoading}
                         />
-
-                    </ExportCard>
-
-
-                    {/* 6. ANWESENHEITSZEITEN */}
-
-                    <ExportCard
-                        title="Anwesenheitszeiten"
-                        description="Auswertung der geplanten und bestätigten Anwesenheit mit PLAN-, SOLL- und IST-Werten in 15-Minuten-Intervallen."
-                        format="Excel"
-                        {...zeitenState}
-                        disabled={
-                            !zeitenDatum ||
-                            (
-                                zeitenFilterTyp !== 'ALLE' &&
-                                (
-                                    !zeitenFilterId ||
-                                    metadataLoading ||
-                                    Boolean(metadataError)
-                                )
-                            )
-                        }
-                        onDownload={handleZeitenExport}
-                    >
-
-                        <DateField
-                            id="export-zeiten-datum"
-                            label="Datum"
-                            value={zeitenDatum}
-                            disabled={zeitenState.loading}
-                            onChange={handleZeitenDatumChange}
-                        />
-
-                        <FilterFields
-                            prefix="export-zeiten"
-                            filterTypes={ZEITEN_FILTER_TYPES}
-                            filterTyp={zeitenFilterTyp}
-                            filterId={zeitenFilterId}
-                            options={zeitenOptions}
-                            onFilterChange={
-                                handleZeitenFilterChange
-                            }
-                            onFilterIdChange={value => {
-
-                                setZeitenFilterId(value);
-
-                                clearExportState('zeiten');
-                            }}
-                            disabled={zeitenState.loading}
-                            metadataLoading={metadataLoading}
-                        />
-
-                        <div className="export-static-info">
-
-                            08:00 – 16:00 Uhr ·
-                            15-Minuten-Intervalle
-
-                        </div>
 
                     </ExportCard>
 

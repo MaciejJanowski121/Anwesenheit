@@ -48,6 +48,7 @@ function App() {
     const [user, setUser] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
 
+
     /* =====================================================
        SESSION PRÜFEN
        ===================================================== */
@@ -87,6 +88,7 @@ function App() {
        ===================================================== */
 
     const handleLogin = loggedInUser => {
+
         setUser(loggedInUser);
     };
 
@@ -122,6 +124,7 @@ function App() {
     if (authLoading) {
 
         return (
+
             <div
                 style={{
                     minHeight: '100vh',
@@ -130,7 +133,9 @@ function App() {
                     justifyContent: 'center'
                 }}
             >
+
                 Anwendung wird geladen...
+
             </div>
         );
     }
@@ -175,6 +180,19 @@ function App() {
                 >
 
                     {/* =====================================
+                        STARTSEITE
+                        ADMIN + ANWENDER
+                       ===================================== */}
+
+                    <Route
+                        path="/"
+                        element={
+                            <HomePage isAdmin={isAdmin} />
+                        }
+                    />
+
+
+                    {/* =====================================
                         NUR ADMIN
                        ===================================== */}
 
@@ -183,58 +201,73 @@ function App() {
                         <>
 
                             <Route
-                                path="/"
-                                element={<HomePage />}
-                            />
-
-                            <Route
                                 path="/gesamtuebersicht"
-                                element={<GesamtuebersichtPage />}
+                                element={
+                                    <GesamtuebersichtPage />
+                                }
                             />
 
                             <Route
                                 path="/angebote/:id"
-                                element={<AngebotDetailsPage />}
+                                element={
+                                    <AngebotDetailsPage />
+                                }
                             />
 
                             <Route
                                 path="/angebote"
-                                element={<AngebotePage />}
+                                element={
+                                    <AngebotePage />
+                                }
                             />
 
                             <Route
                                 path="/kurse"
-                                element={<KursePage />}
+                                element={
+                                    <KursePage />
+                                }
                             />
 
                             <Route
                                 path="/kurse/:id"
-                                element={<KursDetailsPage />}
+                                element={
+                                    <KursDetailsPage />
+                                }
                             />
 
                             <Route
                                 path="/gebuehren"
-                                element={<GebuehrenPage />}
+                                element={
+                                    <GebuehrenPage />
+                                }
                             />
 
                             <Route
                                 path="/import"
-                                element={<ImportPage />}
+                                element={
+                                    <ImportPage />
+                                }
                             />
 
                             <Route
                                 path="/students/:id"
-                                element={<StudentDetailsPage />}
+                                element={
+                                    <StudentDetailsPage />
+                                }
                             />
 
                             <Route
                                 path="/zuschuesse"
-                                element={<ZuschuessePage />}
+                                element={
+                                    <ZuschuessePage />
+                                }
                             />
 
                             <Route
                                 path="/benutzer"
-                                element={<BenutzerPage />}
+                                element={
+                                    <BenutzerPage />
+                                }
                             />
 
                         </>
@@ -243,6 +276,7 @@ function App() {
 
 
                     {/* =====================================
+                        ANGEBOTSINFORMATIONEN
                         ADMIN + ANWENDER
                        ===================================== */}
 
@@ -266,6 +300,7 @@ function App() {
 
                     {/* =====================================
                         ANWESENHEIT
+                        ADMIN + ANWENDER
                        ===================================== */}
 
                     <Route
@@ -280,11 +315,14 @@ function App() {
 
                     {/* =====================================
                         ANWESENHEITSZEITEN
+                        ADMIN + ANWENDER
                        ===================================== */}
 
                     <Route
                         path="/anwesenheitszeiten"
-                        element={<AnwesenheitszeitenPage />}
+                        element={
+                            <AnwesenheitszeitenPage />
+                        }
                     />
 
 
@@ -295,72 +333,88 @@ function App() {
 
                     <Route
                         path="/exporte"
-                        element={<ExportePage />}
+                        element={
+                            <ExportePage />
+                        }
                     />
 
 
                     {/* =====================================
                         ANA INFORMATIONEN
+                        ADMIN + ANWENDER
                        ===================================== */}
 
                     <Route
                         path="/kursinfos"
-                        element={<KursinfosPage />}
+                        element={
+                            <KursinfosPage />
+                        }
                     />
 
                     <Route
                         path="/kursinfos/:id"
-                        element={<KursinfoDetailsPage />}
+                        element={
+                            <KursinfoDetailsPage />
+                        }
                     />
 
 
                     {/* =====================================
                         SCHÜLERINFORMATIONEN
+                        ADMIN + ANWENDER
                        ===================================== */}
 
                     <Route
                         path="/schuelerinfos"
-                        element={<SchuelerinfosPage />}
+                        element={
+                            <SchuelerinfosPage />
+                        }
                     />
 
                     <Route
                         path="/schuelerinfos/:id"
-                        element={<SchuelerinfoDetailsPage />}
+                        element={
+                            <SchuelerinfoDetailsPage />
+                        }
                     />
 
 
                     {/* =====================================
                         KLASSEN
+                        ADMIN + ANWENDER
                        ===================================== */}
 
                     <Route
                         path="/klassen"
                         element={
-                            <KlassenPage isAdmin={isAdmin} />
+                            <KlassenPage
+                                isAdmin={isAdmin}
+                            />
                         }
                     />
 
                     <Route
                         path="/klassen/:id"
                         element={
-                            <KlassenDetailsPage isAdmin={isAdmin} />
+                            <KlassenDetailsPage
+                                isAdmin={isAdmin}
+                            />
                         }
                     />
 
 
                     {/* =====================================
                         FALLBACK
+
+                        Alle angemeldeten Benutzer werden
+                        zur Startseite weitergeleitet.
                        ===================================== */}
 
                     <Route
                         path="*"
                         element={
                             <Navigate
-                                to={
-                                    isAdmin
-                                        ? '/'
-                                        : '/anwesenheit'
-                                }
+                                to="/"
                                 replace
                             />
                         }

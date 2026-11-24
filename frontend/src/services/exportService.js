@@ -282,7 +282,50 @@ export const exportSchuelerBuchungenPdf = () => {
 
 
 /* =====================================================
-   5. ANWESENHEITSVERLAUF EXCEL
+   5. ANWESENHEITSZEITEN PDF
+   ===================================================== */
+
+export const exportAnwesenheitszeitenPdf = (
+
+    datum,
+
+    filterTyp = 'ALLE',
+
+    filterId = null
+
+) => {
+
+    const params = {
+
+        datum,
+
+        filterTyp
+    };
+
+    if (
+        filterTyp !== 'ALLE' &&
+        filterId !== null &&
+        filterId !== ''
+    ) {
+
+        params.filterId = filterId;
+    }
+
+    return downloadExport(
+
+        '/anwesenheitszeiten',
+
+        params,
+
+        `Anwesenheitszeiten_${datum}.pdf`,
+
+        PDF_TYPE
+    );
+};
+
+
+/* =====================================================
+   6. ANWESENHEITSVERLAUF EXCEL
    ===================================================== */
 
 export const exportAnwesenheitsverlaufExcel = (
@@ -322,49 +365,6 @@ export const exportAnwesenheitsverlaufExcel = (
         params,
 
         `Anwesenheitsverlauf_${von}_${bis}.xlsx`,
-
-        EXCEL_TYPE
-    );
-};
-
-
-/* =====================================================
-   6. ANWESENHEITSZEITEN EXCEL
-   ===================================================== */
-
-export const exportAnwesenheitszeitenExcel = (
-
-    datum,
-
-    filterTyp = 'ALLE',
-
-    filterId = null
-
-) => {
-
-    const params = {
-
-        datum,
-
-        filterTyp
-    };
-
-    if (
-        filterTyp !== 'ALLE' &&
-        filterId !== null &&
-        filterId !== ''
-    ) {
-
-        params.filterId = filterId;
-    }
-
-    return downloadExport(
-
-        '/anwesenheitszeiten',
-
-        params,
-
-        `Anwesenheitszeiten_${datum}.xlsx`,
 
         EXCEL_TYPE
     );

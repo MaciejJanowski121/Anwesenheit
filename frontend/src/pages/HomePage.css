@@ -357,3 +357,212 @@
         align-self: flex-start;
     }
 }
+
+/* =====================================================
+   ABWESENHEITSLISTE PDF DOWNLOAD
+   ===================================================== */
+
+.home-absence-section {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    padding: 22px;
+
+    border: 1px solid rgba(232, 121, 43, 0.35);
+    border-radius: 12px;
+
+    background:
+            linear-gradient(
+                    145deg,
+                    rgba(232, 121, 43, 0.08),
+                    rgba(232, 121, 43, 0.01)
+            ),
+            var(--surface-primary);
+}
+
+.home-absence-content {
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 16px;
+}
+
+.home-absence-icon {
+    display: grid;
+
+    flex: 0 0 54px;
+
+    width: 54px;
+    height: 60px;
+
+    place-items: center;
+
+    border: 1px solid rgba(232, 121, 43, 0.25);
+    border-radius: 10px;
+
+    background: rgba(232, 121, 43, 0.12);
+
+    color: var(--accent);
+
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.home-absence-info {
+    min-width: 0;
+}
+
+.home-absence-info h2 {
+    margin: 0 0 6px;
+
+    color: var(--text-heading);
+
+    font-size: 19px;
+    font-weight: 650;
+}
+
+.home-absence-info p {
+    margin: 0 0 8px;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.home-absence-date {
+    display: inline-block;
+
+    color: var(--accent);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   DOWNLOAD BUTTON
+   ===================================================== */
+
+.home-absence-download {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    min-height: 44px;
+
+    padding: 12px 18px;
+
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+
+    background: var(--accent);
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            filter 0.15s ease,
+            transform 0.15s ease,
+            opacity 0.15s ease;
+}
+
+.home-absence-download:hover:not(:disabled) {
+    filter: brightness(1.08);
+
+    transform: translateY(-1px);
+}
+
+.home-absence-download:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.home-absence-download:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.home-absence-download:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+.home-download-icon {
+    font-size: 20px;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+.home-export-error {
+    flex: 0 0 100%;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 850px) {
+
+    .home-absence-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .home-absence-download {
+        width: 100%;
+    }
+
+    .home-export-error {
+        width: 100%;
+        flex-basis: auto;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .home-absence-section {
+        padding: 16px;
+    }
+
+    .home-absence-content {
+        gap: 12px;
+    }
+
+    .home-absence-icon {
+        flex-basis: 44px;
+
+        width: 44px;
+        height: 50px;
+
+        font-size: 13px;
+    }
+
+    .home-absence-info h2 {
+        font-size: 17px;
+    }
+
+    .home-absence-download {
+        font-size: 13px;
+    }
+}

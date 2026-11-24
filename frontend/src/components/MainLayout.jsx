@@ -23,7 +23,6 @@ const NAVIGATION = [
         id: 'start',
         label: 'Startseite',
         icon: '⌂',
-        adminOnly: true,
         path: '/'
     },
     {

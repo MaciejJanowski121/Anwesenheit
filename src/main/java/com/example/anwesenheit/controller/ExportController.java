@@ -9,7 +9,7 @@ import com.example.anwesenheit.service.export.AnaBuchungenPdfExportService;
 import com.example.anwesenheit.service.export.AngebotBuchungenPdfExportService;
 import com.example.anwesenheit.service.export.SchuelerBuchungenPdfExportService;
 import com.example.anwesenheit.service.export.TagesAnwesenheitExcelExportService;
-import com.example.anwesenheit.service.export.AnwesenheitszeitenExcelExportService;
+import com.example.anwesenheit.service.export.AnwesenheitszeitenPdfExportService;
 import com.example.anwesenheit.service.export.AnaArchivExcelExportService;
 
 import com.lowagie.text.DocumentException;
@@ -70,8 +70,8 @@ public class ExportController {
     private final TagesAnwesenheitExcelExportService
             tagesAnwesenheitExcelExportService;
 
-    private final AnwesenheitszeitenExcelExportService
-            anwesenheitszeitenExcelExportService;
+    private final AnwesenheitszeitenPdfExportService
+            anwesenheitszeitenPdfExportService;
 
     private final AnaArchivExcelExportService
             anaArchivExcelExportService;
@@ -214,6 +214,63 @@ public class ExportController {
 
 
     /* =====================================================
+       ANWESENHEITSZEITEN PDF
+       ===================================================== */
+
+    @GetMapping(
+            value = "/anwesenheitszeiten",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public ResponseEntity<byte[]> exportAnwesenheitszeiten(
+
+            @RequestParam
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate datum,
+
+            @RequestParam(defaultValue = "ALLE")
+            AnwesenheitszeitenFilter filterTyp,
+
+            @RequestParam(required = false)
+            Long filterId
+
+    ) {
+
+        try {
+
+            byte[] pdf =
+                    anwesenheitszeitenPdfExportService
+                            .exportAnwesenheitszeiten(
+                                    datum,
+                                    filterTyp,
+                                    filterId
+                            );
+
+            String filename =
+                    "Anwesenheitszeiten_"
+                            + filterTyp.name()
+                            + "_"
+                            + datum
+                            + ".pdf";
+
+            return createPdfResponse(
+                    pdf,
+                    filename
+            );
+
+        } catch (DocumentException | IOException exception) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Die Anwesenheitszeiten konnten nicht exportiert werden.",
+                    exception
+            );
+        }
+    }
+
+
+    /* =====================================================
        ANWESENHEITSVERLAUF EXCEL
        ===================================================== */
 
@@ -273,63 +330,6 @@ public class ExportController {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "Der Anwesenheitsverlauf konnte nicht exportiert werden.",
-                    exception
-            );
-        }
-    }
-
-
-    /* =====================================================
-       ANWESENHEITSZEITEN EXCEL
-       ===================================================== */
-
-    @GetMapping(
-            value = "/anwesenheitszeiten",
-            produces = XLSX_MEDIA_TYPE
-    )
-    public ResponseEntity<byte[]> exportAnwesenheitszeiten(
-
-            @RequestParam
-            @DateTimeFormat(
-                    iso = DateTimeFormat.ISO.DATE
-            )
-            LocalDate datum,
-
-            @RequestParam(defaultValue = "ALLE")
-            AnwesenheitszeitenFilter filterTyp,
-
-            @RequestParam(required = false)
-            Long filterId
-
-    ) {
-
-        try {
-
-            byte[] excel =
-                    anwesenheitszeitenExcelExportService
-                            .exportAnwesenheitszeiten(
-                                    datum,
-                                    filterTyp,
-                                    filterId
-                            );
-
-            String filename =
-                    "Anwesenheitszeiten_"
-                            + filterTyp.name()
-                            + "_"
-                            + datum
-                            + ".xlsx";
-
-            return createExcelResponse(
-                    excel,
-                    filename
-            );
-
-        } catch (IOException exception) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Die Anwesenheitszeiten konnten nicht exportiert werden.",
                     exception
             );
         }

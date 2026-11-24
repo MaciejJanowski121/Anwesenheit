@@ -25,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.Color;
-
 import java.io.ByteArrayOutputStream;
-
 import java.text.Collator;
 
 import java.time.LocalDate;
@@ -97,93 +95,74 @@ public class AbwesenheitPdfExportService {
 
     private static final List<String> KLASSEN_REIHENFOLGE =
             List.of(
+
+                    // GS
                     "Erde",
                     "Feuer",
                     "Luft",
                     "Wasser",
-                    "Mars",
+
+                    // MS
                     "Merkur",
+                    "Mars",
                     "Saturn",
-                    "Sirius",
+
+                    // EKS
                     "Cassiopeia",
                     "Pegasus",
                     "Phönix",
                     "Taurus",
-                    "Perseus"
+
+                    // PK
+                    "Perseus",
+                    "Sirius"
             );
 
 
     /* =====================================================
-       KLASSENFARBEN
+       KLASSENFARBEN NACH STUFE
        ===================================================== */
+
+    private static final Color GS_FARBE =
+            Color.decode("#da2f70");
+
+    private static final Color MS_FARBE =
+            Color.decode("#f49712");
+
+    private static final Color EKS_FARBE =
+            Color.decode("#4190a4");
+
+    private static final Color PK_FARBE =
+            Color.decode("#9ac32e");
+
 
     private static final Map<String, Color> KLASSEN_FARBEN =
             Map.ofEntries(
 
-                    Map.entry(
-                            "erde",
-                            new Color(139, 195, 74)
-                    ),
+                    // GS – Magenta
 
-                    Map.entry(
-                            "feuer",
-                            new Color(239, 83, 80)
-                    ),
+                    Map.entry("erde", GS_FARBE),
+                    Map.entry("feuer", GS_FARBE),
+                    Map.entry("luft", GS_FARBE),
+                    Map.entry("wasser", GS_FARBE),
 
-                    Map.entry(
-                            "luft",
-                            new Color(255, 213, 79)
-                    ),
+                    // MS – Orange
 
-                    Map.entry(
-                            "wasser",
-                            new Color(79, 195, 247)
-                    ),
+                    Map.entry("merkur", MS_FARBE),
+                    Map.entry("mars", MS_FARBE),
+                    Map.entry("saturn", MS_FARBE),
 
-                    Map.entry(
-                            "mars",
-                            new Color(255, 138, 101)
-                    ),
+                    // EKS – Blau
 
-                    Map.entry(
-                            "merkur",
-                            new Color(186, 104, 200)
-                    ),
+                    Map.entry("cassiopeia", EKS_FARBE),
+                    Map.entry("pegasus", EKS_FARBE),
+                    Map.entry("phönix", EKS_FARBE),
+                    Map.entry("taurus", EKS_FARBE),
 
-                    Map.entry(
-                            "saturn",
-                            new Color(255, 183, 77)
-                    ),
+                    // PK – Grün
 
-                    Map.entry(
-                            "sirius",
-                            new Color(100, 181, 246)
-                    ),
-
-                    Map.entry(
-                            "cassiopeia",
-                            new Color(240, 140, 180)
-                    ),
-
-                    Map.entry(
-                            "pegasus",
-                            new Color(77, 182, 172)
-                    ),
-
-                    Map.entry(
-                            "phönix",
-                            new Color(255, 167, 38)
-                    ),
-
-                    Map.entry(
-                            "taurus",
-                            new Color(174, 213, 129)
-                    ),
-
-                    Map.entry(
-                            "perseus",
-                            new Color(159, 168, 218)
-                    )
+                    Map.entry("perseus", PK_FARBE),
+                    Map.entry("sirius", PK_FARBE)
             );
 
 
@@ -203,13 +182,6 @@ public class AbwesenheitPdfExportService {
                     FontFactory.HELVETICA_BOLD,
                     12,
                     Color.DARK_GRAY
-            );
-
-    private static final Font SECTION_FONT =
-            FontFactory.getFont(
-                    FontFactory.HELVETICA_BOLD,
-                    12,
-                    Color.BLACK
             );
 
     private static final Font HEADER_FONT =
@@ -242,10 +214,9 @@ public class AbwesenheitPdfExportService {
 
             String name,
 
-            String zeitraum
+            String information
 
-    ) {
-    }
+    ) {}
 
 
     private record KlassenBlock(
@@ -254,12 +225,9 @@ public class AbwesenheitPdfExportService {
 
             int anzahlSchueler,
 
-            List<AbwesenheitEintrag> vormittag,
+            List<AbwesenheitEintrag> abwesenheiten
 
-            List<AbwesenheitEintrag> abwesendAb
-
-    ) {
-    }
+    ) {}
 
 
     /* =====================================================
@@ -348,7 +316,9 @@ public class AbwesenheitPdfExportService {
                ========================================= */
 
             Paragraph title = new Paragraph(
+
                     "Abwesenheitsliste",
+
                     TITLE_FONT
             );
 
@@ -382,70 +352,29 @@ public class AbwesenheitPdfExportService {
 
 
             /* =========================================
-               GANZTÄGIG / ABWESEND BIS
+               GEMEINSAME ABWESENHEITSLISTE
                ========================================= */
 
-            addSectionTitle(
-
-                    document,
-
-                    "Fehlt / Abwesend bis"
-            );
-
-            PdfPTable vormittagTabelle =
-                    createKlassenTabelle(
-                            klassenBloecke,
-                            false
-                    );
-
-            document.add(vormittagTabelle);
-
-
-            /* =========================================
-               ABWESEND AB
-               ========================================= */
-
-            addSectionTitle(
-
-                    document,
-
-                    "Abwesend ab"
-            );
-
-            List<KlassenBlock> nachmittagBloecke =
-                    klassenBloecke.stream()
-
-                            .filter(block ->
-                                    !block.abwesendAb().isEmpty()
-                            )
-
-                            .toList();
-
-            if (nachmittagBloecke.isEmpty()) {
+            if (klassenBloecke.isEmpty()) {
 
                 Paragraph paragraph =
                         new Paragraph(
 
-                                "Keine Einträge vorhanden.",
+                                "Keine Klassen vorhanden.",
 
                                 MUTED_FONT
                         );
-
-                paragraph.setSpacingAfter(8);
 
                 document.add(paragraph);
 
             } else {
 
-                PdfPTable nachmittagTabelle =
+                PdfPTable klassenTabelle =
                         createKlassenTabelle(
-
-                                nachmittagBloecke,
-
-                                true
+                                klassenBloecke
                         );
 
-                document.add(nachmittagTabelle);
+                document.add(klassenTabelle);
             }
 
 
@@ -508,17 +437,18 @@ public class AbwesenheitPdfExportService {
                 String name =
                         klasse.getName().trim();
 
-                klassenMap.put(
+                String key =
+                        normalizeKlassenName(name);
 
-                        name,
+                klassenMap.putIfAbsent(
+
+                        key,
 
                         new KlassenBlock(
 
                                 name,
 
                                 0,
-
-                                new ArrayList<>(),
 
                                 new ArrayList<>()
                         )
@@ -537,16 +467,20 @@ public class AbwesenheitPdfExportService {
         Map<Long, Student> studentMap =
                 new HashMap<>();
 
+
         for (Student student : students) {
 
             String klassenName =
                     getKlassenName(student);
 
+            String klassenKey =
+                    normalizeKlassenName(klassenName);
+
             studentKlassen.put(
 
                     student.getId(),
 
-                    klassenName
+                    klassenKey
             );
 
             studentMap.put(
@@ -557,7 +491,7 @@ public class AbwesenheitPdfExportService {
             );
 
             KlassenBlock block =
-                    klassenMap.get(klassenName);
+                    klassenMap.get(klassenKey);
 
             if (block == null) {
 
@@ -567,25 +501,21 @@ public class AbwesenheitPdfExportService {
 
                         0,
 
-                        new ArrayList<>(),
-
                         new ArrayList<>()
                 );
             }
 
             klassenMap.put(
 
-                    klassenName,
+                    klassenKey,
 
                     new KlassenBlock(
 
-                            klassenName,
+                            block.klassenName(),
 
                             block.anzahlSchueler() + 1,
 
-                            block.vormittag(),
-
-                            block.abwesendAb()
+                            block.abwesenheiten()
                     )
             );
         }
@@ -616,117 +546,80 @@ public class AbwesenheitPdfExportService {
                 continue;
             }
 
-            String klassenName =
+            String klassenKey =
                     studentKlassen.get(studentId);
 
             KlassenBlock block =
-                    klassenMap.get(klassenName);
+                    klassenMap.get(klassenKey);
 
             if (block == null) {
 
                 continue;
             }
 
+
+            /* =========================================
+               ABWESENHEIT PRÜFEN
+               ========================================= */
+
+            boolean ganztagFehlend =
+                    "FEHLT".equalsIgnoreCase(
+                            anwesenheit.getStatus()
+                    );
+
+            boolean teilweiseAbwesend =
+
+                    anwesenheit.getAbwesendAb() != null
+
+                            ||
+
+                            anwesenheit.getAbwesendBis() != null
+
+                            ||
+
+                            anwesenheit.getAbwesendAb2() != null
+
+                            ||
+
+                            anwesenheit.getAbwesendBis2() != null;
+
+
+            /*
+             * Nur tatsächlich abwesende Schüler
+             * werden in die Liste aufgenommen.
+             */
+
+            if (
+                    !ganztagFehlend
+                            &&
+                            !teilweiseAbwesend
+            ) {
+
+                continue;
+            }
+
+
+            /* =========================================
+               SCHÜLERNAME UND INFORMATION
+               ========================================= */
+
             String studentName =
                     getStudentName(student);
 
-            LocalTime abwesendAb =
-                    anwesenheit.getAbwesendAb();
+            String information =
+                    createAbwesenheitsInformation(
+                            anwesenheit
+                    );
 
-            LocalTime abwesendBis =
-                    anwesenheit.getAbwesendBis();
+            block.abwesenheiten().add(
 
+                    new AbwesenheitEintrag(
 
-            /* =========================================
-               GANZTÄGIG FEHLEND
-               ========================================= */
+                            studentName,
 
-            if (
-                    "FEHLT".equalsIgnoreCase(
-                            anwesenheit.getStatus()
+                            information
                     )
-            ) {
-
-                block.vormittag().add(
-
-                        new AbwesenheitEintrag(
-
-                                studentName,
-
-                                "fehlt"
-                        )
-                );
-
-                continue;
-            }
-
-
-            /* =========================================
-               ZEITRAUM: AB UND BIS
-               ========================================= */
-
-            if (
-                    abwesendAb != null
-                            &&
-                            abwesendBis != null
-            ) {
-
-                block.abwesendAb().add(
-
-                        new AbwesenheitEintrag(
-
-                                studentName,
-
-                                formatTime(abwesendAb)
-
-                                        + " – "
-
-                                        + formatTime(abwesendBis)
-                        )
-                );
-
-                continue;
-            }
-
-
-            /* =========================================
-               ABWESEND BIS
-               ========================================= */
-
-            if (abwesendBis != null) {
-
-                block.vormittag().add(
-
-                        new AbwesenheitEintrag(
-
-                                studentName,
-
-                                "bis "
-                                        + formatTime(abwesendBis)
-                        )
-                );
-
-                continue;
-            }
-
-
-            /* =========================================
-               ABWESEND AB
-               ========================================= */
-
-            if (abwesendAb != null) {
-
-                block.abwesendAb().add(
-
-                        new AbwesenheitEintrag(
-
-                                studentName,
-
-                                "ab "
-                                        + formatTime(abwesendAb)
-                        )
-                );
-            }
+            );
         }
 
 
@@ -747,9 +640,8 @@ public class AbwesenheitPdfExportService {
 
         for (KlassenBlock block : klassenMap.values()) {
 
-            block.vormittag().sort(studentComparator);
-
-            block.abwesendAb().sort(studentComparator);
+            block.abwesenheiten()
+                    .sort(studentComparator);
         }
 
 
@@ -783,16 +675,147 @@ public class AbwesenheitPdfExportService {
 
 
     /* =====================================================
+       ABWESENHEITSINFORMATION ERSTELLEN
+
+       Klammern werden nur angezeigt, wenn mindestens
+       eine Uhrzeit oder ein Abwesenheitsgrund vorhanden ist.
+       ===================================================== */
+
+    private String createAbwesenheitsInformation(
+            TagesAnwesenheit anwesenheit
+    ) {
+
+        List<String> informationen =
+                new ArrayList<>();
+
+
+        /* Erster Abwesenheitszeitraum */
+
+        String ersterZeitraum =
+                formatAbwesenheitsZeitraum(
+
+                        anwesenheit.getAbwesendAb(),
+
+                        anwesenheit.getAbwesendBis(),
+
+                        anwesenheit.getGrundAbwesenheit()
+                );
+
+        if (!ersterZeitraum.isBlank()) {
+
+            informationen.add(ersterZeitraum);
+        }
+
+
+        /* Zweiter Abwesenheitszeitraum */
+
+        String zweiterZeitraum =
+                formatAbwesenheitsZeitraum(
+
+                        anwesenheit.getAbwesendAb2(),
+
+                        anwesenheit.getAbwesendBis2(),
+
+                        anwesenheit.getGrundAbwesenheit2()
+                );
+
+        if (!zweiterZeitraum.isBlank()) {
+
+            informationen.add(zweiterZeitraum);
+        }
+
+
+        return String.join(
+                "; ",
+                informationen
+        );
+    }
+
+
+    /* =====================================================
+       EINZELNEN ABWESENHEITSZEITRAUM FORMATIEREN
+       ===================================================== */
+
+    private String formatAbwesenheitsZeitraum(
+
+            LocalTime abwesendAb,
+
+            LocalTime abwesendBis,
+
+            String grund
+
+    ) {
+
+        List<String> informationen =
+                new ArrayList<>();
+
+
+        /* Ab und bis */
+
+        if (
+                abwesendAb != null
+                        &&
+                        abwesendBis != null
+        ) {
+
+            informationen.add(
+
+                    formatTime(abwesendAb)
+
+                            + " – "
+
+                            + formatTime(abwesendBis)
+            );
+
+        } else if (abwesendAb != null) {
+
+            informationen.add(
+
+                    "ab " + formatTime(abwesendAb)
+            );
+
+        } else if (abwesendBis != null) {
+
+            informationen.add(
+
+                    "bis " + formatTime(abwesendBis)
+            );
+        }
+
+
+        /* Abwesenheitsgrund */
+
+        if (
+                grund != null
+                        &&
+                        !grund.isBlank()
+        ) {
+
+            informationen.add(
+                    grund.trim()
+            );
+        }
+
+
+        return String.join(
+
+                ", ",
+
+                informationen
+        );
+    }
+
+
+    /* =====================================================
        KLASSENTABELLE
 
+       Jede Klasse wird nur einmal angezeigt.
        Drei Klassen pro Tabellenzeile.
        ===================================================== */
 
     private PdfPTable createKlassenTabelle(
 
-            List<KlassenBlock> klassenBloecke,
-
-            boolean abwesendAb
+            List<KlassenBlock> klassenBloecke
 
     ) {
 
@@ -811,12 +834,7 @@ public class AbwesenheitPdfExportService {
         for (KlassenBlock block : klassenBloecke) {
 
             PdfPTable klassenTabelle =
-                    createKlassenBlock(
-
-                            block,
-
-                            abwesendAb
-                    );
+                    createKlassenBlock(block);
 
             PdfPCell wrapper =
                     new PdfPCell(klassenTabelle);
@@ -873,9 +891,7 @@ public class AbwesenheitPdfExportService {
 
     private PdfPTable createKlassenBlock(
 
-            KlassenBlock block,
-
-            boolean abwesendAb
+            KlassenBlock block
 
     ) {
 
@@ -934,12 +950,7 @@ public class AbwesenheitPdfExportService {
            ============================================= */
 
         List<AbwesenheitEintrag> eintraege =
-
-                abwesendAb
-
-                        ? block.abwesendAb()
-
-                        : block.vormittag();
+                block.abwesenheiten();
 
 
         if (eintraege.isEmpty()) {
@@ -976,14 +987,28 @@ public class AbwesenheitPdfExportService {
                     eintraege
             ) {
 
+                /* =====================================
+                   KLAMMERN NUR BEI INFORMATIONEN
+                   ===================================== */
+
                 String text =
-                        eintrag.name()
+                        eintrag.name();
 
-                                + " ("
+                if (
+                        eintrag.information() != null
+                                &&
+                                !eintrag.information().isBlank()
+                ) {
 
-                                + eintrag.zeitraum()
+                    text +=
 
-                                + ")";
+                            " ("
+
+                                    + eintrag.information()
+
+                                    + ")";
+                }
+
 
                 PdfPCell studentCell =
                         new PdfPCell(
@@ -1011,34 +1036,6 @@ public class AbwesenheitPdfExportService {
         }
 
         return table;
-    }
-
-
-    /* =====================================================
-       ABSCHNITTSÜBERSCHRIFT
-       ===================================================== */
-
-    private void addSectionTitle(
-
-            Document document,
-
-            String text
-
-    ) throws DocumentException {
-
-        Paragraph paragraph =
-                new Paragraph(
-
-                        text,
-
-                        SECTION_FONT
-                );
-
-        paragraph.setSpacingBefore(8);
-
-        paragraph.setSpacingAfter(6);
-
-        document.add(paragraph);
     }
 
 
@@ -1074,6 +1071,20 @@ public class AbwesenheitPdfExportService {
         }
 
         return "Ohne Klasse";
+    }
+
+
+    /* =====================================================
+       KLASSENNAME NORMALISIEREN
+       ===================================================== */
+
+    private String normalizeKlassenName(
+            String klassenName
+    ) {
+
+        return klassenName
+                .trim()
+                .toLowerCase(Locale.GERMAN);
     }
 
 
@@ -1129,7 +1140,9 @@ public class AbwesenheitPdfExportService {
        KLASSENPOSITION
        ===================================================== */
 
-    private int getKlassenPosition(String klassenName) {
+    private int getKlassenPosition(
+            String klassenName
+    ) {
 
         for (
                 int i = 0;
@@ -1155,13 +1168,13 @@ public class AbwesenheitPdfExportService {
        KLASSENFARBE
        ===================================================== */
 
-    private Color getKlassenFarbe(String klassenName) {
+    private Color getKlassenFarbe(
+            String klassenName
+    ) {
 
         return KLASSEN_FARBEN.getOrDefault(
 
-                klassenName
-                        .trim()
-                        .toLowerCase(Locale.GERMAN),
+                normalizeKlassenName(klassenName),
 
                 new Color(220, 220, 220)
         );

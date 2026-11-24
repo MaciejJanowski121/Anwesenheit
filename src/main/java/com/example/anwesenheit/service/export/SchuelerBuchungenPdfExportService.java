@@ -539,6 +539,9 @@ public class SchuelerBuchungenPdfExportService {
 
             /* =========================================
                SCHÜLER UND BUCHUNGEN
+
+               Jede neue Klasse beginnt auf einer
+               neuen Seite.
                ========================================= */
 
             String letzteKlasse = null;
@@ -550,6 +553,28 @@ public class SchuelerBuchungenPdfExportService {
 
                 boolean neueKlasse =
                         !klassenName.equals(letzteKlasse);
+
+
+                /* =====================================
+                   SEITENUMBRUCH BEI KLASSENWECHSEL
+
+                   Die erste Klasse bleibt unterhalb
+                   des Titels und der Gesamtstatistik.
+                   ===================================== */
+
+                if (
+                        neueKlasse
+                                &&
+                                letzteKlasse != null
+                ) {
+
+                    document.newPage();
+                }
+
+
+                /* =====================================
+                   BUCHUNGEN DES SCHÜLERS
+                   ===================================== */
 
                 List<BuchungsEintrag>
                         studentBuchungen =
@@ -571,6 +596,11 @@ public class SchuelerBuchungenPdfExportService {
 
                         collator
                 );
+
+
+                /* =====================================
+                   SCHÜLERTABELLE ERSTELLEN
+                   ===================================== */
 
                 PdfPTable studentTabelle =
                         createStudentTabelle(
@@ -744,9 +774,22 @@ public class SchuelerBuchungenPdfExportService {
 
         table.setSpacingAfter(8);
 
+
+        /* =============================================
+           SCHÜLERTABELLE ZUSAMMENHALTEN
+
+           Alle Buchungen eines Schülers sollen
+           möglichst auf derselben Seite erscheinen.
+
+           Falls die Tabelle größer als eine ganze
+           Seite ist, bleibt ein Umbruch möglich.
+           ============================================= */
+
+        table.setKeepTogether(true);
+
         table.setSplitRows(true);
 
-        table.setSplitLate(false);
+        table.setSplitLate(true);
 
 
         /* =============================================
@@ -908,8 +951,10 @@ public class SchuelerBuchungenPdfExportService {
 
 
         /*
-         * Kopfzeilen bei Seitenumbrüchen wiederholen.
+         * Kopfzeilen bei unvermeidbaren
+         * Seitenumbrüchen wiederholen.
          */
+
         table.setHeaderRows(
                 neueKlasse ? 4 : 3
         );

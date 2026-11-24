@@ -432,7 +432,12 @@ public class AngebotBuchungenPdfExportService {
 
             /* =========================================
                WOCHENTAGE UND ANGEBOTE
+
+               Jedes neue Angebot beginnt auf
+               einer neuen Seite.
                ========================================= */
+
+            boolean erstesAngebot = true;
 
             for (
                     Map.Entry<String, List<Angebot>> entry :
@@ -450,9 +455,25 @@ public class AngebotBuchungenPdfExportService {
                     continue;
                 }
 
-                boolean firstAngebot = true;
 
                 for (Angebot angebot : tagesAngebote) {
+
+                    /* =================================
+                       SEITENUMBRUCH VOR JEDEM ANGEBOT
+
+                       Das erste Angebot bleibt unterhalb
+                       der Gesamtstatistik.
+                       ================================= */
+
+                    if (!erstesAngebot) {
+
+                        document.newPage();
+                    }
+
+
+                    /* =================================
+                       TEILNAHMEN LADEN
+                       ================================= */
 
                     List<AngebotTeilnahme>
                             angebotTeilnahmen =
@@ -475,6 +496,14 @@ public class AngebotBuchungenPdfExportService {
                             collator
                     );
 
+
+                    /* =================================
+                       ANGEBOTSTABELLE ERSTELLEN
+
+                       Der Wochentag wird bei jedem
+                       Angebot angezeigt.
+                       ================================= */
+
                     PdfPTable angebotTabelle =
                             createAngebotTabelle(
 
@@ -482,9 +511,7 @@ public class AngebotBuchungenPdfExportService {
 
                                     angebotTeilnahmen,
 
-                                    firstAngebot
-                                            ? wochentag
-                                            : null,
+                                    wochentag,
 
                                     tagesAngebote.size()
                             );
@@ -493,7 +520,7 @@ public class AngebotBuchungenPdfExportService {
                             angebotTabelle
                     );
 
-                    firstAngebot = false;
+                    erstesAngebot = false;
                 }
             }
 
@@ -632,47 +659,54 @@ public class AngebotBuchungenPdfExportService {
 
         table.setSpacingAfter(8);
 
+
+        /* =============================================
+           SEITENUMBRÜCHE INNERHALB EINES ANGEBOTS
+
+           Große Angebote dürfen mehrere Seiten belegen.
+           Tabellenzeilen werden möglichst nicht geteilt.
+           ============================================= */
+
         table.setSplitRows(true);
 
-        table.setSplitLate(false);
+        table.setSplitLate(true);
 
 
         /* =============================================
            WOCHENTAG
+
+           Wird bei jedem Angebot angezeigt.
            ============================================= */
 
-        if (wochentag != null) {
+        PdfPCell dayCell = new PdfPCell(
 
-            PdfPCell dayCell = new PdfPCell(
+                new Phrase(
 
-                    new Phrase(
+                        wochentag
 
-                            wochentag
+                                + " – "
 
-                                    + " – "
+                                + anzahlTagesAngebote
 
-                                    + anzahlTagesAngebote
+                                + " Angebote",
 
-                                    + " Angebote",
+                        DAY_FONT
+                )
+        );
 
-                            DAY_FONT
-                    )
-            );
+        dayCell.setColspan(5);
 
-            dayCell.setColspan(5);
+        dayCell.setBackgroundColor(
+                PRIMARY_COLOR
+        );
 
-            dayCell.setBackgroundColor(
-                    PRIMARY_COLOR
-            );
+        dayCell.setPadding(9);
 
-            dayCell.setPadding(9);
+        dayCell.setBorder(
+                PdfPCell.NO_BORDER
+        );
 
-            dayCell.setBorder(
-                    PdfPCell.NO_BORDER
-            );
-
-            table.addCell(dayCell);
-        }
+        table.addCell(dayCell);
 
 
         /* =============================================
@@ -797,13 +831,16 @@ public class AngebotBuchungenPdfExportService {
         addHeaderCell(table, "Besonderheiten");
 
 
-        /*
-         * Kopfzeilen werden bei einem Seitenumbruch
-         * automatisch wiederholt.
-         */
-        table.setHeaderRows(
-                wochentag != null ? 4 : 3
-        );
+        /* =============================================
+           KOPFZEILEN WIEDERHOLEN
+
+           1. Wochentag
+           2. Angebotsname
+           3. Angebotsinformationen
+           4. Tabellenüberschriften
+           ============================================= */
+
+        table.setHeaderRows(4);
 
 
         /* =============================================
